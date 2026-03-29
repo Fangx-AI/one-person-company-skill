@@ -1006,7 +1006,7 @@ button {
 }
 
 @media (max-width: 780px) {
-  .detail-shell {
+  .detail-shell:not(.hidden) {
     display: flex;
     align-items: stretch;
     justify-content: center;
