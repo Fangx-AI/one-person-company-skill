@@ -55,6 +55,7 @@ npm run dev
 - `npm run smoke:chat`：对 `/api/chat` 做一次冒烟请求
 - `npm run test:reply`：运行本地回复校准脚本
 - `npm run test:deepseek`：运行 DeepSeek 评测脚本
+- `npm run start:monitor`：启动独立监控后台
 
 ## Docker 启动
 
@@ -92,12 +93,54 @@ pm2 status
 pm2 logs book-of-elon
 ```
 
+如果你要启动独立监控后台：
+
+```bash
+pm2 start ecosystem.config.js --only book-of-elon-monitor
+```
+
+默认监听 `127.0.0.1:3201`，不影响主站 `3000` 端口。建议通过 SSH 隧道或单独加一层 Nginx Basic Auth 后再暴露给浏览器访问。
+
 如果你已经执行过 `pm2 startup`，可以再运行启动命令中提示的那条 `sudo` 命令完成开机自启绑定。
 
 ## 健康检查
 
 - `GET /health`
 - `GET /ready`
+
+## 独立监控后台
+
+监控后台是单独的 Node 进程，不会改动主站聊天逻辑。它会读取：
+
+- 主站 `/health`
+- 主站 `/ready`
+- `pm2 jlist`
+- PM2 日志文件中的最近事件
+
+默认地址：
+
+```bash
+http://127.0.0.1:3201
+```
+
+建议至少配置：
+
+```env
+MONITOR_USERNAME=your_monitor_user
+MONITOR_PASSWORD=your_monitor_password
+```
+
+如果你要从本地电脑访问服务器上的监控页，可以先做 SSH 端口转发：
+
+```bash
+ssh -L 3201:127.0.0.1:3201 root@your-server-ip
+```
+
+然后在本地浏览器打开：
+
+```bash
+http://127.0.0.1:3201
+```
 
 ## 生产部署注意
 

@@ -7,6 +7,7 @@
   },
   "scripts": {
     "start": "node server.js",
+    "start:monitor": "node monitor-server.js",
     "dev": "node server.js",
     "preflight": "node preflight-check.js",
     "preflight:degraded": "node preflight-check.js --allow-degraded",

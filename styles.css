@@ -42,6 +42,13 @@ body {
   overflow-x: hidden;
 }
 
+body.modal-open {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
 button,
 input {
   font: inherit;
@@ -1145,6 +1152,7 @@ button {
     max-height: calc(100vh - 16px);
     max-height: calc(100dvh - 16px);
     padding: 0.85rem;
+    padding-bottom: calc(0.85rem + env(safe-area-inset-bottom, 0px));
     display: flex;
     flex-direction: column;
     overflow: hidden;

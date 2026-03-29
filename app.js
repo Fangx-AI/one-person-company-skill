@@ -42,6 +42,7 @@ let isReplyPending = false;
 let resumeSession = loadSavedSession();
 let expandedTopicGroupIds = new Set();
 let currentChatSystemNotice = "";
+let lockedBodyScrollY = 0;
 
 render();
 
@@ -342,7 +343,7 @@ function updateConversationDensity() {
 function showDetail() {
   detailShell.classList.remove("hidden");
   detailShell.setAttribute("aria-hidden", "false");
-  document.body.style.overflow = "hidden";
+  lockBodyScroll();
   if (shouldAutoFocusChatInput()) {
     setTimeout(() => chatInput.focus(), 40);
   }
@@ -352,7 +353,7 @@ function closeDetail() {
   persistChatSession();
   detailShell.classList.add("hidden");
   detailShell.setAttribute("aria-hidden", "true");
-  document.body.style.overflow = "";
+  unlockBodyScroll();
 }
 
 function shouldAutoFocusChatInput() {
@@ -361,6 +362,22 @@ function shouldAutoFocusChatInput() {
   }
 
   return !window.matchMedia("(max-width: 780px)").matches;
+}
+
+function lockBodyScroll() {
+  if (typeof window === "undefined") return;
+
+  lockedBodyScrollY = window.scrollY || window.pageYOffset || 0;
+  document.body.classList.add("modal-open");
+  document.body.style.top = `-${lockedBodyScrollY}px`;
+}
+
+function unlockBodyScroll() {
+  if (typeof window === "undefined") return;
+
+  document.body.classList.remove("modal-open");
+  document.body.style.top = "";
+  window.scrollTo(0, lockedBodyScrollY);
 }
 
 function renderChatSystemNote() {
@@ -389,10 +406,10 @@ function toggleTopicGroup(groupId) {
 }
 
 function applyCardDetail(card) {
-  detailEyebrow.textContent = `${card.backend.part_en} / ${card.backend.theme_en}`;
+  detailEyebrow.textContent = "";
   detailTitle.textContent = card.frontend.title_zh;
   detailHook.textContent = card.frontend.hook_zh;
-  detailSummary.textContent = card.frontend.summary_zh;
+  detailSummary.textContent = "";
   syncDetailDescriptions();
 }
 
@@ -614,6 +631,7 @@ function truncateText(text, maxLength) {
 }
 
 function syncDetailDescriptions() {
+  detailEyebrow.hidden = !detailEyebrow.textContent.trim();
   detailHook.hidden = !detailHook.textContent.trim();
   detailSummary.hidden = !detailSummary.textContent.trim();
 }
