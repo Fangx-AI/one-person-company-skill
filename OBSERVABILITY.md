@@ -38,15 +38,19 @@
 
 - `upstream_request_failed`
 
+### 兜底异常
+
+- `server_request_unhandled_error`
+
 ### 安全拒绝
 
 - `chat_request_rejected`
 
 重点字段：
 
-- `code`
+- `reason`
 - `requestId`
-- `details`
+- `clientIp`
 
 ## 建议告警规则
 

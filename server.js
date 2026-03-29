@@ -17,6 +17,7 @@ const CHAT_RATE_LIMIT_MAX_REQUESTS = readNumberEnv("CHAT_RATE_LIMIT_MAX_REQUESTS
 const CHAT_BURST_WINDOW_MS = readNumberEnv("CHAT_BURST_WINDOW_MS", 10000, 1000, 600000);
 const CHAT_BURST_MAX_REQUESTS = readNumberEnv("CHAT_BURST_MAX_REQUESTS", 3, 1, 1000);
 const CHAT_CACHE_TTL_MS = readNumberEnv("CHAT_CACHE_TTL_MS", 120000, 0, 3600000);
+const CHAT_CACHE_MAX_ENTRIES = readNumberEnv("CHAT_CACHE_MAX_ENTRIES", 300, 1, 5000);
 const CIRCUIT_BREAKER_FAIL_THRESHOLD = readNumberEnv("CIRCUIT_BREAKER_FAIL_THRESHOLD", 5, 1, 100);
 const CIRCUIT_BREAKER_COOLDOWN_MS = readNumberEnv("CIRCUIT_BREAKER_COOLDOWN_MS", 30000, 1000, 600000);
 const SLOW_REQUEST_THRESHOLD_MS = readNumberEnv("SLOW_REQUEST_THRESHOLD_MS", 4000, 100, 120000);
@@ -77,6 +78,7 @@ const server = http.createServer(async (request, response) => {
     cacheReason: "",
     degraded: false,
   };
+  response.__request = request;
 
   response.on("finish", () => {
     logRequest({
@@ -151,6 +153,7 @@ server.listen(PORT, () => {
     burstLimit: CHAT_BURST_MAX_REQUESTS,
     burstWindowSeconds: Math.round(CHAT_BURST_WINDOW_MS / 1000),
     cacheTtlMs: CHAT_CACHE_TTL_MS,
+    cacheMaxEntries: CHAT_CACHE_MAX_ENTRIES,
     slowRequestThresholdMs: SLOW_REQUEST_THRESHOLD_MS,
   });
 });
@@ -173,9 +176,6 @@ async function handleChatRequest(request, response) {
     });
   }
 
-  const rateLimit = consumeRateLimit(response.__meta.clientIp);
-  const rateLimitHeaders = buildRateLimitHeaders(rateLimit);
-
   const securityCheck = validateChatRequestSecurity(request);
   if (!securityCheck.ok) {
     response.__meta.error = securityCheck.reason;
@@ -191,10 +191,12 @@ async function handleChatRequest(request, response) {
         error: securityCheck.reason,
         message: "当前请求未通过站内安全校验。",
         requestId: response.__meta.requestId,
-      },
-      rateLimitHeaders
+      }
     );
   }
+
+  const rateLimit = consumeRateLimit(response.__meta.clientIp);
+  const rateLimitHeaders = buildRateLimitHeaders(rateLimit);
 
   if (!rateLimit.allowed) {
     response.__meta.error = "rate_limited";
@@ -448,6 +450,7 @@ function serveStaticFile(requestPath, response) {
 
   const ext = path.extname(filePath).toLowerCase();
   response.writeHead(200, {
+    ...buildSecurityHeaders(response.__request),
     "Content-Type": MIME_TYPES[ext] || "application/octet-stream",
     "Cache-Control": ext === ".html" ? "no-store" : "public, max-age=3600",
   });
@@ -468,6 +471,7 @@ function buildRuntimeConfigScript(sessionId) {
 
 function sendJavaScript(response, source, extraHeaders = {}) {
   response.writeHead(200, {
+    ...buildSecurityHeaders(response.__request),
     "Content-Type": "application/javascript; charset=utf-8",
     "Cache-Control": "no-store",
     ...extraHeaders,
@@ -837,10 +841,15 @@ function getCachedReply(cacheKey) {
 function setCachedReply(cacheKey, payload) {
   if (!CHAT_CACHE_TTL_MS) return;
 
+  cleanupExpiredCacheEntries();
+  if (responseCache.has(cacheKey)) {
+    responseCache.delete(cacheKey);
+  }
   responseCache.set(cacheKey, {
     expiresAt: Date.now() + CHAT_CACHE_TTL_MS,
     payload,
   });
+  trimCacheEntries();
 }
 
 function isCircuitOpen() {
@@ -876,11 +885,7 @@ function cleanupExpiredEntries() {
   }
   lastCleanupAt = now;
 
-  for (const [key, value] of responseCache.entries()) {
-    if (value.expiresAt <= now) {
-      responseCache.delete(key);
-    }
-  }
+  cleanupExpiredCacheEntries(now);
 
   for (const [key, value] of rateLimitStore.entries()) {
     if (
@@ -889,6 +894,26 @@ function cleanupExpiredEntries() {
     ) {
       rateLimitStore.delete(key);
     }
+  }
+}
+
+function cleanupExpiredCacheEntries(now = Date.now()) {
+  for (const [key, value] of responseCache.entries()) {
+    if (value.expiresAt <= now) {
+      responseCache.delete(key);
+    }
+  }
+}
+
+function trimCacheEntries() {
+  if (!CHAT_CACHE_TTL_MS || responseCache.size <= CHAT_CACHE_MAX_ENTRIES) {
+    return;
+  }
+
+  while (responseCache.size > CHAT_CACHE_MAX_ENTRIES) {
+    const oldestKey = responseCache.keys().next().value;
+    if (!oldestKey) break;
+    responseCache.delete(oldestKey);
   }
 }
 
@@ -1214,6 +1239,7 @@ function validateStartupConfig() {
   validateNumberSetting(errors, "CHAT_BURST_WINDOW_MS", 1000, 600000);
   validateNumberSetting(errors, "CHAT_BURST_MAX_REQUESTS", 1, 1000);
   validateNumberSetting(errors, "CHAT_CACHE_TTL_MS", 0, 3600000);
+  validateNumberSetting(errors, "CHAT_CACHE_MAX_ENTRIES", 1, 5000);
   validateNumberSetting(errors, "CIRCUIT_BREAKER_FAIL_THRESHOLD", 1, 100);
   validateNumberSetting(errors, "CIRCUIT_BREAKER_COOLDOWN_MS", 1000, 600000);
   validateNumberSetting(errors, "SLOW_REQUEST_THRESHOLD_MS", 100, 120000);
@@ -1265,8 +1291,36 @@ function safeSlice(text, maxLength) {
   return String(text || "").slice(0, maxLength);
 }
 
+function buildSecurityHeaders(request) {
+  const headers = {
+    "Content-Security-Policy": [
+      "default-src 'self'",
+      "base-uri 'self'",
+      "object-src 'none'",
+      "frame-ancestors 'none'",
+      "form-action 'self'",
+      "script-src 'self'",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "font-src 'self' https://fonts.gstatic.com data:",
+      "img-src 'self' data: https:",
+      "connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com",
+    ].join("; "),
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
+  };
+
+  if (isSecureRequest(request)) {
+    headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains";
+  }
+
+  return headers;
+}
+
 function sendJson(response, statusCode, payload, extraHeaders = {}) {
   response.writeHead(statusCode, {
+    ...buildSecurityHeaders(response.__request),
     "Content-Type": "application/json; charset=utf-8",
     "Cache-Control": "no-store",
     ...extraHeaders,

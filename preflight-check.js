@@ -19,10 +19,12 @@ checks.push(checkRuntimeNumber("CHAT_RATE_LIMIT_MAX_REQUESTS", 1, 1000));
 checks.push(checkRuntimeNumber("CHAT_BURST_WINDOW_MS", 1000, 600000));
 checks.push(checkRuntimeNumber("CHAT_BURST_MAX_REQUESTS", 1, 1000));
 checks.push(checkRuntimeNumber("CHAT_CACHE_TTL_MS", 0, 3600000));
+checks.push(checkRuntimeNumber("CHAT_CACHE_MAX_ENTRIES", 1, 5000));
 checks.push(checkRuntimeNumber("CIRCUIT_BREAKER_FAIL_THRESHOLD", 1, 100));
 checks.push(checkRuntimeNumber("CIRCUIT_BREAKER_COOLDOWN_MS", 1000, 600000));
 checks.push(checkRuntimeNumber("SLOW_REQUEST_THRESHOLD_MS", 100, 120000));
 checks.push(checkRuntimeNumber("CHAT_TOKEN_TTL_MS", 60000, 604800000));
+checks.push(checkRateLimitConsistency());
 checks.push(checkSessionTokenSecret());
 checks.push(checkDeepSeekConfig());
 
@@ -113,7 +115,7 @@ function checkDeepSeekConfig() {
     };
   }
 
-  if (apiKey === "your_deepseek_api_key_here") {
+  if (looksLikePlaceholderValue(apiKey)) {
     return {
       level: "error",
       message: "DEEPSEEK_API_KEY is still using the placeholder value.",
@@ -146,6 +148,13 @@ function checkSessionTokenSecret() {
     };
   }
 
+  if (looksLikePlaceholderValue(secret)) {
+    return {
+      level: strictProduction ? "error" : "warning",
+      message: "SESSION_TOKEN_SECRET is still using a placeholder value. Replace it with a long random secret.",
+    };
+  }
+
   if (secret.length < 24) {
     return {
       level: strictProduction ? "warning" : "info",
@@ -157,6 +166,46 @@ function checkSessionTokenSecret() {
     level: "info",
     message: "SESSION_TOKEN_SECRET is configured.",
   };
+}
+
+function checkRateLimitConsistency() {
+  const minuteWindow = Number(getConfigValue("CHAT_RATE_LIMIT_WINDOW_MS", ""));
+  const burstWindow = Number(getConfigValue("CHAT_BURST_WINDOW_MS", ""));
+  const minuteLimit = Number(getConfigValue("CHAT_RATE_LIMIT_MAX_REQUESTS", ""));
+  const burstLimit = Number(getConfigValue("CHAT_BURST_MAX_REQUESTS", ""));
+
+  if (Number.isFinite(minuteWindow) && Number.isFinite(burstWindow) && burstWindow > minuteWindow) {
+    return {
+      level: "error",
+      message: "CHAT_BURST_WINDOW_MS cannot be greater than CHAT_RATE_LIMIT_WINDOW_MS.",
+    };
+  }
+
+  if (Number.isFinite(minuteLimit) && Number.isFinite(burstLimit) && burstLimit > minuteLimit) {
+    return {
+      level: "warning",
+      message: "CHAT_BURST_MAX_REQUESTS is greater than CHAT_RATE_LIMIT_MAX_REQUESTS. Burst protection may be ineffective.",
+    };
+  }
+
+  return {
+    level: "info",
+    message: "Rate limit window and burst settings look consistent.",
+  };
+}
+
+function looksLikePlaceholderValue(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (!normalized) return false;
+
+  return (
+    normalized === "your_deepseek_api_key_here" ||
+    normalized === "sk-your-real-production-key" ||
+    normalized === "replace_with_a_long_random_secret" ||
+    normalized.includes("replace_with") ||
+    normalized.includes("your_real") ||
+    normalized.includes("changeme")
+  );
 }
 
 function getConfigValue(key, fallback) {
