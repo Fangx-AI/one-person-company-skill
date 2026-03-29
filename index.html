@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Book of Elon | 互动思想卡片</title>
+  <meta
+    name="description"
+    content="把 The Book of Elon 拆成可点击的思想卡片，用中文快速理解，再把它带回你的现实问题。"
+  >
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;800&display=swap"
+    rel="stylesheet"
+  >
+  <link rel="stylesheet" href="./styles.css?v=20260329-security1">
+</head>
+<body>
+  <div class="page-shell">
+    <div class="ambient ambient-a"></div>
+    <div class="ambient ambient-b"></div>
+    <div class="noise"></div>
+
+    <main class="home-page">
+      <section class="hero" id="top">
+        <div class="hero-copy">
+          <p class="eyebrow">THE BOOK OF ELON / INTERACTIVE COACH</p>
+          <h1>和 The Book of Elon 对话</h1>
+          <p class="hero-subtitle">
+            把整本书拆成可点击的思想卡片。
+          </p>
+          <div class="hero-actions">
+            <button class="primary-button" id="random-card-btn">随机进入一张卡片</button>
+            <button class="secondary-button" id="ask-direct-btn">直接开始提问</button>
+          </div>
+
+          <section class="resume-conversation hidden" id="resume-conversation-block" aria-live="polite">
+            <div class="resume-conversation__copy">
+          <p class="resume-conversation__eyebrow">上次对话</p>
+              <div class="resume-conversation__heading">
+                <span class="resume-conversation__badge" id="resume-conversation-badge">继续对话</span>
+                <h2 class="resume-conversation__title" id="resume-conversation-title">继续上次对话</h2>
+              </div>
+              <p class="resume-conversation__meta" id="resume-conversation-meta"></p>
+              <p class="resume-conversation__hint" id="resume-conversation-hint"></p>
+            </div>
+            <div class="resume-conversation__actions">
+              <button class="primary-button" id="resume-conversation-btn" type="button">继续聊下去</button>
+              <button class="resume-conversation__dismiss" id="resume-conversation-dismiss-btn" type="button">清除记录</button>
+            </div>
+          </section>
+        </div>
+
+        <div class="hero-floating-cards" id="hero-floating-cards"></div>
+      </section>
+
+      <section class="section-block" aria-labelledby="featured-title">
+        <div class="section-heading">
+          <p class="section-kicker">如果你还不知道先点哪张</p>
+          <h2 id="featured-title">先从这六张开始</h2>
+        </div>
+        <div class="featured-grid" id="featured-grid"></div>
+      </section>
+
+      <section class="section-block quick-ask-block" id="quick-ask">
+        <div class="section-heading">
+          <p class="section-kicker">不想选卡片也没关系</p>
+          <h2>也可以直接问</h2>
+        </div>
+
+        <div class="quick-ask-panel">
+          <div class="quick-ask-input-row">
+            <input
+              id="quick-ask-input"
+              type="text"
+              placeholder="比如：我现在很迷茫，怎么判断自己做的事有没有价值？"
+              aria-label="直接提问输入框"
+            >
+            <button class="primary-button" id="quick-ask-submit">开始聊</button>
+          </div>
+
+          <div class="quick-chip-row" id="quick-chip-row"></div>
+        </div>
+      </section>
+
+      <section class="trust-note">
+        <p>
+          基于《The Book of Elon》的主题整理与中文解释，每张卡都保留原书英文锚点，方便快速理解、继续追问，并把书中的思想带回现实问题。
+        </p>
+      </section>
+
+      <section class="section-block topic-library-block" aria-labelledby="topic-library-title">
+        <div class="topic-library__header">
+          <div>
+            <p class="section-kicker">如果上面的 6 张还没点中你</p>
+            <h2 id="topic-library-title">继续往下找入口</h2>
+          </div>
+          <p class="topic-library__intro">
+            先从最贴近你当下的一组开始。
+          </p>
+        </div>
+        <div class="topic-library-groups" id="topic-library-groups"></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="detail-shell hidden" id="detail-shell" aria-hidden="true">
+    <div class="detail-backdrop" id="detail-backdrop"></div>
+    <section class="detail-panel" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+      <button class="close-button" id="detail-close-btn" aria-label="关闭详情">×</button>
+
+      <div class="detail-panel__header">
+        <p class="eyebrow" id="detail-eyebrow">当前主题</p>
+        <h2 id="detail-title"></h2>
+        <p class="detail-hook" id="detail-hook"></p>
+        <p class="detail-summary" id="detail-summary"></p>
+      </div>
+
+      <div class="chat-layout">
+        <div class="chat-panel">
+          <p class="chat-system-note hidden" id="chat-system-note"></p>
+          <div class="messages" id="messages"></div>
+
+          <form class="chat-input-row" id="chat-form">
+            <input
+              id="chat-input"
+              type="text"
+              autocomplete="off"
+              placeholder="继续问，比如：这个观点怎么用在我现在的处境里？"
+              aria-label="聊天输入框"
+            >
+            <button class="primary-button" id="chat-submit-btn" type="submit">发送</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="./book-source.js?v=20260329-security1"></script>
+  <script src="./card-data.js?v=20260329-security1"></script>
+  <script src="./knowledge-base.js?v=20260329-security1"></script>
+  <script src="/config.js?v=20260329-security1"></script>
+  <script src="./model-client.js?v=20260329-security1"></script>
+  <script src="./reply-engine.js?v=20260329-security1"></script>
+  <script src="./app.js?v=20260329-security1"></script>
+</body>
+</html>
+

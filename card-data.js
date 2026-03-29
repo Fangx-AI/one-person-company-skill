@@ -1,0 +1,1085 @@
+var cards = [
+  {
+    id: "feel-the-fear-do-it-anyway",
+    frontend: {
+      title_zh: "明明很害怕，为什么还是要去做？",
+      hook_zh: "害怕不代表你不该做，很多时候它只说明这件事足够重要。",
+      summary_zh:
+        "这里讲的不是“不要怕”，而是“怕也做”。恐惧是正常反应，真正关键的是你愿不愿意让更重要的目标压过这种恐惧。",
+      starter_questions: [
+        "害怕失败的时候，第一步该怎么迈？",
+        "怎么区分谨慎和退缩？",
+        "如果我现在很焦虑，这个主题能怎么帮助我？",
+      ],
+      section: "featured",
+      priority: "P0",
+    },
+    backend: {
+      theme_en: "Feel the Fear; Do It Anyway",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["害怕", "恐惧", "不敢", "焦虑", "风险", "退缩", "勇气"],
+      source_excerpt_en: [
+        "First of all, I feel fear. It's not as though I have the absence of fear.",
+        "When something is important enough... you do it in spite of fear.",
+        "Just feel it and let the importance of your mission drive you to do it anyway.",
+      ],
+      knowledge_points_zh: [
+        "恐惧本身不是停止行动的理由，它更像是你正在面对重要事情时的正常反应。",
+        "这本书在这里最强调的是：不是没有恐惧，而是让更重要的目标压过恐惧。",
+        "它不鼓励蛮冲，而是鼓励你承认害怕，然后带着害怕继续往前。",
+      ],
+      coaching_angles_zh: [
+        "先判断你害怕的是失败本身，还是害怕丢脸、失控、失去安全感。",
+        "把行动切成小到不会把你压垮的第一步，让自己先动起来。",
+        "如果一件事足够重要，你追求的不是不怕，而是怕也愿意做。",
+      ],
+      source_summary_note_zh:
+        "这张卡几乎没有偏离原书主题，只是把原本的表达换成更适合中文用户进入的现实问题入口。",
+      adaptation_level: "low",
+      confidence: "high",
+      related_cards: ["start-before-world-ready", "work-like-hell", "be-useful"],
+    },
+  },
+  {
+    id: "start-before-world-ready",
+    frontend: {
+      title_zh: "世界还没准备好时，为什么你反而应该先开始？",
+      hook_zh: "真正新的东西，在一开始往往没人会主动说“我正需要它”。",
+      summary_zh:
+        "如果一个方向足够新，外界一开始不理解，几乎是常态。关键不是先获得所有人的认同，而是在推进中不断积累证据。",
+      starter_questions: [
+        "我怎么判断自己是超前，还是自我感动？",
+        "没人支持的时候，应该怎么坚持？",
+        "这个观点能怎么用在我现在的项目上？",
+      ],
+      section: "featured",
+      priority: "P0",
+    },
+    backend: {
+      theme_en: "Start Before the World Is Ready",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["开始", "超前", "没人理解", "不被认可", "新产品", "质疑", "创新"],
+      source_excerpt_en: [
+        "When you're building a radically new product, people don't know they want it yet...",
+        "In the beginning of Tesla, no one told us they wanted an electric car...",
+        "If you need encouragement, don't start a company.",
+      ],
+      knowledge_points_zh: [
+        "足够新的东西，在早期往往不在大多数人的认知范围里，所以很难得到即时确认。",
+        "市场一开始没有主动表达需求，不等于这件事没有价值。",
+        "真正关键的是推进过程中有没有逐渐出现真实证据，而不是有没有第一时间得到掌声。",
+      ],
+      coaching_angles_zh: [
+        "区分“超前”与“自我感动”，核心不是情绪，而是有没有信号在出现。",
+        "先找小范围真实反馈，而不是急着追求大范围认可。",
+        "如果一直没有进展，不要拿“别人不懂我”当万能解释。",
+      ],
+      source_summary_note_zh:
+        "这张卡围绕“新事物在早期不会被主流理解”展开，中文标题做了问题化改写，但核心判断仍忠于原主题。",
+      adaptation_level: "medium",
+      confidence: "high",
+      related_cards: ["feel-the-fear-do-it-anyway", "obsess-for-success", "first-principles-thinking"],
+    },
+  },
+  {
+    id: "be-useful",
+    frontend: {
+      title_zh: "如何判断自己做的事，到底有没有价值？",
+      hook_zh: "与其总问“我会不会成功”，不如先问“我到底帮到了谁”。",
+      summary_zh:
+        "这张卡围绕“有用”展开。不是空泛地做大事，而是认真判断你的行动、产品和工作，是否真正让一部分人变得更好。",
+      starter_questions: [
+        "什么叫真正有用，而不是自我感动？",
+        "做小而有用的事，算不算有价值？",
+        "如果我现在很迷茫，怎么判断该往哪里投入？",
+      ],
+      section: "featured",
+      priority: "P0",
+    },
+    backend: {
+      theme_en: "Be Useful",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["价值", "有用", "迷茫", "帮助别人", "意义", "贡献", "值得"],
+      source_excerpt_en: [
+        "How can I be useful today?",
+        "Try to be useful. Do useful things for your fellow human beings and the world.",
+        "A useful life is worth having lived.",
+      ],
+      knowledge_points_zh: [
+        "这里的价值不是抽象名词，而是你是否真的改善了别人的处境。",
+        "书里很强调 usefulness，可以从影响人数和影响强度两个维度来看。",
+        "不是每件事都要改变世界，但至少要问：它是不是在增加净贡献。",
+      ],
+      coaching_angles_zh: [
+        "把注意力从“我会不会成功”转成“我到底帮到了谁”。",
+        "允许“小而真实的有用”，不要只认宏大叙事。",
+        "迷茫时先看哪件事最能形成净贡献，而不是哪件事最像成就。",
+      ],
+      source_summary_note_zh:
+        "这张卡的核心依据就是书里关于 usefulness、utility、contribution 的表达，适合拿来做大众入口。",
+      adaptation_level: "medium",
+      confidence: "high",
+      related_cards: ["obsess-for-success", "create-more-than-you-consume", "fight-for-the-future"],
+    },
+  },
+  {
+    id: "obsess-for-success",
+    frontend: {
+      title_zh: "创业和做事，到底该追钱，还是追想做成的事？",
+      hook_zh: "最容易长期坚持的，通常不是“最赚钱的事”，而是你真正在乎、又对别人有用的事。",
+      summary_zh:
+        "这里不是反对赚钱，而是在提醒顺序问题：不要把赚钱当作起点。更稳的路径，是先找到你真想做、也确实有价值的东西，然后持续把它做得更好。",
+      starter_questions: [
+        "我怎么判断自己是真的热爱，还是一时上头？",
+        "喜欢做的事不赚钱怎么办？",
+        "怎么找到“我擅长”和“别人需要”的交集？",
+      ],
+      section: "featured",
+      priority: "P0",
+    },
+    backend: {
+      theme_en: "Obsess for Success",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["赚钱", "热爱", "创业", "兴趣", "坚持", "喜欢", "回报"],
+      source_excerpt_en: [
+        "Don't start a company because you want to be an entrepreneur or because you want to make money.",
+        "What is a useful thing you could build that you wish existed in the world?",
+        "If you create something useful, money will be the result.",
+      ],
+      knowledge_points_zh: [
+        "书里反对的是把赚钱本身当成一开始唯一的驱动力。",
+        "更稳的顺序是：先找到你真正想做、又能对别人产生价值的事。",
+        "真正长期的投入，通常来自你对事情本身的在意，而不是只看短期回报。",
+      ],
+      coaching_angles_zh: [
+        "把“我想赚钱”拆开，看里面是不是其实藏着安全感、认可或虚荣。",
+        "如果喜欢的事暂时不赚钱，先判断它是不是有真实价值，而不是立刻否定。",
+        "你真正要找的是：兴趣、能力、现实需求三者的交叉点。",
+      ],
+      source_summary_note_zh:
+        "中文标题加强了现实冲突感，但底层仍然来自原书对“兴趣、价值、回报顺序”的讨论。",
+      adaptation_level: "medium",
+      confidence: "high",
+      related_cards: ["be-useful", "work-like-hell", "start-before-world-ready"],
+    },
+  },
+  {
+    id: "first-principles-thinking",
+    frontend: {
+      title_zh: "第一性原理，到底怎么用在现实问题上？",
+      hook_zh: "不要只看别人怎么做，先问最底层到底什么是真的。",
+      summary_zh:
+        "这张卡讲的是一种拆解问题的方法。面对重要问题时，不先沿用惯例和共识，而是回到底层事实、约束和逻辑，再重新推导答案。",
+      starter_questions: [
+        "第一性原理和抄优秀案例有什么区别？",
+        "现实工作里，怎样开始练这种思维？",
+        "你能用我的问题示范一次吗？",
+      ],
+      section: "featured",
+      priority: "P0",
+    },
+    backend: {
+      theme_en: "First-Principles Thinking",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["第一性原理", "底层", "推导", "约束", "事实", "逻辑", "分析"],
+      source_excerpt_en: [
+        "When you want to do something new, you have to apply the physics approach.",
+        "Break something down to the most fundamental principles.",
+        "Look at the fundamentals and construct your reasoning from there.",
+      ],
+      knowledge_points_zh: [
+        "第一性原理不是炫酷名词，而是把问题拆到底层事实和约束，再重新推导。",
+        "它反对的是只靠惯例、行业共识和类比来判断重要问题。",
+        "书里最经典的例子，就是从电池材料成本反推 Tesla 电池包成本并非天生那么高。",
+      ],
+      coaching_angles_zh: [
+        "先区分哪些是底层事实，哪些只是习惯说法。",
+        "如果从零开始重推一遍，你现在的结论还成立吗？",
+        "真正适合用第一性原理的，是高价值、难决策、常识又容易误导你的问题。",
+      ],
+      source_summary_note_zh:
+        "这张卡几乎就是原主题的中文产品化入口，主要变化在于把抽象方法论转成“现实问题怎么用”。",
+      adaptation_level: "low",
+      confidence: "high",
+      related_cards: ["think-like-a-physicist", "obsess-over-truth", "aspire-to-be-less-wrong"],
+    },
+  },
+  {
+    id: "work-like-hell",
+    frontend: {
+      title_zh: "想做成不普通的事，到底要拼到什么程度？",
+      hook_zh: "很多人想要结果，但很少人真正接受那个代价。",
+      summary_zh:
+        "这张卡讲的不是简单鸡血，而是目标和代价之间的真实关系。如果你想做的是高难度、低概率、别人做不到的事，那投入强度大概率不会普通。",
+      starter_questions: [
+        "高强度工作一定是对的吗？",
+        "拼命和透支之间的界限在哪里？",
+        "如果我不是创业者，这一套还有参考价值吗？",
+      ],
+      section: "featured",
+      priority: "P0",
+    },
+    backend: {
+      theme_en: "Work like Hell",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["努力", "拼", "工作强度", "投入", "代价", "卷", "熬"],
+      source_excerpt_en: [
+        "Work like hell.",
+        "You have to put in eighty- to one-hundred-hour weeks every week.",
+        "Nobody ever changed the world on forty hours a week.",
+      ],
+      knowledge_points_zh: [
+        "书里真正强调的不是简单吃苦，而是目标与投入强度之间的真实比例关系。",
+        "如果你追求的是非常规结果，就不能假装自己只需要常规代价。",
+        "但书里也不是完全美化透支，它承认长期高压会伤人，也承认偶尔停下来是必要的。",
+      ],
+      coaching_angles_zh: [
+        "先判断你要的结果，到底值不值得那个代价。",
+        "区分高强度推进和无效透支。",
+        "如果你只是被环境裹挟着加班，这张卡不一定直接替你辩护。",
+      ],
+      source_summary_note_zh:
+        "这张卡忠于原书“高难度目标对应高强度投入”的主张，只是增加了代价感和现实判断角度。",
+      adaptation_level: "medium",
+      confidence: "high",
+      related_cards: ["feel-the-fear-do-it-anyway", "obsess-for-success", "fight-for-the-future"],
+    },
+  },
+  {
+    id: "obsess-over-truth",
+    frontend: {
+      title_zh: "为什么愿望常常骗人，真相反而更有用？",
+      hook_zh: "很多错误不是因为你不聪明，而是因为你太想让某件事成立。",
+      summary_zh:
+        "这张卡直指一种很常见的认知问题：人会天然过滤掉不想看到的信息。所以无论做产品、做决定，还是看待自己，真实情况往往比愿望更重要。",
+      starter_questions: [
+        "怎么识别自己是不是在自欺欺人？",
+        "追求真相会不会让人变得很痛苦？",
+        "现实里怎么训练这种诚实感？",
+      ],
+      section: "secondary",
+      priority: "P1",
+    },
+    backend: {
+      theme_en: "Obsess over Truth",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["真相", "自欺欺人", "愿望", "证据", "盲区", "wishful thinking"],
+      source_excerpt_en: [
+        "I am obsessed with truth. Obsessed.",
+        "In business and personal life, wishful thinking causes a lot of mistakes.",
+        "If you have beliefs that are incompatible with a rocket getting to orbit, the rocket will not get to orbit.",
+      ],
+      knowledge_points_zh: [
+        "这张卡最重要的点，是反对 wishful thinking，也就是愿望性思考。",
+        "书里把真相看得极重，因为错的愿望不会因为你喜欢它就变成对的现实。",
+        "真正有价值的判断，应该尽量和证据成比例，而不是和你的希望成比例。",
+      ],
+      coaching_angles_zh: [
+        "先问自己：我现在是因为证据这样想，还是因为我希望它成立。",
+        "多找和你立场相反的信息，不要只收集支持自己判断的东西。",
+        "如果这件事失败了，最可能是我忽略了什么。",
+      ],
+      source_summary_note_zh:
+        "原书这里的重点就是“真相优先于愿望”和“反对 wishful thinking”，中文标题只是把它改写得更可点。",
+      adaptation_level: "medium",
+      confidence: "high",
+      related_cards: ["first-principles-thinking", "aspire-to-be-less-wrong", "think-like-a-physicist"],
+    },
+  },
+  {
+    id: "aspire-to-be-less-wrong",
+    frontend: {
+      title_zh: "怎样不断修正自己，变得没那么错？",
+      hook_zh: "成长很多时候不是越来越厉害，而是越来越少犯同样的错。",
+      summary_zh:
+        "这张卡强调的不是追求完美正确，而是持续修正。你不需要每天都对，但如果大多数时候能比之前少错一点，就已经在往更好的方向走。",
+      starter_questions: [
+        "承认自己错了，为什么这么难？",
+        "怎么做到既坚持自己，又能修正自己？",
+        "在工作和关系里，这种能力怎么练？",
+      ],
+      section: "secondary",
+      priority: "P1",
+    },
+    backend: {
+      theme_en: "Aspire to Be Less Wrong",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["修正", "变得没那么错", "承认错误", "证据", "学习", "更新认知"],
+      source_excerpt_en: [
+        "Assume we're wrong and that our goal is to be less wrong.",
+        "It's OK to be wrong. Just don't be confident and wrong.",
+        "Aspirationally, you want to believe things proportionate to the evidence.",
+      ],
+      knowledge_points_zh: [
+        "这张卡不是叫你永远怀疑自己，而是把“减少错误”看成成长方向。",
+        "书里强调的是：错不可怕，带着过度自信持续错才可怕。",
+        "这一节还连到阅读、广泛输入和知识树结构，说明修正认知离不开持续学习。",
+      ],
+      coaching_angles_zh: [
+        "别把修正理解成否定自己，把它理解成升级判断。",
+        "遇到新证据时，先问自己有没有必要微调而不是死扛。",
+        "真正成熟的判断，不是永远对，而是更快变得没那么错。",
+      ],
+      source_summary_note_zh:
+        "这张卡与原书标题几乎一一对应，是目前最稳定的一类“认知修正型”主题。",
+      adaptation_level: "low",
+      confidence: "high",
+      related_cards: ["obsess-over-truth", "first-principles-thinking", "be-useful"],
+    },
+  },
+  {
+    id: "think-like-a-physicist",
+    frontend: {
+      title_zh: "遇到复杂问题，怎样像物理学家一样思考？",
+      hook_zh: "先别问别人怎么做，先问这件事在底层上到底成不成立。",
+      summary_zh:
+        "这张卡强调一种理性框架。面对复杂问题时，不先被惯例、情绪和权威带着走，而是回到底层约束、事实和逻辑，先判断这件事是否真正可行。",
+      starter_questions: [
+        "这种思维只适合技术问题吗？",
+        "我怎么判断自己是不是在自以为理性？",
+        "能不能用生活里的例子讲讲？",
+      ],
+      section: "secondary",
+      priority: "P1",
+    },
+    backend: {
+      theme_en: "Think Like a Physicist",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["物理学家", "理性", "约束", "可行", "底层规律", "真实边界"],
+      source_excerpt_en: [
+        "I try to be hyperrational.",
+        "If the reasoning fits, and you're not violating the laws of physics, that's the thing you should try to do.",
+        "These things just don't seem that crazy to me.",
+      ],
+      knowledge_points_zh: [
+        "这张卡强调的不是冷血，而是先尊重真实规律，再去谈愿景。",
+        "书里这里最重要的判断是：只要没有违反底层规律，很多看上去疯狂的事其实都值得试。",
+        "它和第一性原理相近，但更偏“先看真实边界和约束”。",
+      ],
+      coaching_angles_zh: [
+        "如果一个问题太乱，先别听所有观点，先问真实约束是什么。",
+        "把“别人觉得难”与“这件事真的不成立”分开。",
+        "复杂问题先回到底层，再决定要不要投入。",
+      ],
+      source_summary_note_zh:
+        "这张卡与原书主题直接对应，重点在于“超理性、看底层约束、先判断是否违反真实规律”。",
+      adaptation_level: "medium",
+      confidence: "high",
+      related_cards: ["first-principles-thinking", "obsess-over-truth", "seek-the-nature-of-the-universe"],
+    },
+  },
+  {
+    id: "create-more-than-you-consume",
+    frontend: {
+      title_zh: "为什么你应该创造得比消耗得更多？",
+      hook_zh: "真正让人变强的，不只是获取更多，而是持续为世界增加一点东西。",
+      summary_zh:
+        "这张卡讲的不是道德说教，而是一种长期成长逻辑。如果一个人总在消费、索取、比较，很容易陷进零和思维；但如果开始创造、建设、贡献，他和世界的关系会完全不同。",
+      starter_questions: [
+        "普通人怎么做到创造多于消耗？",
+        "如果我现在能力不强，也能算在创造吗？",
+        "这和个人成长有什么关系？",
+      ],
+      section: "secondary",
+      priority: "P1",
+    },
+    backend: {
+      theme_en: "Create More than You Consume",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["创造", "消耗", "零和", "成长", "贡献", "增量"],
+      source_excerpt_en: [
+        "The economy is a positive-sum game, a 'grow the pie' situation.",
+        "Make sure you're not operating from a zero-sum mindset...",
+        "Create more than you consume.",
+      ],
+      knowledge_points_zh: [
+        "这里核心不是道德姿态，而是“增量思维”。",
+        "零和心态会让人把世界理解成只能争抢存量，于是更容易走向比较和掠夺。",
+        "创造多于消耗，意味着你在不断给世界增加一些东西，而不是只从里面拿走东西。",
+      ],
+      coaching_angles_zh: [
+        "先别问我拿到了什么，先问我增加了什么。",
+        "创造不一定很大，也可以是一点真实贡献。",
+        "如果你长期只在消费和比较，很容易越来越空。",
+      ],
+      source_summary_note_zh:
+        "原书重点是“非零和心态”和“增加总价值而不是争抢存量”，中文版本强化了个体成长视角。",
+      adaptation_level: "medium",
+      confidence: "high",
+      related_cards: ["be-useful", "fight-for-the-future", "obsess-over-truth"],
+    },
+  },
+  {
+    id: "fight-for-the-future",
+    frontend: {
+      title_zh: "什么样的未来，值得你拼命去推动？",
+      hook_zh: "很多人是在过日子，少数人是在主动押注未来。",
+      summary_zh:
+        "这张卡讨论的不是空泛理想，而是你愿意把力气用在哪个方向上。真正重要的不是“我今天在忙什么”，而是“我推动的东西，会把世界带向哪里”。",
+      starter_questions: [
+        "普通人也需要有未来使命吗？",
+        "怎么判断一个方向值不值得长期投入？",
+        "如果我现在看不到很大的未来怎么办？",
+      ],
+      section: "exploration",
+      priority: "P1",
+    },
+    backend: {
+      theme_en: "Fight for the Future",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["未来", "使命", "长期投入", "方向", "推动", "愿景"],
+      source_excerpt_en: [
+        "Fight for the things that make you excited about the future.",
+        "The future will not get here fast enough unless we force it.",
+        "What are we doing to move toward the paths likely to make for a good future?",
+      ],
+      knowledge_points_zh: [
+        "这张卡讲的不是空喊愿景，而是你愿不愿意把精力投向一个值得发生的未来。",
+        "书里的意思很明确：未来不会自己加速到来，需要有人主动去推。",
+        "它适合用来判断长期方向，而不是用来处理短期技巧问题。",
+      ],
+      coaching_angles_zh: [
+        "先问自己：我现在的努力，到底在服务什么未来。",
+        "如果一个方向三个月后有用，但三年后你并不认同，那它未必值得你长期投入。",
+        "不是每个人都要宏大叙事，但至少要知道自己在推动什么。",
+      ],
+      source_summary_note_zh:
+        "这张卡与原书主题高度一致，核心就是主动推动值得发生的未来，中文标题只是改成更易代入的问法。",
+      adaptation_level: "medium",
+      confidence: "high",
+      related_cards: ["be-useful", "work-like-hell", "seek-the-nature-of-the-universe"],
+    },
+  },
+  {
+    id: "seek-the-nature-of-the-universe",
+    frontend: {
+      title_zh: "如果人生很迷茫，为什么要先去追问更大的问题？",
+      hook_zh: "有时候你不是缺答案，而是你问的问题太小了。",
+      summary_zh:
+        "这张卡讲的是，当你只围着眼前得失打转时，人生会越来越窄。但如果你开始追问更大的问题，比如未来、人类、意义、探索，你反而更容易找到自己的位置和方向。",
+      starter_questions: [
+        "想太大的问题，会不会反而更空？",
+        "这种思考怎么落到现实生活里？",
+        "迷茫的时候，应该先想意义还是先做事？",
+      ],
+      section: "exploration",
+      priority: "P1",
+    },
+    backend: {
+      theme_en: "Seek the Nature of the Universe",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["迷茫", "意义", "宇宙", "好奇心", "探索", "人生方向"],
+      source_excerpt_en: [
+        "We must expand humanity and consciousness to the point where we are able to answer that question.",
+        "This is the foundation of my philosophy: I am curious about the nature of the universe.",
+        "We need to expand the scope and scale of consciousness...",
+      ],
+      knowledge_points_zh: [
+        "这一节在原书里更宏大，核心是好奇心、意识扩展，以及追问更大的问题。",
+        "中文产品版把它转成一个更可进入的入口：当你很迷茫时，也许不是答案不够，而是问题尺度太小。",
+        "这张卡更适合在用户已经进入状态后再看，不适合作为第一张最强入口卡。",
+      ],
+      coaching_angles_zh: [
+        "先问自己：我现在困住自己的问题，是不是太窄。",
+        "当你只盯着短期得失时，很容易越来越失去方向感。",
+        "抬高问题尺度，不是逃离现实，而是重新给现实找坐标。",
+      ],
+      source_summary_note_zh:
+        "原书这一节更宏大、更哲学，中文产品版压缩成“迷茫时抬高问题尺度”的入口，因此改写幅度更大。",
+      adaptation_level: "high",
+      confidence: "medium",
+      related_cards: ["fight-for-the-future", "be-useful", "think-like-a-physicist"],
+    },
+  },
+  {
+    id: "persist-or-stop",
+    frontend: {
+      title_zh: "结果一般的时候，怎么判断该坚持还是止损？",
+      hook_zh: "继续不一定高贵，止损也不一定懦弱，关键是你到底在看证据还是在硬撑。",
+      summary_zh:
+        "这张卡不是劝你一味坚持，也不是鼓励你轻易放弃。真正要拆开的，是结果不理想时，你手上到底有没有在积累证据，还是只是靠惯性和不甘心在撑。",
+      starter_questions: [
+        "做了一段时间没有明显结果，还该继续吗？",
+        "怎么区分耐心积累和自我消耗？",
+        "止损会不会只是我在逃避？",
+      ],
+      section: "secondary",
+      priority: "P1",
+    },
+    backend: {
+      theme_en: "Obsess over Truth / Start Before the World Is Ready",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["止损", "坚持", "结果一般", "证据", "反馈", "复盘", "继续还是放弃"],
+      source_excerpt_en: [
+        "In business and personal life, wishful thinking causes a lot of mistakes.",
+        "If you have beliefs that are incompatible with reality, reality wins.",
+        "The key question is whether the evidence is improving over time.",
+      ],
+      knowledge_points_zh: [
+        "结果一般时，最容易犯的错不是失败，而是把不甘心误当成坚持。",
+        "书里更强调证据而不是情绪，要看这件事有没有逐渐变得更真实、更具体。",
+        "继续还是止损，不该只看你已经投入了多少，也要看未来证据是否还在改善。",
+      ],
+      coaching_angles_zh: [
+        "先看最近一段时间有没有更清晰的小信号，而不是只看总体成败。",
+        "把“我舍不得停”与“这件事值得继续”分开看。",
+        "如果继续，下一步要追什么证据；如果没有证据，及时止损也算理性。",
+      ],
+      source_summary_note_zh:
+        "这是一张从“真相优先”和“早期要看证据”延伸出来的现实判断卡，更偏产品化话题入口。",
+      adaptation_level: "high",
+      confidence: "medium",
+      related_cards: ["start-before-world-ready", "obsess-over-truth", "aspire-to-be-less-wrong"],
+    },
+  },
+  {
+    id: "fear-of-judgment-topic",
+    frontend: {
+      title_zh: "总怕别人觉得我很蠢，怎么办？",
+      hook_zh: "很多退缩不是因为风险太大，而是羞耻感先替你做了决定。",
+      summary_zh:
+        "这张卡讲的不是简单“别在意别人”，而是帮你区分：你现在害怕的是现实后果，还是来自外界眼光的羞耻感。很多时候，后者才是真正卡住人的东西。",
+      starter_questions: [
+        "我怎么区分丢脸感和真实风险？",
+        "为什么我明知道该做，还是会退？",
+        "别人怎么看我，为什么影响这么大？",
+      ],
+      section: "secondary",
+      priority: "P1",
+    },
+    backend: {
+      theme_en: "Feel the Fear; Do It Anyway",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["别人怎么看", "丢脸", "很蠢", "羞耻", "外界评价", "怕被笑话"],
+      source_excerpt_en: [
+        "First of all, I feel fear. It's not as though I have the absence of fear.",
+        "When something is important enough... you do it in spite of fear.",
+        "Just feel it and let the importance of your mission drive you to do it anyway.",
+      ],
+      knowledge_points_zh: [
+        "害怕别人评价，常常不是能力问题，而是羞耻感在提前替你做决定。",
+        "书里更重要的提醒是：重要的事情，本来就常常伴随不舒服和暴露感。",
+        "真正要分开的不是做和不做，而是现实风险和面子损伤。",
+      ],
+      coaching_angles_zh: [
+        "先说清你最怕发生的具体后果，到底是损失、关系，还是丢脸。",
+        "如果没有旁观者，你会不会更愿意往前走一步。",
+        "把事情切小，让你不用一次性承受全部暴露感。",
+      ],
+      source_summary_note_zh:
+        "这张卡从原书的“怕也做”延伸到社会评价和羞耻场景，是更贴近中文用户现实处境的话题改写。",
+      adaptation_level: "high",
+      confidence: "medium",
+      related_cards: ["feel-the-fear-do-it-anyway", "start-before-world-ready", "fight-for-the-future"],
+    },
+  },
+  {
+    id: "family-pressure-topic",
+    frontend: {
+      title_zh: "家里希望你走稳路时，怎么判断该不该听？",
+      hook_zh: "真正难的不是选哪条路，而是你认同的未来和他们认同的安全感不重合。",
+      summary_zh:
+        "这张卡不是鼓励你和家里对抗，而是帮你看清：他们担心的到底是真风险，还是对不确定性的本能排斥；你想走的路，又是不是真对应一个你愿意长期负责的未来。",
+      starter_questions: [
+        "家里反对的时候，我怎么判断不是自己一时冲动？",
+        "稳和想做的事冲突时，该怎么拆？",
+        "有没有一种不用硬碰硬的走法？",
+      ],
+      section: "secondary",
+      priority: "P1",
+    },
+    backend: {
+      theme_en: "Fight for the Future",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["家里人", "稳路", "父母反对", "安全感", "未来方向", "家人压力"],
+      source_excerpt_en: [
+        "Fight for the things that make you excited about the future.",
+        "The future will not get here fast enough unless we force it.",
+        "What are we doing to move toward the paths likely to make for a good future?",
+      ],
+      knowledge_points_zh: [
+        "这类冲突的核心通常不是谁对谁错，而是双方在押注不同的未来。",
+        "书里更强调长期值得推动的方向，而不是只看眼前是否安稳。",
+        "真正成熟的判断，不是立刻反抗，而是看这条路是否真的值得你长期负责。",
+      ],
+      coaching_angles_zh: [
+        "先把家里担心的具体点说清，是现金流、失败率，还是面子与比较。",
+        "再问自己：如果没有这些声音，你会不会还是认同这条路。",
+        "优先找渐进式推进方案，而不是把选择做成一次性决裂。",
+      ],
+      source_summary_note_zh:
+        "这张卡把原书的“推动值得发生的未来”落到家庭压力场景，是典型的话题入口型延伸。",
+      adaptation_level: "high",
+      confidence: "medium",
+      related_cards: ["fight-for-the-future", "obsess-for-success", "feel-the-fear-do-it-anyway"],
+    },
+  },
+  {
+    id: "constraints-topic",
+    frontend: {
+      title_zh: "现实约束很多的时候，还能谈理想吗？",
+      hook_zh: "理想不是忽视边界，而是在边界里重新找可行动的空间。",
+      summary_zh:
+        "这张卡讲的不是空讲梦想，而是帮你把现实约束拆开。时间、钱、能力都不够时，真正重要的不是喊口号，而是分清哪些是硬边界，哪些只是默认设定。",
+      starter_questions: [
+        "理想和现实冲突时，应该先看什么？",
+        "第一性原理怎么用在现实约束上？",
+        "边界这么多，我还能推进什么？",
+      ],
+      section: "secondary",
+      priority: "P1",
+    },
+    backend: {
+      theme_en: "First-Principles Thinking / Think Like a Physicist",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["现实约束", "时间不够", "钱不够", "能力不够", "边界", "限制", "理想"],
+      source_excerpt_en: [
+        "Break something down to the most fundamental principles.",
+        "If the reasoning fits, and you're not violating the laws of physics, that's the thing you should try to do.",
+        "Look at the fundamentals and construct your reasoning from there.",
+      ],
+      knowledge_points_zh: [
+        "约束多的时候，更需要回到底层事实，而不是被情绪和惯性带着走。",
+        "不是所有限制都一样，有些是硬边界，有些只是还没被重新设计过。",
+        "理想不是无视现实，而是从现实里重新推导出最小可行动空间。",
+      ],
+      coaching_angles_zh: [
+        "先列出哪些是真不能动的，哪些是可以微调的。",
+        "别急着问能不能实现，先问最小可验证动作是什么。",
+        "用底层事实替代理想化想象，也替代过度悲观。",
+      ],
+      source_summary_note_zh:
+        "这张卡把第一性原理和真实边界的思路，延伸到中文用户最常见的“现实约束”场景里。",
+      adaptation_level: "high",
+      confidence: "medium",
+      related_cards: ["first-principles-thinking", "think-like-a-physicist", "fight-for-the-future"],
+    },
+  },
+  {
+    id: "startup-risk-topic",
+    frontend: {
+      title_zh: "想创业又怕把积蓄烧没，怎么判断？",
+      hook_zh: "真正该拆的不是鸡血和退缩，而是风险、现金流和证据。",
+      summary_zh:
+        "这张卡把“创业值不值得做”拆得更现实。它不鼓励盲目追梦，也不鼓励只盯着安全感，而是要求你同时看长期价值、短期现金流和真实验证信号。",
+      starter_questions: [
+        "创业前到底先验证什么？",
+        "怕把钱烧没，是不是就不该做？",
+        "怎么区分理想方向和财务冒险？",
+      ],
+      section: "secondary",
+      priority: "P1",
+    },
+    backend: {
+      theme_en: "Obsess for Success / Start Before the World Is Ready",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["创业风险", "积蓄", "烧钱", "现金流", "验证", "怕亏", "财务风险"],
+      source_excerpt_en: [
+        "Don't start a company because you want to be an entrepreneur or because you want to make money.",
+        "What is a useful thing you could build that you wish existed in the world?",
+        "If you need encouragement, don't start a company.",
+      ],
+      knowledge_points_zh: [
+        "创业不是纯粹热血问题，而是价值、回报和风险排序的问题。",
+        "书里更反对把创业当身份幻想，也反对只靠赚钱冲动做判断。",
+        "最重要的是：这件事有没有真实价值，以及你能否用更小成本先得到信号。",
+      ],
+      coaching_angles_zh: [
+        "把“我要不要创业”拆成价值判断、现金流承受力、验证节奏三个问题。",
+        "先设计最小验证，不要一上来押全部筹码。",
+        "如果现实承压太大，延后或并行验证不等于背叛方向。",
+      ],
+      source_summary_note_zh:
+        "这张卡把书中关于价值驱动、早期验证和不要把创业当身份标签的想法，转成更现实的风险判断入口。",
+      adaptation_level: "high",
+      confidence: "medium",
+      related_cards: ["obsess-for-success", "start-before-world-ready", "be-useful"],
+    },
+  },
+  {
+    id: "ordinary-intensity-topic",
+    frontend: {
+      title_zh: "如果我不是创业者，高强度投入还有意义吗？",
+      hook_zh: "不是所有人都该照搬极限投入，但任何投入都要先问值不值得。",
+      summary_zh:
+        "这张卡不是要把所有人都创业化，而是帮你判断：高强度投入到底是在换真实结果，还是只是被环境裹挟。不是身份决定强度，而是目标、边界和回报关系决定。",
+      starter_questions: [
+        "普通人的拼命和创业者的拼命，有什么不同？",
+        "我现在这么累，到底值不值？",
+        "怎么判断是在推进还是在透支？",
+      ],
+      section: "secondary",
+      priority: "P1",
+    },
+    backend: {
+      theme_en: "Work like Hell",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["不是创业者", "普通人", "高强度", "透支", "拼命", "加班", "值不值得"],
+      source_excerpt_en: [
+        "Work like hell.",
+        "You have to put in eighty- to one-hundred-hour weeks every week.",
+        "Nobody ever changed the world on forty hours a week.",
+      ],
+      knowledge_points_zh: [
+        "高强度逻辑的核心不是身份，而是你要的结果是否真的对应那个代价。",
+        "如果目标只是维持现状，却长期透支自己，这种投入往往不划算。",
+        "书里强调代价匹配，但中文场景里更要补上边界意识。",
+      ],
+      coaching_angles_zh: [
+        "先看你现在的高强度在换什么，不要只看自己有多累。",
+        "区分主动押注式投入和被动裹挟式消耗。",
+        "如果结果不值得，降低强度不是懒，而是重新做价值判断。",
+      ],
+      source_summary_note_zh:
+        "这张卡是对原书“高强度投入”逻辑的中文化延伸，专门处理非创业用户的代入问题。",
+      adaptation_level: "high",
+      confidence: "medium",
+      related_cards: ["work-like-hell", "fight-for-the-future", "be-useful"],
+    },
+  },
+  {
+    id: "career-meaning-topic",
+    frontend: {
+      title_zh: "稳定但不兴奋的工作，要不要换？",
+      hook_zh: "稳定能养活你，但未必能长期承载你真正想推动的未来。",
+      summary_zh:
+        "这张卡不是简单劝离职，而是让你先拆清楚：留下你的，到底是稳定、成长，还是惯性；你想走的，又是真方向，还是暂时厌倦后的投射。",
+      starter_questions: [
+        "稳定和兴奋感冲突时，先看什么？",
+        "我是不是真的该换，还是只是最近累了？",
+        "不辞职也能先验证方向吗？",
+      ],
+      section: "exploration",
+      priority: "P1",
+    },
+    backend: {
+      theme_en: "Fight for the Future / Be Useful",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["稳定工作", "不兴奋", "换工作", "职业意义", "长期方向", "去留"],
+      source_excerpt_en: [
+        "Fight for the things that make you excited about the future.",
+        "What are we doing to move toward the paths likely to make for a good future?",
+        "A useful life is worth having lived.",
+      ],
+      knowledge_points_zh: [
+        "稳定不是问题，问题是它是否长期把你固定在一个你并不认同的未来里。",
+        "书里更看重的是你在推动什么未来，而不是眼前是不是足够舒服。",
+        "职业判断里，意义、回报和方向不能只看其中一个。",
+      ],
+      coaching_angles_zh: [
+        "把“留下我的”和“我想离开的”分别说清楚。",
+        "先别急着离开，先设计一个低成本试探，看你想去的方向是否真实。",
+        "如果三年后还是这样，你愿不愿意接受，也是一个好问题。",
+      ],
+      source_summary_note_zh:
+        "这张卡把书中关于未来方向与 usefulness 的判断，落到最常见的职业去留问题上。",
+      adaptation_level: "high",
+      confidence: "medium",
+      related_cards: ["fight-for-the-future", "be-useful", "obsess-for-success"],
+    },
+  },
+  {
+    id: "small-step-topic",
+    frontend: {
+      title_zh: "问题太大时，第一步到底该怎么迈？",
+      hook_zh: "很多时候你缺的不是勇气，而是一个小到能开始的动作。",
+      summary_zh:
+        "这张卡不只是讲行动力，而是帮你把动作压小。面前的问题越大，越不该想着一次看清整张地图，而是先找到能带来真实反馈的最小一步。",
+      starter_questions: [
+        "我该怎么把问题压到足够小？",
+        "第一步怎么判断不是瞎忙？",
+        "如果一直在准备，问题到底出在哪？",
+      ],
+      section: "exploration",
+      priority: "P1",
+    },
+    backend: {
+      theme_en: "Feel the Fear; Do It Anyway / Start Before the World Is Ready",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["第一步", "开始行动", "问题太大", "起步", "启动阻力", "一直在准备"],
+      source_excerpt_en: [
+        "When something is important enough... you do it in spite of fear.",
+        "When you're building a radically new product, people don't know they want it yet...",
+        "Just feel it and let the importance of your mission drive you to do it anyway.",
+      ],
+      knowledge_points_zh: [
+        "真正卡住人的，很多时候不是不想动，而是问题大到没有第一步。",
+        "书里更强调推进中的真实信号，因此第一步不必完美，但最好能带来反馈。",
+        "面对大问题时，先求可验证的小动作，比先求完整答案更有用。",
+      ],
+      coaching_angles_zh: [
+        "把“解决整个问题”改成“拿到第一个真实信号”。",
+        "如果一个动作 30 分钟内做不完，它通常还不够小。",
+        "先做最小原型、最短对话、最轻试探，而不是继续做抽象准备。",
+      ],
+      source_summary_note_zh:
+        "这张卡是把原书里“怕也做”和“先推进再拿信号”的逻辑，合并改写成更强的问题入口。",
+      adaptation_level: "high",
+      confidence: "medium",
+      related_cards: ["feel-the-fear-do-it-anyway", "start-before-world-ready", "first-principles-thinking"],
+    },
+  },
+  {
+    id: "founder-loneliness-topic",
+    frontend: {
+      title_zh: "只有你自己相信一件事的时候，怎么撑下去？",
+      hook_zh: "孤独不一定说明你错了，但也不能把孤独本身当成证据。",
+      summary_zh:
+        "这张卡处理的是那种长期没人理解、只能自己往前推的状态。它不会浪漫化孤独，而是提醒你去分清：你缺的是支持、证据，还是节奏。",
+      starter_questions: [
+        "只有我自己信这件事，是不是很危险？",
+        "没人支持的时候，怎样不把自己耗空？",
+        "怎么区分真孤独和真没进展？",
+      ],
+      section: "exploration",
+      priority: "P1",
+    },
+    backend: {
+      theme_en: "Start Before the World Is Ready",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["孤独推进", "没人理解", "没人支持", "只有我相信", "坚持", "长期推进"],
+      source_excerpt_en: [
+        "When you're building a radically new product, people don't know they want it yet...",
+        "In the beginning of Tesla, no one told us they wanted an electric car...",
+        "If you need encouragement, don't start a company.",
+      ],
+      knowledge_points_zh: [
+        "早期不被理解可能是常态，但它本身并不能证明你是对的。",
+        "孤独感会消耗判断力，所以要同时看外部信号和内部节奏。",
+        "真正重要的不是“有没有人支持”，而是推进中有没有真实证据在积累。",
+      ],
+      coaching_angles_zh: [
+        "别把孤独浪漫化，先问自己缺的是认同感、证据还是支持结构。",
+        "给自己补上更稳定的节奏，而不是只靠意志硬撑。",
+        "如果长期没有信号，别用“别人不懂我”替代复盘。",
+      ],
+      source_summary_note_zh:
+        "这张卡是从“新事物早期没人理解”直接延伸出来的现实心理场景，更偏话题化入口。",
+      adaptation_level: "high",
+      confidence: "medium",
+      related_cards: ["start-before-world-ready", "feel-the-fear-do-it-anyway", "fight-for-the-future"],
+    },
+  },
+  {
+    id: "mission-no-money-topic",
+    frontend: {
+      title_zh: "长期有价值但短期不赚钱的事，要继续吗？",
+      hook_zh: "先别急着站队理想或现实，先把现金流和长期价值拆开。",
+      summary_zh:
+        "这张卡处理的是最真实的拉扯：你认同一件事的长期价值，但它眼下就是养不活你。真正有用的判断，不是喊热爱，也不是立刻放弃，而是把价值、回报和承受力分层看。",
+      starter_questions: [
+        "喜欢但不赚钱的事，到底该怎么继续？",
+        "现金流压力大时，还谈长期是不是很奢侈？",
+        "怎么拆开价值判断和生存判断？",
+      ],
+      section: "exploration",
+      priority: "P1",
+    },
+    backend: {
+      theme_en: "Obsess for Success / Be Useful",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["长期价值", "短期不赚钱", "现金流", "热爱", "继续吗", "生存压力"],
+      source_excerpt_en: [
+        "Don't start a company because you want to be an entrepreneur or because you want to make money.",
+        "If you create something useful, money will be the result.",
+        "Try to be useful. Do useful things for your fellow human beings and the world.",
+      ],
+      knowledge_points_zh: [
+        "长期价值和短期回报经常不在同一个时间线上，不能混成一句话判断。",
+        "书里更看重价值驱动，但不代表它否认现金流和现实承受力。",
+        "真正成熟的做法，是把事情拆成值得不值得做，以及现在能不能这样做。",
+      ],
+      coaching_angles_zh: [
+        "先判断这件事是真有价值，还是只是你个人偏爱。",
+        "再看现实上你是否需要并行方案，而不是二选一站队。",
+        "如果方向对，但节奏错，调节奏比直接砍掉更聪明。",
+      ],
+      source_summary_note_zh:
+        "这张卡把原书关于价值优先、结果随后到来的逻辑，改写成更现实的现金流冲突入口。",
+      adaptation_level: "high",
+      confidence: "medium",
+      related_cards: ["obsess-for-success", "be-useful", "work-like-hell"],
+    },
+  },
+  {
+    id: "delusion-or-vision-topic",
+    frontend: {
+      title_zh: "怎么区分自己是超前，还是在自我感动？",
+      hook_zh: "关键不是你多激动，而是有没有信号在出现。",
+      summary_zh:
+        "这张卡正面处理一个很刺痛的问题：你以为自己在坚持长期主义，结果其实只是舍不得承认方向不对。真正有用的分界线，不在情绪强度，而在证据质量。",
+      starter_questions: [
+        "什么样的信号算是“不是自我感动”？",
+        "没人理解，到底是超前还是错了？",
+        "怎么避免拿理想掩盖盲区？",
+      ],
+      section: "exploration",
+      priority: "P1",
+    },
+    backend: {
+      theme_en: "Start Before the World Is Ready / Obsess over Truth",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["超前", "自我感动", "没人理解", "信号", "验证", "理想还是幻觉"],
+      source_excerpt_en: [
+        "When you're building a radically new product, people don't know they want it yet...",
+        "In business and personal life, wishful thinking causes a lot of mistakes.",
+        "I am obsessed with truth. Obsessed.",
+      ],
+      knowledge_points_zh: [
+        "早期不被理解本身并不能证明你超前，也不能证明你错了。",
+        "最有用的判断方法，是看有没有逐渐变具体的信号，而不是只看自己多相信。",
+        "书里反复在提醒：别用愿望替代证据，也别用孤独替代验证。",
+      ],
+      coaching_angles_zh: [
+        "先定义你要看的信号，不要只凭感觉判断自己是不是在往前。",
+        "如果三个月后还是完全没有更清晰的反馈，就该警惕。",
+        "让一个不站你这边的人来挑刺，常常比继续自我鼓劲更有用。",
+      ],
+      source_summary_note_zh:
+        "这张卡把“早期不被理解”和“真相优先于愿望”合并成一个更尖锐、更容易点开的中文话题。",
+      adaptation_level: "high",
+      confidence: "medium",
+      related_cards: ["start-before-world-ready", "obsess-over-truth", "aspire-to-be-less-wrong"],
+    },
+  },
+  {
+    id: "meaning-after-failure-topic",
+    frontend: {
+      title_zh: "如果最后还是失败了，坚持还有意义吗？",
+      hook_zh: "意义不只来自赢，也来自你到底在服务什么价值和未来。",
+      summary_zh:
+        "这张卡不做廉价安慰。它真正要问的不是“失败了要不要自我感动”，而是如果结果不如愿，这段投入到底有没有创造价值、拉近真相、或者推动了一个你认同的方向。",
+      starter_questions: [
+        "失败了以后，怎么判断之前的坚持值不值？",
+        "没有结果，是不是就说明方向错了？",
+        "意义和成败，到底是什么关系？",
+      ],
+      section: "exploration",
+      priority: "P1",
+    },
+    backend: {
+      theme_en: "Be Useful / Fight for the Future",
+      part_en: "Part I: Pursue Purpose",
+      search_terms: ["失败了还有意义吗", "坚持值不值", "失败意义", "结果不好", "目标", "价值"],
+      source_excerpt_en: [
+        "A useful life is worth having lived.",
+        "Fight for the things that make you excited about the future.",
+        "Try to be useful. Do useful things for your fellow human beings and the world.",
+      ],
+      knowledge_points_zh: [
+        "如果一段投入真的增加了价值、证据或方向感，它不一定因为没赢就变成毫无意义。",
+        "书里的底色不是结果论，而是价值、用处和你在推动什么未来。",
+        "失败当然需要复盘，但意义不能只由输赢单点定义。",
+      ],
+      coaching_angles_zh: [
+        "先问这段经历到底留下了什么，而不只是失去了什么。",
+        "再问它服务的那个价值或未来，是不是你至今仍认同。",
+        "如果价值还在，失败更像校准；如果价值本身不成立，才更像该结束。",
+      ],
+      source_summary_note_zh:
+        "这张卡把书中的 usefulness 和 future 逻辑，转成更容易击中用户的人生追问型入口。",
+      adaptation_level: "high",
+      confidence: "medium",
+      related_cards: ["be-useful", "fight-for-the-future", "feel-the-fear-do-it-anyway"],
+    },
+  },
+];
+
+var featuredIds = [
+  "feel-the-fear-do-it-anyway",
+  "start-before-world-ready",
+  "be-useful",
+  "obsess-for-success",
+  "first-principles-thinking",
+  "work-like-hell",
+];
+
+var quickAskPrompts = [
+  "害怕失败的时候，怎么行动？",
+  "我该追赚钱，还是追想做成的事？",
+  "第一性原理怎么用在现实问题上？",
+];
+
+var featuredCardTags = {
+  "feel-the-fear-do-it-anyway": "高频共鸣",
+  "start-before-world-ready": "最常追问",
+  "be-useful": "最容易代入",
+  "obsess-for-success": "现实冲突",
+  "first-principles-thinking": "方法感强",
+  "work-like-hell": "争议最高",
+};
+
+var topicLibraryGroups = [
+  {
+    id: "emotion-resistance",
+    title: "情绪与阻力",
+    intro: "当你不是不知道道理，而是被害怕、羞耻、孤独和启动阻力卡住。",
+    cardIds: [
+      "feel-the-fear-do-it-anyway",
+      "fear-of-judgment-topic",
+      "small-step-topic",
+      "founder-loneliness-topic",
+      "create-more-than-you-consume",
+    ],
+  },
+  {
+    id: "reality-choices",
+    title: "现实选择",
+    intro: "工作、钱、家庭、安全感和风险，都是最容易把人拉扯住的现实层面。",
+    cardIds: [
+      "obsess-for-success",
+      "startup-risk-topic",
+      "career-meaning-topic",
+      "family-pressure-topic",
+      "mission-no-money-topic",
+      "ordinary-intensity-topic",
+      "work-like-hell",
+    ],
+  },
+  {
+    id: "judgment-methods",
+    title: "判断方法",
+    intro: "当你不是缺努力，而是缺一个更清楚、更少自欺的判断框架。",
+    cardIds: [
+      "first-principles-thinking",
+      "think-like-a-physicist",
+      "obsess-over-truth",
+      "aspire-to-be-less-wrong",
+      "persist-or-stop",
+      "delusion-or-vision-topic",
+    ],
+  },
+  {
+    id: "direction-meaning",
+    title: "方向与意义",
+    intro: "当你想知道什么值得长期投入，或者失败之后到底还剩下什么。",
+    cardIds: [
+      "be-useful",
+      "fight-for-the-future",
+      "seek-the-nature-of-the-universe",
+      "meaning-after-failure-topic",
+    ],
+  },
+  {
+    id: "venture-building",
+    title: "创业与推进",
+    intro: "更适合已经在做项目、想做新事，或正在判断该怎么往前推的人。",
+    cardIds: [
+      "start-before-world-ready",
+      "constraints-topic",
+      "startup-risk-topic",
+      "delusion-or-vision-topic",
+      "persist-or-stop",
+    ],
+  },
+];
+
+var cardLibraryGroupById = Object.fromEntries(
+  topicLibraryGroups.flatMap((group) => group.cardIds.map((cardId) => [cardId, group.id]))
+);
+
+cards.forEach((card) => {
+  card.frontend.library_group = cardLibraryGroupById[card.id] || "direction-meaning";
+});
+
+var idToCard = Object.fromEntries(cards.map((card) => [card.id, card]));

@@ -1,0 +1,7 @@
+.git
+.cursor
+.env
+node_modules
+*.log
+reply-calibration-output.md
+deepseek-eval-output.md
