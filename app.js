@@ -343,7 +343,9 @@ function showDetail() {
   detailShell.classList.remove("hidden");
   detailShell.setAttribute("aria-hidden", "false");
   document.body.style.overflow = "hidden";
-  setTimeout(() => chatInput.focus(), 40);
+  if (shouldAutoFocusChatInput()) {
+    setTimeout(() => chatInput.focus(), 40);
+  }
 }
 
 function closeDetail() {
@@ -351,6 +353,14 @@ function closeDetail() {
   detailShell.classList.add("hidden");
   detailShell.setAttribute("aria-hidden", "true");
   document.body.style.overflow = "";
+}
+
+function shouldAutoFocusChatInput() {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+    return true;
+  }
+
+  return !window.matchMedia("(max-width: 780px)").matches;
 }
 
 function renderChatSystemNote() {
