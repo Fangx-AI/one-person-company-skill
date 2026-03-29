@@ -1184,8 +1184,35 @@ button {
     overflow: hidden;
   }
 
+  .detail-shell.chat-active .chat-layout {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+
   .messages {
     flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
+    gap: 0.7rem;
+    padding-right: 0;
+    padding-bottom: 0.35rem;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+  }
+
+  .detail-shell.chat-active .chat-panel {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+  }
+
+  .detail-shell.chat-active .messages {
+    flex: 1 1 auto;
+    min-height: 0;
     max-height: none;
     overflow-y: auto;
     gap: 0.7rem;
