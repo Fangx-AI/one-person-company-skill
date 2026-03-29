@@ -1006,6 +1006,12 @@ button {
 }
 
 @media (max-width: 780px) {
+  .detail-shell {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+  }
+
   .hero {
     padding-top: 2rem;
     gap: 1.2rem;
@@ -1134,8 +1140,14 @@ button {
   .detail-panel {
     width: min(100% - 16px, 1320px);
     margin: 8px auto;
+    height: calc(100vh - 16px);
+    height: calc(100dvh - 16px);
     max-height: calc(100vh - 16px);
+    max-height: calc(100dvh - 16px);
     padding: 0.85rem;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   .detail-panel__header {
@@ -1159,8 +1171,15 @@ button {
   }
 
   .chat-panel {
-    min-height: auto;
+    min-height: 0;
+    flex: 1 1 auto;
     padding: 1rem 0.95rem 0.95rem;
+  }
+
+  .chat-layout {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
   }
 
   .messages {
