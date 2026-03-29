@@ -100,6 +100,7 @@ pm2 start ecosystem.config.js --only book-of-elon-monitor
 ```
 
 默认监听 `127.0.0.1:3201`，不影响主站 `3000` 端口。建议通过 SSH 隧道或单独加一层 Nginx Basic Auth 后再暴露给浏览器访问。
+监控后台要求先配置 `MONITOR_USERNAME` 和 `MONITOR_PASSWORD`，否则会拒绝启动。
 
 如果你已经执行过 `pm2 startup`，可以再运行启动命令中提示的那条 `sudo` 命令完成开机自启绑定。
 
@@ -129,6 +130,8 @@ http://127.0.0.1:3201
 MONITOR_USERNAME=your_monitor_user
 MONITOR_PASSWORD=your_monitor_password
 ```
+
+如果还是示例占位值，监控后台同样会拒绝启动。
 
 如果你要从本地电脑访问服务器上的监控页，可以先做 SSH 端口转发：
 

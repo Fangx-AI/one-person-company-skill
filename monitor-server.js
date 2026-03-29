@@ -18,6 +18,20 @@ const PM2_HOME = readStringEnv("PM2_HOME", path.join(os.homedir(), ".pm2"));
 const LOG_TAIL_BYTES = 320000;
 const MAX_RECENT_EVENTS = 24;
 const REFRESH_INTERVAL_MS = 5000;
+const MONITOR_AUTH_CONFIG = validateMonitorAuthConfig();
+
+if (!MONITOR_AUTH_CONFIG.ok) {
+  console.error(
+    JSON.stringify({
+      type: "event",
+      level: "error",
+      event: "monitor_startup_validation_failed",
+      time: new Date().toISOString(),
+      details: MONITOR_AUTH_CONFIG.message,
+    })
+  );
+  process.exit(1);
+}
 
 const server = http.createServer(async (request, response) => {
   try {
@@ -69,7 +83,7 @@ server.listen(MONITOR_PORT, MONITOR_HOST, () => {
       targetHost: MONITOR_TARGET_HOST,
       targetPort: MONITOR_TARGET_PORT,
       targetApp: MONITOR_TARGET_APP,
-      authEnabled: Boolean(MONITOR_USERNAME && MONITOR_PASSWORD),
+      authEnabled: true,
     })
   );
 });
@@ -92,7 +106,7 @@ async function collectSnapshot() {
     monitor: {
       host: MONITOR_HOST,
       port: MONITOR_PORT,
-      authEnabled: Boolean(MONITOR_USERNAME && MONITOR_PASSWORD),
+      authEnabled: true,
     },
     health,
     ready,
@@ -146,52 +160,38 @@ function requestJson(url) {
 
 function readPm2ProcessInfo() {
   return new Promise((resolve) => {
-    execFile("pm2", ["jlist"], { windowsHide: true, timeout: 3000 }, (error, stdout) => {
-      if (error) {
+    readPm2AppEntry().then((result) => {
+      if (!result.ok) {
         resolve({
           ok: false,
-          error: error.message,
+          error: result.error,
         });
         return;
       }
 
-      try {
-        const list = JSON.parse(stdout);
-        const app = Array.isArray(list) ? list.find((item) => item?.name === MONITOR_TARGET_APP) : null;
-        if (!app) {
-          resolve({
-            ok: false,
-            error: `pm2_app_not_found:${MONITOR_TARGET_APP}`,
-          });
-          return;
-        }
-
-        const monit = app.monit || {};
-        const pm2Env = app.pm2_env || {};
-        resolve({
-          ok: true,
-          name: app.name,
-          pid: pm2Env.pm_pid || 0,
-          status: pm2Env.status || "unknown",
-          restarts: Number(pm2Env.restart_time || 0),
-          cpu: Number(monit.cpu || 0),
-          memoryMb: Number(((monit.memory || 0) / 1024 / 1024).toFixed(1)),
-          uptimeMs: pm2Env.pm_uptime ? Math.max(0, Date.now() - Number(pm2Env.pm_uptime)) : 0,
-        });
-      } catch (parseError) {
-        resolve({
-          ok: false,
-          error: `pm2_parse_failed:${parseError.message}`,
-        });
-      }
+      const app = result.app;
+      const monit = app.monit || {};
+      const pm2Env = app.pm2_env || {};
+      resolve({
+        ok: true,
+        name: app.name,
+        pid: pm2Env.pm_pid || 0,
+        status: pm2Env.status || "unknown",
+        restarts: Number(pm2Env.restart_time || 0),
+        cpu: Number(monit.cpu || 0),
+        memoryMb: Number(((monit.memory || 0) / 1024 / 1024).toFixed(1)),
+        uptimeMs: pm2Env.pm_uptime ? Math.max(0, Date.now() - Number(pm2Env.pm_uptime)) : 0,
+      });
     });
   });
 }
 
 async function readRecentEvents() {
+  const pm2Entry = await readPm2AppEntry();
+  const pm2Env = pm2Entry.ok ? pm2Entry.app.pm2_env || {} : {};
   const sources = {
-    outLog: path.join(PM2_HOME, "logs", `${MONITOR_TARGET_APP}-out-0.log`),
-    errorLog: path.join(PM2_HOME, "logs", `${MONITOR_TARGET_APP}-error-0.log`),
+    outLog: pm2Env.pm_out_log_path || path.join(PM2_HOME, "logs", `${MONITOR_TARGET_APP}-out-0.log`),
+    errorLog: pm2Env.pm_err_log_path || path.join(PM2_HOME, "logs", `${MONITOR_TARGET_APP}-error-0.log`),
   };
 
   const [outEvents, errorEvents] = await Promise.all([
@@ -336,10 +336,6 @@ function isEventWithinWindow(event, now, windowMs) {
 }
 
 function isAuthorized(request) {
-  if (!MONITOR_USERNAME || !MONITOR_PASSWORD) {
-    return true;
-  }
-
   const header = String(request.headers.authorization || "");
   if (!header.startsWith("Basic ")) {
     return false;
@@ -604,6 +600,63 @@ function readStringEnv(key, fallback) {
   return String(process.env[key] || env[key] || fallback).trim();
 }
 
+function validateMonitorAuthConfig() {
+  if (!MONITOR_USERNAME || !MONITOR_PASSWORD) {
+    return {
+      ok: false,
+      message: "MONITOR_USERNAME and MONITOR_PASSWORD are required before starting the monitor service.",
+    };
+  }
+
+  if (looksLikePlaceholderValue(MONITOR_USERNAME) || looksLikePlaceholderValue(MONITOR_PASSWORD)) {
+    return {
+      ok: false,
+      message: "Replace MONITOR_USERNAME and MONITOR_PASSWORD placeholders before starting the monitor service.",
+    };
+  }
+
+  return {
+    ok: true,
+    message: "Monitor auth config looks valid.",
+  };
+}
+
+function readPm2AppEntry() {
+  return new Promise((resolve) => {
+    execFile("pm2", ["jlist"], { windowsHide: true, timeout: 3000 }, (error, stdout) => {
+      if (error) {
+        resolve({
+          ok: false,
+          error: error.message,
+        });
+        return;
+      }
+
+      try {
+        const list = JSON.parse(stdout);
+        const app = Array.isArray(list) ? list.find((item) => item?.name === MONITOR_TARGET_APP) : null;
+        if (!app) {
+          resolve({
+            ok: false,
+            error: `pm2_app_not_found:${MONITOR_TARGET_APP}`,
+          });
+          return;
+        }
+
+        resolve({
+          ok: true,
+          app,
+        });
+      } catch (parseError) {
+        resolve({
+          ok: false,
+          error: `pm2_parse_failed:${parseError.message}`,
+        });
+      }
+    });
+  });
+}
+
 function readNumberEnv(key, fallback, min, max) {
   const raw = process.env[key] || env[key];
   const value = Number(raw);
@@ -630,4 +683,15 @@ function loadEnvFile(filePath) {
 
 function safeSlice(text, maxLength) {
   return String(text || "").slice(0, maxLength);
+}
+
+function looksLikePlaceholderValue(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (!normalized) return false;
+
+  return (
+    normalized.includes("replace_with") ||
+    normalized.includes("your_monitor") ||
+    normalized.includes("changeme")
+  );
 }
