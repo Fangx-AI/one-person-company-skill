@@ -259,6 +259,7 @@ function buildStats(events) {
   const now = Date.now();
   const last5m = events.filter((event) => isEventWithinWindow(event, now, 5 * 60 * 1000));
   const requestEvents = last5m.filter((event) => event.event === "request_completed");
+  const suspiciousScans = requestEvents.filter((event) => isLikelyScanRequest(event)).length;
 
   return {
     windowMinutes: 5,
@@ -272,6 +273,7 @@ function buildStats(events) {
     slowRequests: requestEvents.filter((event) => event.slowRequest === true).length,
     uniqueClientIps: new Set(requestEvents.map((event) => event.clientIp).filter(Boolean)).size,
     degradedResponses: requestEvents.filter((event) => event.degraded === true).length,
+    suspiciousScans,
   };
 }
 
@@ -292,30 +294,42 @@ function buildRecentEvents(events) {
 
 function isInterestingEvent(event) {
   if (!event) return false;
+  if (isLikelyScanRequest(event)) return false;
   if (event.event !== "request_completed") return true;
   return Number(event.statusCode) >= 400 || event.degraded === true || event.slowRequest === true;
 }
 
 function summarizeEvent(event) {
   if (event.event === "request_completed") {
-    return [
-      event.method || "",
-      event.path || "",
-      `status ${event.statusCode || ""}`,
-      event.provider ? `provider ${event.provider}` : "",
-      event.error ? `error ${event.error}` : "",
-      event.slowRequest ? "slow" : "",
-    ]
-      .filter(Boolean)
-      .join(" | ");
+    if (event.route === "api_chat" && Number(event.statusCode) === 200 && event.provider === "DeepSeek") {
+      return "用户发起了一次聊天，DeepSeek 正常回复。";
+    }
+
+    if (event.route === "api_chat" && Number(event.statusCode) === 200 && event.provider === "local-fallback") {
+      return "用户发起了一次聊天，但这次回复走了本地降级模式。";
+    }
+
+    if (Number(event.statusCode) === 429) {
+      return "有用户请求过快，被限流拦住了。";
+    }
+
+    if (Number(event.statusCode) >= 500) {
+      return "服务端返回了 5xx 错误，需要尽快检查。";
+    }
+
+    if (event.slowRequest) {
+      return `请求耗时较长（${event.durationMs || 0} ms），需要留意是否开始变慢。`;
+    }
+
+    return `${event.method || "请求"} ${event.path || ""} 返回了 ${event.statusCode || ""}。`;
   }
 
   if (event.event === "chat_request_rejected") {
-    return `reason ${event.reason || "unknown"} | ip ${event.clientIp || "-"}`;
+    return `有请求被安全策略拦住，原因是 ${event.reason || "unknown"}。`;
   }
 
   if (event.event === "upstream_request_failed") {
-    return `code ${event.code || "unknown"} | ${safeSlice(event.details || "", 120)}`;
+    return `DeepSeek 上游请求失败：${event.code || "unknown"}。`;
   }
 
   return safeSlice(
@@ -333,6 +347,14 @@ function summarizeEvent(event) {
 function isEventWithinWindow(event, now, windowMs) {
   const timestamp = Date.parse(event.time || "");
   return Number.isFinite(timestamp) && now - timestamp <= windowMs;
+}
+
+function isLikelyScanRequest(event) {
+  if (!event || event.event !== "request_completed") return false;
+  if (event.route !== "static" || Number(event.statusCode) !== 404) return false;
+
+  const requestPath = String(event.path || "").toLowerCase();
+  return /(index\.(php|jsp|asp)|localstart|xmlrpc|wp-|admin|cgi-bin|\.cgi|\.asp|\.aspx|\.jsp)$/.test(requestPath);
 }
 
 function isAuthorized(request) {
@@ -422,6 +444,16 @@ function buildDashboardHtml() {
     }
     .title { margin: 0 0 8px; font-size: 28px; }
     .subtitle, .meta, .mini { color: var(--soft); margin: 0; line-height: 1.6; }
+    .status-card { display: grid; gap: 12px; align-content: start; }
+    .status-main { font-size: 24px; font-weight: 800; }
+    .status-tip {
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: var(--soft);
+      line-height: 1.6;
+    }
     .badge {
       display: inline-flex;
       align-items: center;
@@ -438,6 +470,7 @@ function buildDashboardHtml() {
     .dot.danger { background: var(--danger); }
     .metric-value { font-size: 34px; font-weight: 800; margin: 8px 0 4px; }
     .metric-label { color: var(--soft); font-size: 14px; }
+    .metric-state { margin-top: 6px; font-size: 13px; color: var(--soft); }
     .events { grid-template-columns: 1fr 1fr; }
     .event-list { display: grid; gap: 10px; margin-top: 12px; }
     .event-item {
@@ -462,12 +495,13 @@ function buildDashboardHtml() {
     <section class="topbar">
       <div class="panel">
         <h1 class="title">Book of Elon 监控后台</h1>
-        <p class="subtitle">独立监控页，不影响主站聊天逻辑。自动每 ${Math.round(REFRESH_INTERVAL_MS / 1000)} 秒刷新一次。</p>
+        <p class="subtitle">只保留最重要的运行信号，自动每 ${Math.round(REFRESH_INTERVAL_MS / 1000)} 秒刷新一次。</p>
         <p class="meta" id="meta-line">正在加载监控数据...</p>
       </div>
-      <div class="panel">
+      <div class="panel status-card">
         <div class="badge"><span class="dot" id="status-dot"></span><span id="status-text">检查中</span></div>
-        <p class="meta" style="margin-top: 12px;" id="status-extra">等待服务状态...</p>
+        <div class="status-main" id="status-main">等待服务状态...</div>
+        <div class="status-tip" id="status-tip">正在读取主站运行状态和最近 5 分钟数据。</div>
       </div>
     </section>
 
@@ -492,7 +526,8 @@ function buildDashboardHtml() {
     const metaLine = document.getElementById("meta-line");
     const statusDot = document.getElementById("status-dot");
     const statusText = document.getElementById("status-text");
-    const statusExtra = document.getElementById("status-extra");
+    const statusMain = document.getElementById("status-main");
+    const statusTip = document.getElementById("status-tip");
 
     function escapeHtml(value) {
       return String(value || "")
@@ -514,7 +549,7 @@ function buildDashboardHtml() {
       return '<article class="panel">' +
         '<div class="metric-label">' + escapeHtml(label) + '</div>' +
         '<div class="metric-value">' + escapeHtml(value) + '</div>' +
-        '<div class="mini">' + escapeHtml(hint) + '</div>' +
+        '<div class="metric-state">' + escapeHtml(hint) + '</div>' +
         '</article>';
     }
 
@@ -535,46 +570,84 @@ function buildDashboardHtml() {
       const degraded = Boolean(ready.body && ready.body.degraded);
       const statusLevel = !healthOk || !readyOk ? "danger" : degraded ? "warn" : "ok";
       const statusLabel = !healthOk || !readyOk ? "服务异常" : degraded ? "降级运行中" : "运行正常";
+      const totalAlerts = (stats.rateLimited || 0) + (stats.securityRejected || 0) + (stats.serverErrors || 0) + (stats.degradedResponses || 0);
 
       statusDot.className = 'dot ' + statusLevel;
       statusText.textContent = statusLabel;
-      statusExtra.textContent =
-        'PM2: ' + (processInfo.status || 'unknown') +
-        ' | CPU ' + (processInfo.cpu || 0) + '%' +
-        ' | 内存 ' + (processInfo.memoryMb || 0) + ' MB';
+      statusMain.textContent = buildStatusMainText(statusLevel, stats, ready, processInfo);
+      statusTip.textContent = buildStatusTipText(statusLevel, stats, ready, processInfo);
 
       metaLine.textContent =
         '目标 ' + snapshot.target.app + ' @ ' + snapshot.target.host + ':' + snapshot.target.port +
         ' | 最近更新 ' + new Date(snapshot.generatedAt).toLocaleString();
 
       metricsGrid.innerHTML = [
-        buildMetricCard('近 5 分钟总请求', stats.totalRequests || 0, '全部 request_completed'),
-        buildMetricCard('聊天请求', stats.apiChatRequests || 0, 'route = api_chat'),
-        buildMetricCard('DeepSeek 正常回复', stats.deepseekReplies || 0, 'provider = DeepSeek'),
-        buildMetricCard('本地降级回复', stats.fallbackReplies || 0, 'provider = local-fallback'),
-        buildMetricCard('429 限流', stats.rateLimited || 0, '近 5 分钟'),
-        buildMetricCard('403 安全拦截', stats.securityRejected || 0, 'chat_request_rejected'),
-        buildMetricCard('慢请求', stats.slowRequests || 0, 'slowRequest = true'),
-        buildMetricCard('最近活跃 IP', stats.uniqueClientIps || 0, '近 5 分钟估算'),
+        buildMetricCard('最近 5 分钟访问', formatCount(stats.totalRequests), stats.totalRequests > 0 ? '说明现在有人在访问网站' : '最近 5 分钟几乎没人访问'),
+        buildMetricCard('最近 5 分钟聊天', formatCount(stats.apiChatRequests), stats.apiChatRequests > 0 ? '说明用户确实在和网站聊天' : '最近 5 分钟没人发起聊天'),
+        buildMetricCard('AI 正常回复', formatCount(stats.deepseekReplies), stats.deepseekReplies > 0 ? '说明 DeepSeek 正在正常工作' : '最近 5 分钟没有 DeepSeek 回复'),
+        buildMetricCard('降级回复', formatCount(stats.fallbackReplies), stats.fallbackReplies > 0 ? '说明有一部分回复没有走大模型' : '最近 5 分钟没有发生降级'),
+        buildMetricCard('需要注意的告警', formatCount(totalAlerts), totalAlerts > 0 ? '包含限流、安全拦截、5xx 或降级' : '最近 5 分钟没有明显告警'),
+        buildMetricCard('最近活跃人数', formatCount(stats.uniqueClientIps), '按不同 IP 粗略估算，不等于真实用户数'),
       ].join('');
 
       const recent = Array.isArray(snapshot.recentEvents) ? snapshot.recentEvents : [];
       recentEvents.innerHTML = recent.length
         ? recent.map((event) => buildEventItem(event.event, event.summary, new Date(event.time).toLocaleTimeString())).join('')
-        : buildEventItem('暂无关键事件', '最近日志里没有需要特别注意的异常或慢请求。', '');
+        : buildEventItem('暂无关键事件', '最近 5 分钟没有需要你立刻处理的问题。', '');
 
       const summaryItems = [
-        buildEventItem('健康检查 /health', health.ok ? '正常返回' : '请求失败', 'status ' + (health.statusCode || 0)),
-        buildEventItem('就绪检查 /ready', readyOk ? 'ready=true' : 'ready 异常', 'status ' + (ready.statusCode || 0)),
-        buildEventItem('降级状态', degraded ? '当前存在降级或熔断' : '当前未降级', ready.body ? JSON.stringify({
-          degraded: ready.body.degraded,
-          llmEnabled: ready.body.llmEnabled,
-          circuitOpen: ready.body.circuitOpen
-        }) : ''),
-        buildEventItem('PM2 进程', processInfo.ok === false ? (processInfo.error || '无法读取 PM2') : '进程在线', processInfo.ok === false ? '' : '重启 ' + (processInfo.restarts || 0) + ' 次，运行 ' + formatDuration(processInfo.uptimeMs || 0)),
-        buildEventItem('日志来源', 'out: ' + snapshot.sources.outLog, 'error: ' + snapshot.sources.errorLog),
+        buildEventItem('网站现在能不能用', healthOk && readyOk ? '可以，主站健康检查和就绪检查都正常。' : '现在不太正常，需要检查主站服务。', ''),
+        buildEventItem('大模型现在在不在工作', ready.body && ready.body.llmEnabled ? (degraded ? '大模型配置还在，但当前有降级。' : '大模型正常启用中。') : '当前没有启用大模型。', ''),
+        buildEventItem('有没有人被限流', (stats.rateLimited || 0) > 0 ? ('最近 5 分钟有 ' + formatCount(stats.rateLimited) + ' 次限流。') : '最近 5 分钟没有人被限流。', ''),
+        buildEventItem('有没有明显报错', (stats.serverErrors || 0) > 0 ? ('最近 5 分钟有 ' + formatCount(stats.serverErrors) + ' 次 5xx 错误。') : '最近 5 分钟没有看到 5xx 错误。', ''),
+        buildEventItem('有没有异常扫描', (stats.suspiciousScans || 0) > 0 ? ('最近 5 分钟发现 ' + formatCount(stats.suspiciousScans) + ' 次外网探测扫描，这很常见。') : '最近 5 分钟没有明显扫描噪音。', ''),
+        buildEventItem('进程状态', processInfo.ok === false ? '暂时读不到 PM2 进程状态。' : 'PM2 进程在线。', processInfo.ok === false ? '' : '重启 ' + formatCount(processInfo.restarts) + ' 次，已运行 ' + formatDuration(processInfo.uptimeMs || 0)),
       ];
       serviceSummary.innerHTML = summaryItems.join('');
+    }
+
+    function formatCount(value) {
+      return String(typeof value === 'number' && Number.isFinite(value) ? value : 0);
+    }
+
+    function buildStatusMainText(level, stats, ready, processInfo) {
+      if (level === 'danger') {
+        return '主站现在有明显异常，需要你优先看错误和进程状态。';
+      }
+
+      if (level === 'warn') {
+        return '主站还在跑，但已经出现降级，需要留意大模型链路。';
+      }
+
+      if ((stats.totalRequests || 0) === 0) {
+        return '服务是正常的，只是最近 5 分钟流量不多。';
+      }
+
+      if ((stats.apiChatRequests || 0) > 0 && (stats.deepseekReplies || 0) > 0) {
+        return '用户正在访问，而且聊天和大模型回复都在正常进行。';
+      }
+
+      if ((stats.apiChatRequests || 0) > 0) {
+        return '有人在聊天，但最近 5 分钟 DeepSeek 回复不多，建议再盯一下。';
+      }
+
+      return '网站正常在线，最近 5 分钟主要是浏览访问。';
+    }
+
+    function buildStatusTipText(level, stats, ready, processInfo) {
+      if (level === 'danger') {
+        return '先看下面的“最近关键事件”和“当前服务摘要”，重点盯 5xx、降级和 PM2 是否 still online。';
+      }
+
+      if (level === 'warn') {
+        return '先看“降级回复”和最近关键事件，如果继续增加，说明大模型链路可能开始不稳。';
+      }
+
+      if ((stats.rateLimited || 0) > 0 || (stats.securityRejected || 0) > 0) {
+        return '主站总体正常，但已经出现部分拦截或限流，可以继续观察是否持续增多。';
+      }
+
+      return '你现在主要看 3 个数字：聊天请求、AI 正常回复、需要注意的告警。它们一起正常，通常就说明站点没问题。';
     }
 
     async function refresh() {
