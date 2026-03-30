@@ -43,6 +43,8 @@ let resumeSession = loadSavedSession();
 let expandedTopicGroupIds = new Set();
 let currentChatSystemNotice = "";
 let lockedBodyScrollY = 0;
+let analyticsHeartbeatTimer = 0;
+let analyticsTrackingStarted = false;
 
 render();
 
@@ -53,6 +55,7 @@ function render() {
   renderQuickAskChips();
   renderResumeEntry();
   wireEvents();
+  startAnalyticsTracking();
 }
 
 function renderHeroFloatingCards() {
@@ -649,6 +652,70 @@ function escapeHtml(text) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function startAnalyticsTracking() {
+  if (analyticsTrackingStarted || typeof window === "undefined") {
+    return;
+  }
+
+  if (!runtimeConfig.analyticsEndpoint || !runtimeConfig.chatSessionToken) {
+    return;
+  }
+
+  analyticsTrackingStarted = true;
+  sendAnalyticsEvent("heartbeat");
+
+  const heartbeatMs = Math.max(30000, Number(runtimeConfig.analyticsHeartbeatMs) || 45000);
+  analyticsHeartbeatTimer = window.setInterval(() => {
+    if (document.visibilityState === "visible") {
+      sendAnalyticsEvent("heartbeat");
+    }
+  }, heartbeatMs);
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      sendAnalyticsEvent("leave", { preferBeacon: true });
+      return;
+    }
+
+    sendAnalyticsEvent("heartbeat");
+  });
+
+  window.addEventListener("pagehide", () => {
+    sendAnalyticsEvent("leave", { preferBeacon: true });
+  });
+}
+
+function sendAnalyticsEvent(type, options = {}) {
+  if (!runtimeConfig.analyticsEndpoint || !runtimeConfig.chatSessionToken) {
+    return;
+  }
+
+  const payload = JSON.stringify({
+    type,
+    token: runtimeConfig.chatSessionToken,
+    pagePath: window.location.pathname,
+  });
+
+  if (options.preferBeacon && navigator.sendBeacon) {
+    try {
+      const blob = new Blob([payload], { type: "application/json" });
+      navigator.sendBeacon(runtimeConfig.analyticsEndpoint, blob);
+      return;
+    } catch (error) {
+      console.warn("Analytics beacon failed, falling back to fetch.", error);
+    }
+  }
+
+  fetch(runtimeConfig.analyticsEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: payload,
+    keepalive: Boolean(options.preferBeacon),
+  }).catch(() => {});
 }
 
 window.BOOK_OF_ELON_DEBUG = {

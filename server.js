@@ -23,12 +23,23 @@ const CIRCUIT_BREAKER_COOLDOWN_MS = readNumberEnv("CIRCUIT_BREAKER_COOLDOWN_MS",
 const SLOW_REQUEST_THRESHOLD_MS = readNumberEnv("SLOW_REQUEST_THRESHOLD_MS", 4000, 100, 120000);
 const CLEANUP_INTERVAL_MS = 30000;
 const CHAT_TOKEN_TTL_MS = readNumberEnv("CHAT_TOKEN_TTL_MS", 6 * 60 * 60 * 1000, 60000, 7 * 24 * 60 * 60 * 1000);
+const ANALYTICS_ONLINE_WINDOW_MS = readNumberEnv("ANALYTICS_ONLINE_WINDOW_MS", 90000, 30000, 600000);
+const ANALYTICS_HEARTBEAT_MIN_INTERVAL_MS = readNumberEnv(
+  "ANALYTICS_HEARTBEAT_MIN_INTERVAL_MS",
+  20000,
+  5000,
+  300000
+);
+const ANALYTICS_RETENTION_DAYS = readNumberEnv("ANALYTICS_RETENTION_DAYS", 30, 1, 180);
+const ANALYTICS_FLUSH_INTERVAL_MS = 5000;
 const SESSION_TOKEN_SECRET =
   process.env.SESSION_TOKEN_SECRET ||
   env.SESSION_TOKEN_SECRET ||
   crypto.randomBytes(32).toString("hex");
 const CHAT_SESSION_COOKIE = "book_of_elon_sid";
 const CHAT_TOKEN_HEADER = "x-book-of-elon-token";
+const ANALYTICS_DATA_DIR = path.join(projectRoot, "data");
+const ANALYTICS_DATA_FILE = path.join(ANALYTICS_DATA_DIR, "business-metrics.json");
 
 const startupValidation = validateStartupConfig();
 if (startupValidation.errors.length) {
@@ -61,7 +72,10 @@ const circuitState = {
   consecutiveFailures: 0,
   openedAt: 0,
 };
+const analyticsState = loadAnalyticsState();
 let lastCleanupAt = 0;
+let analyticsFlushTimer = null;
+let analyticsFlushInFlight = false;
 
 const server = http.createServer(async (request, response) => {
   const startedAt = Date.now();
@@ -117,14 +131,32 @@ const server = http.createServer(async (request, response) => {
     if (requestUrl.pathname === "/config.js") {
       response.__meta.route = "config";
       const sessionId = getOrCreateAnonymousSessionId(request);
+      recordAnalyticsVisit(sessionId, request, requestUrl.pathname);
       return sendJavaScript(response, buildRuntimeConfigScript(sessionId), {
         "Set-Cookie": buildSessionCookie(request, sessionId),
       });
     }
 
+    if (requestUrl.pathname === "/api/analytics") {
+      response.__meta.route = "api_analytics";
+      return handleAnalyticsEventRequest(request, response);
+    }
+
     if (requestUrl.pathname === "/api/chat") {
       response.__meta.route = "api_chat";
       return handleChatRequest(request, response);
+    }
+
+    if (requestUrl.pathname === "/internal/analytics") {
+      response.__meta.route = "internal_analytics";
+      if (!isInternalMonitorRequest(request)) {
+        response.__meta.error = "forbidden";
+        return sendJson(response, 403, {
+          error: "forbidden",
+          requestId,
+        });
+      }
+      return sendJson(response, 200, buildAnalyticsSummary());
     }
 
     response.__meta.route = "static";
@@ -257,6 +289,11 @@ async function handleChatRequest(request, response) {
   if (cachedReply) {
     response.__meta.provider = cachedReply.provider;
     response.__meta.cacheHit = true;
+    recordAnalyticsChatTurn(securityCheck.sessionId, request, {
+      provider: cachedReply.provider,
+      degraded: false,
+      cacheHit: true,
+    });
     return sendJson(
       response,
       200,
@@ -272,6 +309,11 @@ async function handleChatRequest(request, response) {
   if (!DEEPSEEK_API_KEY) {
     response.__meta.provider = "local-fallback";
     response.__meta.degraded = true;
+    recordAnalyticsChatTurn(securityCheck.sessionId, request, {
+      provider: "local-fallback",
+      degraded: true,
+      reason: "missing_api_key",
+    });
     return sendJson(
       response,
       200,
@@ -291,6 +333,11 @@ async function handleChatRequest(request, response) {
     response.__meta.provider = "local-fallback";
     response.__meta.degraded = true;
     response.__meta.error = "circuit_open";
+    recordAnalyticsChatTurn(securityCheck.sessionId, request, {
+      provider: "local-fallback",
+      degraded: true,
+      reason: "circuit_open",
+    });
     return sendJson(
       response,
       200,
@@ -313,6 +360,11 @@ async function handleChatRequest(request, response) {
       setCachedReply(cacheKey, upstreamResult);
     }
     response.__meta.provider = upstreamResult.provider;
+    recordAnalyticsChatTurn(securityCheck.sessionId, request, {
+      provider: upstreamResult.provider,
+      degraded: false,
+      cacheHit: false,
+    });
 
     return sendJson(
       response,
@@ -334,6 +386,11 @@ async function handleChatRequest(request, response) {
       requestId: response.__meta.requestId,
       code: error.code || "upstream_failed",
       details: error.details || safeSlice(error.message, 300),
+    });
+    recordAnalyticsChatTurn(securityCheck.sessionId, request, {
+      provider: "local-fallback",
+      degraded: true,
+      reason: error.code || "upstream_unavailable",
     });
 
     return sendJson(
@@ -464,6 +521,8 @@ function buildRuntimeConfigScript(sessionId) {
     model: DEEPSEEK_MODEL,
     llmEnabled: Boolean(DEEPSEEK_API_KEY),
     chatEndpoint: "/api/chat",
+    analyticsEndpoint: "/api/analytics",
+    analyticsHeartbeatMs: Math.max(30000, ANALYTICS_HEARTBEAT_MIN_INTERVAL_MS * 2),
     requestTimeoutMs: UPSTREAM_TIMEOUT_MS,
     chatSessionToken: createChatSessionToken(sessionId),
   })};`;
@@ -546,6 +605,56 @@ function validateChatBody(body) {
       context: sanitizeContext(body.context),
     },
   };
+}
+
+async function handleAnalyticsEventRequest(request, response) {
+  if (request.method !== "POST") {
+    return sendJson(response, 405, {
+      error: "method_not_allowed",
+      requestId: response.__meta.requestId,
+    });
+  }
+
+  let rawBody;
+  try {
+    rawBody = await readJsonBody(request);
+  } catch (error) {
+    response.__meta.error = error.message || "invalid_json";
+    return sendJson(response, 400, {
+      error: "invalid_json",
+      requestId: response.__meta.requestId,
+    });
+  }
+
+  const securityCheck = validateChatRequestSecurity(request, rawBody?.token);
+  if (!securityCheck.ok) {
+    response.__meta.error = securityCheck.reason;
+    return sendJson(response, 403, {
+      error: securityCheck.reason,
+      requestId: response.__meta.requestId,
+    });
+  }
+
+  const eventType = String(rawBody?.type || "").trim();
+  if (eventType !== "heartbeat" && eventType !== "leave") {
+    response.__meta.error = "invalid_event_type";
+    return sendJson(response, 400, {
+      error: "invalid_event_type",
+      requestId: response.__meta.requestId,
+    });
+  }
+
+  const accepted = recordAnalyticsActivity(securityCheck.sessionId, request, eventType, {
+    pagePath: safeSlice(rawBody?.pagePath || "/", 120),
+    source: "frontend_beacon",
+  });
+
+  return sendJson(response, 202, {
+    ok: true,
+    accepted,
+    throttled: !accepted,
+    requestId: response.__meta.requestId,
+  });
 }
 
 function sanitizeMessages(messages) {
@@ -895,6 +1004,8 @@ function cleanupExpiredEntries() {
       rateLimitStore.delete(key);
     }
   }
+
+  pruneAnalyticsState(now);
 }
 
 function cleanupExpiredCacheEntries(now = Date.now()) {
@@ -940,6 +1051,7 @@ function logRequest({ request, response, startedAt }) {
 
 function shutdown() {
   logEvent("info", "server_shutdown_requested");
+  flushAnalyticsStateSync();
   server.close(() => process.exit(0));
 }
 
@@ -1009,7 +1121,7 @@ function createChatSessionToken(sessionId) {
   return `${expiresAt}.${signature}`;
 }
 
-function validateChatRequestSecurity(request) {
+function validateChatRequestSecurity(request, tokenOverride = "") {
   if (isLocalDevelopmentBypass(request)) {
     return {
       ok: true,
@@ -1033,7 +1145,12 @@ function validateChatRequestSecurity(request) {
     return { ok: false, reason: "missing_session" };
   }
 
-  const token = typeof request.headers[CHAT_TOKEN_HEADER] === "string" ? request.headers[CHAT_TOKEN_HEADER].trim() : "";
+  const token =
+    typeof tokenOverride === "string" && tokenOverride.trim()
+      ? tokenOverride.trim()
+      : typeof request.headers[CHAT_TOKEN_HEADER] === "string"
+        ? request.headers[CHAT_TOKEN_HEADER].trim()
+        : "";
   if (!token) {
     return { ok: false, reason: "missing_chat_token" };
   }
@@ -1166,6 +1283,12 @@ function normalizeIp(ip) {
   return ip;
 }
 
+function isInternalMonitorRequest(request) {
+  const remoteAddress = normalizeIp(request.socket?.remoteAddress || "");
+  const forwardedFor = String(request.headers["x-forwarded-for"] || "").trim();
+  return isTrustedProxy(remoteAddress) && !forwardedFor;
+}
+
 function isTrustedProxy(ip) {
   return ip === "127.0.0.1" || ip === "::1";
 }
@@ -1243,6 +1366,9 @@ function validateStartupConfig() {
   validateNumberSetting(errors, "CIRCUIT_BREAKER_FAIL_THRESHOLD", 1, 100);
   validateNumberSetting(errors, "CIRCUIT_BREAKER_COOLDOWN_MS", 1000, 600000);
   validateNumberSetting(errors, "SLOW_REQUEST_THRESHOLD_MS", 100, 120000);
+  validateNumberSetting(errors, "ANALYTICS_ONLINE_WINDOW_MS", 30000, 600000);
+  validateNumberSetting(errors, "ANALYTICS_HEARTBEAT_MIN_INTERVAL_MS", 5000, 300000);
+  validateNumberSetting(errors, "ANALYTICS_RETENTION_DAYS", 1, 180);
 
   if (!fs.existsSync(path.join(projectRoot, ".env")) && !process.env.DEEPSEEK_API_KEY) {
     warnings.push(".env file is missing and no process-level DEEPSEEK_API_KEY was provided.");
@@ -1326,4 +1452,274 @@ function sendJson(response, statusCode, payload, extraHeaders = {}) {
     ...extraHeaders,
   });
   response.end(JSON.stringify(payload));
+}
+
+function loadAnalyticsState() {
+  const fallback = {
+    version: 1,
+    updatedAt: new Date().toISOString(),
+    days: {},
+  };
+
+  try {
+    if (!fs.existsSync(ANALYTICS_DATA_FILE)) {
+      return fallback;
+    }
+
+    const parsed = JSON.parse(fs.readFileSync(ANALYTICS_DATA_FILE, "utf8"));
+    if (!parsed || typeof parsed !== "object" || typeof parsed.days !== "object") {
+      return fallback;
+    }
+
+    return {
+      version: 1,
+      updatedAt: typeof parsed.updatedAt === "string" ? parsed.updatedAt : fallback.updatedAt,
+      days: parsed.days,
+    };
+  } catch (error) {
+    logEvent("warning", "analytics_state_load_failed", {
+      details: safeSlice(error.message, 240),
+    });
+    return fallback;
+  }
+}
+
+function getAnalyticsDayKey(timestamp = Date.now()) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(timestamp);
+}
+
+function createEmptyAnalyticsDay(dayKey) {
+  return {
+    dayKey,
+    sessions: {},
+    totals: {
+      visits: 0,
+      chatUsers: 0,
+      chatTurns: 0,
+      deepseekReplies: 0,
+      fallbackReplies: 0,
+      degradedReplies: 0,
+    },
+  };
+}
+
+function ensureAnalyticsDay(dayKey = getAnalyticsDayKey()) {
+  if (!analyticsState.days[dayKey]) {
+    analyticsState.days[dayKey] = createEmptyAnalyticsDay(dayKey);
+  }
+  return analyticsState.days[dayKey];
+}
+
+function ensureAnalyticsSession(day, sessionId, now) {
+  if (!day.sessions[sessionId]) {
+    day.sessions[sessionId] = {
+      sessionId,
+      firstSeenAt: now,
+      lastSeenAt: now,
+      hasVisited: false,
+      hasChatted: false,
+      chatTurns: 0,
+      lastPagePath: "/",
+      lastHeartbeatRecordedAt: 0,
+    };
+  }
+  return day.sessions[sessionId];
+}
+
+function recordAnalyticsVisit(sessionId, request, pagePath = "/") {
+  return recordAnalyticsActivity(sessionId, request, "visit", {
+    pagePath,
+    source: "config_bootstrap",
+  });
+}
+
+function recordAnalyticsChatTurn(sessionId, request, details = {}) {
+  const accepted = recordAnalyticsActivity(sessionId, request, "chat_turn", {
+    pagePath: "/api/chat",
+    source: "chat_response",
+  });
+  if (!accepted) return false;
+
+  const day = ensureAnalyticsDay();
+  const session = ensureAnalyticsSession(day, sessionId, Date.now());
+  day.totals.chatTurns += 1;
+  session.chatTurns += 1;
+
+  if (!session.hasChatted) {
+    session.hasChatted = true;
+    day.totals.chatUsers += 1;
+  }
+
+  if (details.provider === "local-fallback") {
+    day.totals.fallbackReplies += 1;
+  } else {
+    day.totals.deepseekReplies += 1;
+  }
+
+  if (details.degraded) {
+    day.totals.degradedReplies += 1;
+  }
+
+  markAnalyticsDirty();
+  return true;
+}
+
+function recordAnalyticsActivity(sessionId, request, eventType, details = {}) {
+  const now = Date.now();
+  const day = ensureAnalyticsDay();
+  const session = ensureAnalyticsSession(day, sessionId, now);
+
+  if (
+    eventType === "heartbeat" &&
+    session.lastHeartbeatRecordedAt &&
+    now - session.lastHeartbeatRecordedAt < ANALYTICS_HEARTBEAT_MIN_INTERVAL_MS
+  ) {
+    return false;
+  }
+
+  if (!session.hasVisited) {
+    session.hasVisited = true;
+    day.totals.visits += 1;
+  }
+
+  session.lastSeenAt = now;
+  session.lastEventType = eventType;
+  session.lastPagePath = details.pagePath || session.lastPagePath || "/";
+  session.lastIp = getClientIp(request);
+  session.lastUserAgent = safeSlice(request.headers["user-agent"] || "", 180);
+
+  if (eventType === "heartbeat") {
+    session.lastHeartbeatRecordedAt = now;
+  }
+
+  markAnalyticsDirty();
+  return true;
+}
+
+function buildAnalyticsSummary() {
+  const now = Date.now();
+  pruneAnalyticsState(now);
+
+  const dayKey = getAnalyticsDayKey(now);
+  const day = ensureAnalyticsDay(dayKey);
+  const sessions = Object.values(day.sessions || {});
+  const totalDurationMs = sessions.reduce((sum, session) => sum + getAnalyticsSessionDurationMs(session), 0);
+  const currentOnlineUsers = countCurrentOnlineUsers(now);
+
+  return {
+    ok: true,
+    dayKey,
+    generatedAt: new Date(now).toISOString(),
+    today: {
+      visitors: Number(day.totals.visits || 0),
+      chatUsers: Number(day.totals.chatUsers || 0),
+      chatTurns: Number(day.totals.chatTurns || 0),
+      averageSessionDurationMs: sessions.length ? Math.round(totalDurationMs / sessions.length) : 0,
+      totalSessionDurationMs: totalDurationMs,
+      currentOnlineUsers,
+      deepseekReplies: Number(day.totals.deepseekReplies || 0),
+      fallbackReplies: Number(day.totals.fallbackReplies || 0),
+      degradedReplies: Number(day.totals.degradedReplies || 0),
+      trackedSessions: sessions.length,
+    },
+    config: {
+      onlineWindowMs: ANALYTICS_ONLINE_WINDOW_MS,
+      heartbeatMinIntervalMs: ANALYTICS_HEARTBEAT_MIN_INTERVAL_MS,
+    },
+  };
+}
+
+function countCurrentOnlineUsers(now = Date.now()) {
+  let total = 0;
+  for (const day of Object.values(analyticsState.days || {})) {
+    for (const session of Object.values(day.sessions || {})) {
+      if (session && now - Number(session.lastSeenAt || 0) <= ANALYTICS_ONLINE_WINDOW_MS) {
+        total += 1;
+      }
+    }
+  }
+  return total;
+}
+
+function getAnalyticsSessionDurationMs(session) {
+  const firstSeenAt = Number(session?.firstSeenAt || 0);
+  const lastSeenAt = Number(session?.lastSeenAt || firstSeenAt);
+  if (!firstSeenAt || !lastSeenAt) return 0;
+  return Math.min(Math.max(0, lastSeenAt - firstSeenAt), 12 * 60 * 60 * 1000);
+}
+
+function pruneAnalyticsState(now = Date.now()) {
+  const retentionThreshold = now - ANALYTICS_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+  let mutated = false;
+
+  for (const [dayKey, day] of Object.entries(analyticsState.days || {})) {
+    const dayTimestamp = Date.parse(`${dayKey}T00:00:00+08:00`);
+    if (Number.isFinite(dayTimestamp) && dayTimestamp < retentionThreshold) {
+      delete analyticsState.days[dayKey];
+      mutated = true;
+      continue;
+    }
+
+    for (const session of Object.values(day.sessions || {})) {
+      if (!session.lastSeenAt) {
+        session.lastSeenAt = session.firstSeenAt || now;
+        mutated = true;
+      }
+    }
+  }
+
+  if (mutated) {
+    markAnalyticsDirty();
+  }
+}
+
+function markAnalyticsDirty() {
+  analyticsState.updatedAt = new Date().toISOString();
+  scheduleAnalyticsFlush();
+}
+
+function scheduleAnalyticsFlush() {
+  if (analyticsFlushTimer) return;
+  analyticsFlushTimer = setTimeout(() => {
+    analyticsFlushTimer = null;
+    flushAnalyticsState();
+  }, ANALYTICS_FLUSH_INTERVAL_MS);
+}
+
+function flushAnalyticsState() {
+  if (analyticsFlushInFlight) {
+    scheduleAnalyticsFlush();
+    return;
+  }
+
+  analyticsFlushInFlight = true;
+  const snapshot = JSON.stringify(analyticsState);
+
+  fs.promises
+    .mkdir(ANALYTICS_DATA_DIR, { recursive: true })
+    .then(() => fs.promises.writeFile(ANALYTICS_DATA_FILE, snapshot, "utf8"))
+    .catch((error) => {
+      logEvent("warning", "analytics_state_flush_failed", {
+        details: safeSlice(error.message, 240),
+      });
+    })
+    .finally(() => {
+      analyticsFlushInFlight = false;
+    });
+}
+
+function flushAnalyticsStateSync() {
+  try {
+    fs.mkdirSync(ANALYTICS_DATA_DIR, { recursive: true });
+    fs.writeFileSync(ANALYTICS_DATA_FILE, JSON.stringify(analyticsState), "utf8");
+  } catch (error) {
+    logEvent("warning", "analytics_state_flush_failed", {
+      details: safeSlice(error.message, 240),
+    });
+  }
 }

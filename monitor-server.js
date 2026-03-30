@@ -89,11 +89,12 @@ server.listen(MONITOR_PORT, MONITOR_HOST, () => {
 });
 
 async function collectSnapshot() {
-  const [health, ready, processInfo, logResult] = await Promise.all([
+  const [health, ready, processInfo, logResult, business] = await Promise.all([
     requestJson(`http://${MONITOR_TARGET_HOST}:${MONITOR_TARGET_PORT}/health`),
     requestJson(`http://${MONITOR_TARGET_HOST}:${MONITOR_TARGET_PORT}/ready`),
     readPm2ProcessInfo(),
     readRecentEvents(),
+    requestJson(`http://${MONITOR_TARGET_HOST}:${MONITOR_TARGET_PORT}/internal/analytics`),
   ]);
 
   return {
@@ -111,6 +112,7 @@ async function collectSnapshot() {
     health,
     ready,
     process: processInfo,
+    business,
     stats: buildStats(logResult.events),
     recentEvents: buildRecentEvents(logResult.events),
     sources: logResult.sources,
@@ -259,21 +261,23 @@ function buildStats(events) {
   const now = Date.now();
   const last5m = events.filter((event) => isEventWithinWindow(event, now, 5 * 60 * 1000));
   const requestEvents = last5m.filter((event) => event.event === "request_completed");
-  const suspiciousScans = requestEvents.filter((event) => isLikelyScanRequest(event)).length;
+  const userFacingRequests = requestEvents.filter((event) => !isInternalMonitorProbe(event));
+  const suspiciousScans = userFacingRequests.filter((event) => isLikelyScanRequest(event)).length;
 
   return {
     windowMinutes: 5,
-    totalRequests: requestEvents.length,
-    apiChatRequests: requestEvents.filter((event) => event.route === "api_chat").length,
-    deepseekReplies: requestEvents.filter((event) => event.provider === "DeepSeek").length,
-    fallbackReplies: requestEvents.filter((event) => event.provider === "local-fallback").length,
+    totalRequests: userFacingRequests.length,
+    apiChatRequests: userFacingRequests.filter((event) => event.route === "api_chat").length,
+    deepseekReplies: userFacingRequests.filter((event) => event.provider === "DeepSeek").length,
+    fallbackReplies: userFacingRequests.filter((event) => event.provider === "local-fallback").length,
     securityRejected: last5m.filter((event) => event.event === "chat_request_rejected").length,
-    rateLimited: requestEvents.filter((event) => event.statusCode === 429).length,
-    serverErrors: requestEvents.filter((event) => Number(event.statusCode) >= 500).length,
-    slowRequests: requestEvents.filter((event) => event.slowRequest === true).length,
-    uniqueClientIps: new Set(requestEvents.map((event) => event.clientIp).filter(Boolean)).size,
-    degradedResponses: requestEvents.filter((event) => event.degraded === true).length,
+    rateLimited: userFacingRequests.filter((event) => event.statusCode === 429).length,
+    serverErrors: userFacingRequests.filter((event) => Number(event.statusCode) >= 500).length,
+    slowRequests: userFacingRequests.filter((event) => event.slowRequest === true).length,
+    uniqueClientIps: new Set(userFacingRequests.map((event) => event.clientIp).filter(Boolean)).size,
+    degradedResponses: userFacingRequests.filter((event) => event.degraded === true).length,
     suspiciousScans,
+    internalProbes: requestEvents.filter((event) => isInternalMonitorProbe(event)).length,
   };
 }
 
@@ -355,6 +359,14 @@ function isLikelyScanRequest(event) {
 
   const requestPath = String(event.path || "").toLowerCase();
   return /(index\.(php|jsp|asp)|localstart|xmlrpc|wp-|admin|cgi-bin|\.cgi|\.asp|\.aspx|\.jsp)$/.test(requestPath);
+}
+
+function isInternalMonitorProbe(event) {
+  if (!event || event.event !== "request_completed") return false;
+  if (!(event.route === "health" || event.route === "ready")) return false;
+
+  const clientIp = String(event.clientIp || "").trim();
+  return clientIp === "127.0.0.1" || clientIp === "::1";
 }
 
 function isAuthorized(request) {
@@ -471,6 +483,8 @@ function buildDashboardHtml() {
     .metric-value { font-size: 34px; font-weight: 800; margin: 8px 0 4px; }
     .metric-label { color: var(--soft); font-size: 14px; }
     .metric-state { margin-top: 6px; font-size: 13px; color: var(--soft); }
+    .definitions { margin-bottom: 16px; }
+    .definition-list { display: grid; gap: 10px; margin-top: 12px; }
     .events { grid-template-columns: 1fr 1fr; }
     .event-list { display: grid; gap: 10px; margin-top: 12px; }
     .event-item {
@@ -495,17 +509,22 @@ function buildDashboardHtml() {
     <section class="topbar">
       <div class="panel">
         <h1 class="title">Book of Elon 监控后台</h1>
-        <p class="subtitle">只保留最重要的运行信号，自动每 ${Math.round(REFRESH_INTERVAL_MS / 1000)} 秒刷新一次。</p>
+        <p class="subtitle">优先看今天的访问、聊天和停留时长，再辅以最关键的运行状态。</p>
         <p class="meta" id="meta-line">正在加载监控数据...</p>
       </div>
       <div class="panel status-card">
         <div class="badge"><span class="dot" id="status-dot"></span><span id="status-text">检查中</span></div>
         <div class="status-main" id="status-main">等待服务状态...</div>
-        <div class="status-tip" id="status-tip">正在读取主站运行状态和最近 5 分钟数据。</div>
+        <div class="status-tip" id="status-tip">正在读取主站运行状态和今日业务数据。</div>
       </div>
     </section>
 
     <section class="grid" id="metrics-grid"></section>
+
+    <section class="panel definitions">
+      <h2 style="margin: 0;">统计口径说明</h2>
+      <div class="definition-list" id="metric-definitions"></div>
+    </section>
 
     <section class="events">
       <div class="panel">
@@ -521,6 +540,7 @@ function buildDashboardHtml() {
 
   <script>
     const metricsGrid = document.getElementById("metrics-grid");
+    const metricDefinitions = document.getElementById("metric-definitions");
     const recentEvents = document.getElementById("recent-events");
     const serviceSummary = document.getElementById("service-summary");
     const metaLine = document.getElementById("meta-line");
@@ -562,6 +582,8 @@ function buildDashboardHtml() {
 
     function renderSnapshot(snapshot) {
       const stats = snapshot.stats || {};
+      const business = snapshot.business || {};
+      const today = business.body && business.body.today ? business.body.today : {};
       const ready = snapshot.ready || {};
       const health = snapshot.health || {};
       const processInfo = snapshot.process || {};
@@ -582,13 +604,23 @@ function buildDashboardHtml() {
         ' | 最近更新 ' + new Date(snapshot.generatedAt).toLocaleString();
 
       metricsGrid.innerHTML = [
-        buildMetricCard('最近 5 分钟访问', formatCount(stats.totalRequests), stats.totalRequests > 0 ? '说明现在有人在访问网站' : '最近 5 分钟几乎没人访问'),
-        buildMetricCard('最近 5 分钟聊天', formatCount(stats.apiChatRequests), stats.apiChatRequests > 0 ? '说明用户确实在和网站聊天' : '最近 5 分钟没人发起聊天'),
-        buildMetricCard('AI 正常回复', formatCount(stats.deepseekReplies), stats.deepseekReplies > 0 ? '说明 DeepSeek 正在正常工作' : '最近 5 分钟没有 DeepSeek 回复'),
-        buildMetricCard('降级回复', formatCount(stats.fallbackReplies), stats.fallbackReplies > 0 ? '说明有一部分回复没有走大模型' : '最近 5 分钟没有发生降级'),
-        buildMetricCard('需要注意的告警', formatCount(totalAlerts), totalAlerts > 0 ? '包含限流、安全拦截、5xx 或降级' : '最近 5 分钟没有明显告警'),
-        buildMetricCard('最近活跃人数', formatCount(stats.uniqueClientIps), '按不同 IP 粗略估算，不等于真实用户数'),
+        buildMetricCard('今天访问人数', formatCount(today.visitors), (today.visitors || 0) > 0 ? '按匿名会话去重，更接近真实访客数。' : '今天暂时还没有新的访问记录。'),
+        buildMetricCard('今天聊天人数', formatCount(today.chatUsers), (today.chatUsers || 0) > 0 ? '表示今天至少聊过一次的人数。' : '今天还没有人真正发起聊天。'),
+        buildMetricCard('今天总对话次数', formatCount(today.chatTurns), (today.chatTurns || 0) > 0 ? '每成功返回一轮回复就记 1 次。' : '今天还没有记录到对话轮次。'),
+        buildMetricCard('平均停留时长', formatDuration(today.averageSessionDurationMs || 0), '根据访问、心跳和离开事件估算，不需要登录。'),
+        buildMetricCard('当前在线人数', formatCount(today.currentOnlineUsers), (today.currentOnlineUsers || 0) > 0 ? '最近一小段时间内仍在活跃的匿名会话。' : '现在暂时没有检测到在线用户。'),
+        buildMetricCard('今日降级回复', formatCount(today.degradedReplies), (today.degradedReplies || 0) > 0 ? '说明今天有一部分回复没走到完整大模型链路。' : '今天暂时没有发生降级回复。'),
       ].join('');
+
+      const definitionItems = [
+        buildEventItem('今天访问人数怎么算', '用户打开网站时，主站会基于匿名会话记一次访问。同一个浏览器重复刷新不会一直累加，但换浏览器、开无痕或清缓存后，可能会被视为新的访客。', '真实访问事件'),
+        buildEventItem('今天聊天人数怎么算', '某个匿名会话今天只要成功聊过至少一轮，就会记为 1 个聊天用户。一个人今天聊很多次，仍然只算 1 个聊天人。', '按匿名会话去重'),
+        buildEventItem('今天总对话次数怎么算', '每当后端成功返回一轮聊天回复，就累计 1 次，所以这个数字通常是最接近真实使用次数的。', '最接近真实'),
+        buildEventItem('平均停留时长怎么算', '根据首次访问、停留期间的心跳、以及离开页面时的上报来估算。它是基于真实事件计算的，但不是埋点平台那种绝对精确秒表。', '估算值'),
+        buildEventItem('当前在线人数怎么算', '最近一小段时间内仍有心跳或活动记录的匿名会话，会被认为在线。所以它表示“当前活跃人数的大概值”，不是即时连接数。', '活跃近似值'),
+        buildEventItem('为什么会有误差', '主要来自无痕模式、换浏览器、清缓存、网络中断、浏览器没来得及发离开事件。这些不会让数据变成瞎编，只会带来可接受的小幅偏差。', '正常现象'),
+      ];
+      metricDefinitions.innerHTML = definitionItems.join('');
 
       const recent = Array.isArray(snapshot.recentEvents) ? snapshot.recentEvents : [];
       recentEvents.innerHTML = recent.length
@@ -598,9 +630,10 @@ function buildDashboardHtml() {
       const summaryItems = [
         buildEventItem('网站现在能不能用', healthOk && readyOk ? '可以，主站健康检查和就绪检查都正常。' : '现在不太正常，需要检查主站服务。', ''),
         buildEventItem('大模型现在在不在工作', ready.body && ready.body.llmEnabled ? (degraded ? '大模型配置还在，但当前有降级。' : '大模型正常启用中。') : '当前没有启用大模型。', ''),
-        buildEventItem('有没有人被限流', (stats.rateLimited || 0) > 0 ? ('最近 5 分钟有 ' + formatCount(stats.rateLimited) + ' 次限流。') : '最近 5 分钟没有人被限流。', ''),
-        buildEventItem('有没有明显报错', (stats.serverErrors || 0) > 0 ? ('最近 5 分钟有 ' + formatCount(stats.serverErrors) + ' 次 5xx 错误。') : '最近 5 分钟没有看到 5xx 错误。', ''),
-        buildEventItem('有没有异常扫描', (stats.suspiciousScans || 0) > 0 ? ('最近 5 分钟发现 ' + formatCount(stats.suspiciousScans) + ' 次外网探测扫描，这很常见。') : '最近 5 分钟没有明显扫描噪音。', ''),
+        buildEventItem('今天有多少人进来过', (today.visitors || 0) > 0 ? ('今天已经有 ' + formatCount(today.visitors) + ' 个匿名访客进入站点。') : '今天暂时还没有新的访客。', ''),
+        buildEventItem('今天聊得多不多', (today.chatTurns || 0) > 0 ? ('今天累计产生了 ' + formatCount(today.chatTurns) + ' 轮对话。') : '今天还没有形成实际对话。', ''),
+        buildEventItem('今天平均停留多久', (today.averageSessionDurationMs || 0) > 0 ? ('当前平均停留约 ' + formatDuration(today.averageSessionDurationMs || 0) + '。') : '目前停留时长样本还比较少。', ''),
+        buildEventItem('最近 5 分钟有没有告警', totalAlerts > 0 ? ('最近 5 分钟有 ' + formatCount(totalAlerts) + ' 条需要注意的告警。') : '最近 5 分钟没有明显告警。', ''),
         buildEventItem('进程状态', processInfo.ok === false ? '暂时读不到 PM2 进程状态。' : 'PM2 进程在线。', processInfo.ok === false ? '' : '重启 ' + formatCount(processInfo.restarts) + ' 次，已运行 ' + formatDuration(processInfo.uptimeMs || 0)),
       ];
       serviceSummary.innerHTML = summaryItems.join('');
@@ -620,7 +653,7 @@ function buildDashboardHtml() {
       }
 
       if ((stats.totalRequests || 0) === 0) {
-        return '服务是正常的，只是最近 5 分钟流量不多。';
+        return '服务是正常的，现在只是实时流量不高。';
       }
 
       if ((stats.apiChatRequests || 0) > 0 && (stats.deepseekReplies || 0) > 0) {
@@ -647,7 +680,7 @@ function buildDashboardHtml() {
         return '主站总体正常，但已经出现部分拦截或限流，可以继续观察是否持续增多。';
       }
 
-      return '你现在主要看 3 个数字：聊天请求、AI 正常回复、需要注意的告警。它们一起正常，通常就说明站点没问题。';
+      return '你现在优先看 5 个数字：今天访问、今天聊天、总对话次数、平均停留时长、当前在线人数。';
     }
 
     async function refresh() {
@@ -658,7 +691,8 @@ function buildDashboardHtml() {
       } catch (error) {
         statusDot.className = 'dot danger';
         statusText.textContent = '监控拉取失败';
-        statusExtra.textContent = error.message;
+        statusMain.textContent = '监控后台暂时拉不到最新数据。';
+        statusTip.textContent = error.message;
       }
     }
 
