@@ -1747,6 +1747,23 @@ button {
   letter-spacing: 0.02em;
 }
 
+/* Chrome/Edge/Safari 自动填充会强制把 input 背景刷成黄白色，
+   用 inset box-shadow + transition delay 大法盖掉，保留我们的深色玻璃风格。 */
+#auth-phone:-webkit-autofill,
+#auth-phone:-webkit-autofill:hover,
+#auth-phone:-webkit-autofill:focus,
+#auth-phone:-webkit-autofill:active,
+.auth-form__code-input:-webkit-autofill,
+.auth-form__code-input:-webkit-autofill:hover,
+.auth-form__code-input:-webkit-autofill:focus,
+.auth-form__code-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px rgba(11, 15, 26, 0.78) inset !important;
+  box-shadow: 0 0 0 1000px rgba(11, 15, 26, 0.78) inset !important;
+  -webkit-text-fill-color: var(--text) !important;
+  caret-color: var(--text) !important;
+  transition: background-color 99999s ease-in-out 0s, color 99999s ease-in-out 0s;
+}
+
 .auth-form__code-input {
   width: 100%;
   padding: 1.1rem 1rem;
