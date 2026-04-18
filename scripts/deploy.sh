@@ -144,7 +144,8 @@ HOME_CODE=$(curl -sf -o /dev/null -w "%{http_code}" http://127.0.0.1:3000/)
 ok "主页 HTTP $HOME_CODE"
 
 # 鉴权必须拒绝未登录
-DASH_CODE=$(curl -sf -o /dev/null -w "%{http_code}" http://127.0.0.1:3000/api/me/dashboard || echo "401")
+# 注意：不能用 -f，否则 curl 会因 401 被当失败而退出非零，叠加 -w 会输出 "401401"
+DASH_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:3000/api/me/dashboard)
 [ "$DASH_CODE" = "401" ] || fail "/api/me/dashboard 应该 401，实际 $DASH_CODE（鉴权破了？）"
 ok "鉴权拒绝 HTTP $DASH_CODE"
 
