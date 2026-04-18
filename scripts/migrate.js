@@ -127,15 +127,24 @@ if (DRY) {
 }
 
 // ───────── 执行 ─────────
+// schema.sql 顶头有 PRAGMA synchronous=NORMAL 等，这种 PRAGMA 不能在
+// transaction 里改 (SQLITE_ERROR: Safety level may not be changed inside
+// a transaction)。把它从 SQL 里剥掉，PRAGMA 留给 db/database.js 在 getDb()
+// 时设置即可。
+const rawSchemaSql = fs.readFileSync(SCHEMA_PATH, "utf8");
+const ddlOnlySchemaSql = rawSchemaSql
+  .split("\n")
+  .filter((line) => !/^\s*PRAGMA\s/i.test(line))
+  .join("\n");
+
 const txn = db.transaction(() => {
   for (const p of toApply) {
     db.exec(p.sql);
     console.log(`  ✓ ${p.sql}`);
   }
   // 跑 schema.sql：所有 CREATE 都是 IF NOT EXISTS，幂等
-  const schemaSql = fs.readFileSync(SCHEMA_PATH, "utf8");
-  db.exec(schemaSql);
-  console.log("  ✓ schema.sql applied (idempotent)");
+  db.exec(ddlOnlySchemaSql);
+  console.log("  ✓ schema.sql applied (idempotent, PRAGMAs skipped)");
 
   // 显式更新 schema_version
   db.prepare(
