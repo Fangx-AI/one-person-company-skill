@@ -14,6 +14,17 @@
     "preflight:prod": "node preflight-check.js --strict-production",
     "smoke:chat": "node deepseek-smoke-test.js",
     "test:reply": "node reply-calibration.js",
-    "test:deepseek": "node deepseek-eval.js"
+    "test:deepseek": "node deepseek-eval.js",
+    "db:init": "node scripts/init-db.js",
+    "db:smoke": "node scripts/smoke-db.js",
+    "db:backup": "node scripts/backup-db.js",
+    "db:migrate": "node scripts/migrate.js",
+    "db:migrate:apply": "node scripts/migrate.js --apply",
+    "auth:smoke": "node scripts/smoke-auth.js",
+    "persist:smoke": "node scripts/smoke-persistence.js",
+    "northstar:smoke": "node scripts/smoke-northstar.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.9.0"
   }
 }

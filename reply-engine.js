@@ -43,7 +43,21 @@ function buildGroundedReply(userText, card, intent, userContext) {
     : "";
   const quoteLine = evidence ? `书里有一句很贴近你现在的问题：\"${evidence}\"` : "";
 
-  return [mirror, "", chapterLine, "", interpretation, "", quoteLine, "", nextStep, "", buildClosingPrompt(userContext, card)]
+  const turnCount = chatMessages.filter((m) => m.role === "user").length;
+
+  if (turnCount <= 1) {
+    return [mirror, "", chapterLine, "", interpretation, "", quoteLine, "", nextStep, "", buildClosingPrompt(userContext, card)]
+      .filter(Boolean)
+      .join("\n");
+  }
+
+  if (turnCount <= 3) {
+    return [mirror, "", interpretation, "", quoteLine, "", nextStep]
+      .filter(Boolean)
+      .join("\n");
+  }
+
+  return [mirror, "", interpretation, "", nextStep]
     .filter(Boolean)
     .join("\n");
 }
@@ -156,6 +170,111 @@ function getCardFraming(card) {
       coreTension: "你是不是太快沿用了别人现成的答案",
       coreLesson: "重要问题要先回到底层事实、约束和逻辑，再重新推导答案",
       checks: ["最确定的底层事实是什么", "哪些前提只是惯例", "如果从零推导，结论会不会一样"],
+    },
+    "be-useful": {
+      coreTension: "你是不是把“我会不会成功”看得比“我到底帮到了谁”更重",
+      coreLesson: "价值不是抽象名词，而是你是否真的改善了别人的处境",
+      checks: ["你做的事到底帮到了谁", "这件事是在增加净贡献还是自我感动", "能不能先从小而真实的有用开始"],
+    },
+    "obsess-for-success": {
+      coreTension: "你是不是把赚钱本身当成了唯一驱动力",
+      coreLesson: "更稳的顺序是先找到你真正想做、又能对别人产生价值的事",
+      checks: ["你追的是赚钱本身，还是背后的安全感或认可", "如果喜欢的事暂时不赚钱，它有没有真实价值", "兴趣、能力和需求的交集在哪"],
+    },
+    "work-like-hell": {
+      coreTension: "你想要的结果和你愿意付出的代价是不是匹配",
+      coreLesson: "不是简单鸡血，而是目标和代价之间的真实比例关系",
+      checks: ["你要的结果到底值不值得那个代价", "你是在高强度推进还是在无效透支", "你是主动选择还是被环境裹挟"],
+    },
+    "obsess-over-truth": {
+      coreTension: "你是不是太想让某件事成立，以至于忽略了不想看到的信息",
+      coreLesson: "真实情况往往比愿望更重要，错的愿望不会因为你喜欢就变成对的现实",
+      checks: ["你现在是因为证据这样想，还是因为你希望它成立", "有没有主动找过和你立场相反的信息", "如果这件事失败了，最可能忽略了什么"],
+    },
+    "aspire-to-be-less-wrong": {
+      coreTension: "你是不是把承认错误等同于否定自己",
+      coreLesson: "成长不是追求永远对，而是越来越少犯同样的错",
+      checks: ["遇到新证据时能不能微调判断而不是死扛", "你上一次主动修正自己是什么时候", "你现在最可能错在哪一步"],
+    },
+    "think-like-a-physicist": {
+      coreTension: "你是不是被惯例和权威带着走，而没有回到底层约束",
+      coreLesson: "先尊重真实规律，再去谈愿景",
+      checks: ["真实的约束到底是什么", "你觉得难是因为真的不成立还是因为别人说难", "如果没有违反底层规律这件事值不值得试"],
+    },
+    "create-more-than-you-consume": {
+      coreTension: "你是不是陷在只争抢存量的零和心态里",
+      coreLesson: "创造多于消耗，意味着你在不断给世界增加东西",
+      checks: ["你最近在增加什么而不只是获取什么", "你做的事是在扩大总价值还是在重新分配", "能不能先从一点真实贡献开始"],
+    },
+    "fight-for-the-future": {
+      coreTension: "你是不是只盯着今天在忙什么，而没有问过自己在推动什么未来",
+      coreLesson: "未来不会自己加速到来，需要有人主动去推",
+      checks: ["你现在的努力在服务什么未来", "三年后你还认同这个方向吗", "你是在过日子还是在主动押注"],
+    },
+    "seek-the-nature-of-the-universe": {
+      coreTension: "你是不是被眼前得失限制了问题的尺度",
+      coreLesson: "当你只围着短期得失打转，人生会越来越窄",
+      checks: ["你困住自己的问题是不是太窄", "如果抬高一层来看这件事重要吗", "你是缺答案还是问的问题太小了"],
+    },
+    "persist-or-stop": {
+      coreTension: "你是在靠证据做判断，还是在靠不甘心在撑",
+      coreLesson: "继续还是止损，不该只看已经投入了多少，也要看证据是否在改善",
+      checks: ["最近有没有更清晰的小信号", "你的坚持是基于证据还是沉没成本", "如果继续下一步要追什么证据"],
+    },
+    "fear-of-judgment-topic": {
+      coreTension: "你害怕的是现实后果，还是来自外界眼光的羞耻感",
+      coreLesson: "很多退缩不是因为风险太大，而是羞耻感先替你做了决定",
+      checks: ["你最怕发生的具体后果是什么", "如果没有旁观者你会不会更愿意往前", "能不能先切小到不用一次性承受全部暴露感"],
+    },
+    "family-pressure-topic": {
+      coreTension: "你和家里人押注的是不同的未来",
+      coreLesson: "这类冲突的核心通常不是谁对谁错，而是双方在押注不同的确定性",
+      checks: ["家里担心的具体是什么", "如果没有这些声音你还认同这条路吗", "有没有渐进式推进方案"],
+    },
+    "constraints-topic": {
+      coreTension: "你是不是把默认设定当成了硬边界",
+      coreLesson: "理想不是忽视边界，而是在边界里重新找可行动的空间",
+      checks: ["哪些是真的不能动的硬边界", "哪些只是还没被重新设计过的默认值", "最小可验证动作是什么"],
+    },
+    "startup-risk-topic": {
+      coreTension: "你是不是在用鸡血或退缩替代对风险的真实判断",
+      coreLesson: "创业不是纯热血问题，而是价值、回报和风险排序的问题",
+      checks: ["这件事有没有真实价值", "你能不能用更小成本先得到信号", "现金流承受力到底有多大"],
+    },
+    "ordinary-intensity-topic": {
+      coreTension: "你的高强度在换什么，还是只是被环境裹挟",
+      coreLesson: "不是身份决定强度，而是目标、边界和回报关系决定",
+      checks: ["你现在的高强度在换什么结果", "你是主动押注还是被动消耗", "降低强度是不是更理性"],
+    },
+    "career-meaning-topic": {
+      coreTension: "留下你的到底是稳定、成长，还是惯性",
+      coreLesson: "稳定不是问题，问题是它是否长期把你固定在你并不认同的未来里",
+      checks: ["留下你的和你想离开的分别是什么", "三年后还是这样你愿不愿意接受", "能不能先低成本试探想去的方向"],
+    },
+    "small-step-topic": {
+      coreTension: "你缺的不是勇气，而是一个小到能开始的动作",
+      coreLesson: "面前的问题越大，越不该想着一次看清整张地图",
+      checks: ["这个动作能不能在 30 分钟内完成", "它能不能带来真实反馈", "你是在等完美方案还是在拖延"],
+    },
+    "founder-loneliness-topic": {
+      coreTension: "你缺的是支持、证据，还是节奏",
+      coreLesson: "孤独不一定说明你错了，但也不能把孤独当成你对了的证据",
+      checks: ["推进中有没有真实证据在积累", "你是缺认同感还是缺反馈", "你的节奏能不能让你不靠意志硬撑"],
+    },
+    "mission-no-money-topic": {
+      coreTension: "你是在混淆长期价值判断和短期生存判断",
+      coreLesson: "长期价值和短期回报经常不在同一个时间线上",
+      checks: ["这件事是真有价值还是只是你个人偏爱", "你是否需要并行方案而不是二选一", "如果方向对但节奏错能不能调节奏"],
+    },
+    "delusion-or-vision-topic": {
+      coreTension: "你以为自己在坚持长期主义，还是舍不得承认方向不对",
+      coreLesson: "真正有用的分界线不在情绪强度，而在证据质量",
+      checks: ["你定义过你要看的信号吗", "三个月后反馈有没有变得更清晰", "能不能让一个不站你这边的人来挑刺"],
+    },
+    "meaning-after-failure-topic": {
+      coreTension: "你是不是在用输赢单点定义意义",
+      coreLesson: "意义不只来自赢，也来自你到底在服务什么价值和未来",
+      checks: ["这段经历到底留下了什么", "它服务的那个价值你至今仍认同吗", "失败是在校准方向还是说明该结束"],
     },
   };
 
@@ -368,10 +487,14 @@ function buildClarifyingPrompt(userContext, card) {
 }
 
 function buildClosingPrompt(userContext, card) {
+  const clarify = buildClarifyingPrompt(userContext, card);
   const prompts = [
-    `如果你愿意，你下一条可以直接告诉我：${buildClarifyingPrompt(userContext, card)}`,
-    `你要是想继续拆，我建议你下一条直接回答：${buildClarifyingPrompt(userContext, card)}`,
-    `我们可以继续往下走，你下一条最值得补的是：${buildClarifyingPrompt(userContext, card)}`,
+    `如果你愿意，你下一条可以直接告诉我：${clarify}`,
+    `你要是想继续拆，我建议你下一条直接回答：${clarify}`,
+    `我们可以继续往下走，你下一条最值得补的是：${clarify}`,
+    `想再深一层的话，你可以说说：${clarify}`,
+    `不急着下结论，你下一条可以先聊聊：${clarify}`,
+    `如果你想把这件事拆得更具体，可以先回答：${clarify}`,
   ];
   return pickVariant(`${userContext.currentText}:${card.id}`, prompts);
 }

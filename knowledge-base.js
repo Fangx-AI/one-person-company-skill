@@ -30,6 +30,7 @@ function buildCardChunks(card) {
 
   const pushChunk = (type, text, weight, extraTerms = []) => {
     if (!text) return;
+    const allTerms = [...baseTerms, ...extraTerms].filter(Boolean);
     chunks.push({
       id: `${card.id}:${type}:${chunks.length}`,
       cardId: card.id,
@@ -37,7 +38,9 @@ function buildCardChunks(card) {
       type,
       text,
       weight,
-      terms: [...baseTerms, ...extraTerms].filter(Boolean),
+      terms: allTerms,
+      _normalizedText: normalizeSearchText(text),
+      _normalizedTerms: allTerms.map(normalizeSearchText).filter(Boolean),
     });
   };
 
@@ -66,17 +69,22 @@ function buildBookSourceChunks(cards, bookSource) {
     const linkedCardIds = inferLinkedCardIds(cards, chapter);
     const paragraphs = splitBookText(chapter.text);
 
-    return paragraphs.map((paragraph, index) => ({
-      id: `book:${chapter.id}:${index}`,
-      cardId: linkedCardIds[0] || null,
-      linkedCardIds,
-      type: paragraph.length > 260 ? "book_paragraph" : "book_quote",
-      text: paragraph,
-      weight: linkedCardIds.length ? 3 : 1.6,
-      terms: [chapter.title, chapter.part, chapter.excerpt, ...linkedCardIds.map((id) => idToCard[id]?.frontend.title_zh)].filter(Boolean),
-      chapterTitle: chapter.title,
-      chapterPart: chapter.part,
-    }));
+    return paragraphs.map((paragraph, index) => {
+      const allTerms = [chapter.title, chapter.part, chapter.excerpt, ...linkedCardIds.map((id) => idToCard[id]?.frontend.title_zh)].filter(Boolean);
+      return {
+        id: `book:${chapter.id}:${index}`,
+        cardId: linkedCardIds[0] || null,
+        linkedCardIds,
+        type: paragraph.length > 260 ? "book_paragraph" : "book_quote",
+        text: paragraph,
+        weight: linkedCardIds.length ? 3 : 1.6,
+        terms: allTerms,
+        _normalizedText: normalizeSearchText(paragraph),
+        _normalizedTerms: allTerms.map(normalizeSearchText).filter(Boolean),
+        chapterTitle: chapter.title,
+        chapterPart: chapter.part,
+      };
+    });
   });
 }
 
@@ -144,16 +152,15 @@ function searchKnowledgeBase(query, options = {}) {
 }
 
 function scoreKnowledgeChunk(normalizedQuery, tokens, chunk, activeCardId) {
-  const chunkText = normalizeSearchText(chunk.text);
+  const chunkText = chunk._normalizedText || normalizeSearchText(chunk.text);
+  const normalizedTerms = chunk._normalizedTerms || chunk.terms.map(normalizeSearchText).filter(Boolean);
   let score = 0;
 
   if (activeCardId && chunk.cardId === activeCardId) score += 6;
   if (activeCardId && chunk.linkedCardIds?.includes(activeCardId)) score += 8;
   if (chunkText.includes(normalizedQuery)) score += 8 * chunk.weight;
 
-  for (const term of chunk.terms) {
-    const normalizedTerm = normalizeSearchText(term);
-    if (!normalizedTerm) continue;
+  for (const normalizedTerm of normalizedTerms) {
     if (normalizedQuery.includes(normalizedTerm)) score += 4 * chunk.weight;
     if (normalizedTerm.includes(normalizedQuery) && normalizedQuery.length >= 2) score += 3;
   }
@@ -161,9 +168,7 @@ function scoreKnowledgeChunk(normalizedQuery, tokens, chunk, activeCardId) {
   for (const token of tokens) {
     if (token.length < 2) continue;
     if (chunkText.includes(token)) score += token.length > 2 ? 1.6 : 0.8;
-    if (chunk.terms.some((term) => normalizeSearchText(term).includes(token))) {
-      score += 2;
-    }
+    if (normalizedTerms.some((nt) => nt.includes(token))) score += 2;
   }
 
   return score;

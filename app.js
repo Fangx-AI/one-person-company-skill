@@ -1,6 +1,23 @@
-var bookSource = window.BOOK_OF_ELON_SOURCE || null;
-var knowledgeBase = buildKnowledgeBase(cards, bookSource);
+var knowledgeBase = buildKnowledgeBase(cards, null);
 window.BOOK_OF_ELON_KB = knowledgeBase;
+
+function loadBookSourceAsync() {
+  if (window.BOOK_OF_ELON_SOURCE) {
+    knowledgeBase = buildKnowledgeBase(cards, window.BOOK_OF_ELON_SOURCE);
+    window.BOOK_OF_ELON_KB = knowledgeBase;
+    return;
+  }
+
+  var script = document.createElement("script");
+  script.src = "./book-source.js?v=20260414-perf2";
+  script.onload = function () {
+    if (window.BOOK_OF_ELON_SOURCE) {
+      knowledgeBase = buildKnowledgeBase(cards, window.BOOK_OF_ELON_SOURCE);
+      window.BOOK_OF_ELON_KB = knowledgeBase;
+    }
+  };
+  document.head.appendChild(script);
+}
 
 const heroFloatingCards = document.getElementById("hero-floating-cards");
 const featuredGrid = document.getElementById("featured-grid");
@@ -56,9 +73,39 @@ function render() {
   renderResumeEntry();
   wireEvents();
   startAnalyticsTracking();
+  setupAnimationObservers();
+  setTimeout(loadBookSourceAsync, 0);
+}
+
+function setupAnimationObservers() {
+  if (typeof IntersectionObserver === "undefined") return;
+
+  const beltTrack = document.querySelector(".topic-library-belt__track");
+  if (beltTrack) {
+    new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          entry.target.style.animationPlayState = entry.isIntersecting ? "running" : "paused";
+        });
+      },
+      { threshold: 0 }
+    ).observe(beltTrack);
+  }
+
+  document.querySelectorAll(".ambient").forEach((el) => {
+    new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          entry.target.style.animationPlayState = entry.isIntersecting ? "running" : "paused";
+        });
+      },
+      { threshold: 0 }
+    ).observe(el);
+  });
 }
 
 function renderHeroFloatingCards() {
+  if (!heroFloatingCards) return;
   const floatingConfig = [
     { id: "feel-the-fear-do-it-anyway", top: "0px", left: "24px" },
     { id: "start-before-world-ready", top: "110px", right: "14px" },
@@ -82,6 +129,7 @@ function renderHeroFloatingCards() {
 }
 
 function renderFeaturedCards() {
+  if (!featuredGrid) return;
   const spans = [7, 5, 5, 7, 6, 6];
   featuredGrid.innerHTML = featuredIds
     .map((id, index) => {
@@ -163,6 +211,8 @@ function renderTopicLibraryGroupCard(group, index) {
 }
 
 function renderQuickAskChips() {
+  if (!quickChipRow) return;
+  if (quickChipRow.dataset.preserveChildren === "true") return;
   quickChipRow.innerHTML = quickAskPrompts
     .map((prompt) => `<button class="chip-button" type="button" data-quick-ask="${prompt}">${prompt}</button>`)
     .join("");
@@ -207,8 +257,8 @@ function wireEvents() {
   });
 
   randomCardBtn.addEventListener("click", () => {
-    const pick = featuredIds[Math.floor(Math.random() * featuredIds.length)];
-    openCard(pick);
+    const pick = cards[Math.floor(Math.random() * cards.length)];
+    openCard(pick.id);
   });
 
   askDirectBtn.addEventListener("click", () => openGenericCoach(""));
@@ -219,12 +269,22 @@ function wireEvents() {
   });
 
   quickAskInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
       event.preventDefault();
       const message = quickAskInput.value.trim();
       openGenericCoach(message);
     }
   });
+
+  if (quickAskInput.tagName === "TEXTAREA") {
+    const autoGrow = () => {
+      quickAskInput.style.height = "auto";
+      const next = Math.min(quickAskInput.scrollHeight, 200);
+      quickAskInput.style.height = next + "px";
+    };
+    quickAskInput.addEventListener("input", autoGrow);
+    autoGrow();
+  }
 
   chatForm.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -270,12 +330,9 @@ function openGenericCoach(initialQuestion) {
   currentCardId = null;
   currentChatSystemNotice = "";
   applyGenericDetail();
-  chatMessages = [
-    {
-      role: "assistant",
-      text: "直接说你现在卡住的问题就行。我会先帮你找到最相关的主题，再陪你往下拆。",
-    },
-  ];
+  chatMessages = initialQuestion
+    ? []
+    : [{ role: "assistant", text: "说吧。" }];
 
   updateConversationDensity();
   renderMessages();
@@ -292,14 +349,21 @@ function renderMessages() {
   renderChatSystemNote();
   messagesEl.innerHTML = chatMessages
     .map(
-      (message) => `
-        <article class="message message--${message.role}${message.pending ? " message--pending" : ""}">
-          ${formatMessage(message.text)}
-        </article>
-      `
+      (message) =>
+        `<article class="message message--${message.role}${message.pending ? " message--pending" : ""}">${formatMessage(message.text)}</article>`
     )
     .join("");
-  messagesEl.scrollTop = messagesEl.scrollHeight;
+  scrollConversationToBottom();
+}
+
+function scrollConversationToBottom() {
+  if (messagesEl) {
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+  const scroller = document.getElementById("conversation-scroll");
+  if (scroller) {
+    scroller.scrollTop = scroller.scrollHeight;
+  }
 }
 
 async function pushUserMessage(text) {
@@ -325,6 +389,10 @@ async function pushUserMessage(text) {
     currentChatSystemNotice = assistantResult.degraded ? assistantResult.notice : "";
     pendingMessage.text = assistantResult.text;
     delete pendingMessage.pending;
+  } catch (error) {
+    console.error("Chat reply failed:", error);
+    pendingMessage.text = "抱歉，回复生成失败了。你可以再试一次，或者换个方式描述你的问题。";
+    delete pendingMessage.pending;
   } finally {
     setComposerState(false);
     renderMessages();
@@ -347,6 +415,8 @@ function showDetail() {
   detailShell.classList.remove("hidden");
   detailShell.setAttribute("aria-hidden", "false");
   lockBodyScroll();
+  const scroller = document.getElementById("conversation-scroll");
+  if (scroller) scroller.scrollTop = 0;
   if (shouldAutoFocusChatInput()) {
     setTimeout(() => chatInput.focus(), 40);
   }
@@ -357,6 +427,12 @@ function closeDetail() {
   detailShell.classList.add("hidden");
   detailShell.setAttribute("aria-hidden", "true");
   unlockBodyScroll();
+  if (quickAskInput) {
+    quickAskInput.value = "";
+    if (quickAskInput.tagName === "TEXTAREA") {
+      quickAskInput.style.height = "auto";
+    }
+  }
 }
 
 function shouldAutoFocusChatInput() {
@@ -411,18 +487,30 @@ function toggleTopicGroup(groupId) {
 function applyCardDetail(card) {
   detailEyebrow.textContent = "";
   detailTitle.textContent = card.frontend.title_zh;
-  detailHook.textContent = card.frontend.hook_zh;
+  detailHook.textContent = "";
   detailSummary.textContent = "";
   syncDetailDescriptions();
+  updateConversationHeadVisibility();
 }
 
 function applyGenericDetail() {
-  detailEyebrow.textContent = "开放提问 / 中文思考教练";
-  detailTitle.textContent = "直接开始提问";
-  detailHook.textContent = "你可以先说出你现在真实卡住的问题，我会把它尽量连接到合适的主题。";
-  detailSummary.textContent =
-    "这是一个基于《The Book of Elon》主题知识构建的中文互动教练入口。它优先帮你澄清问题，再把你带向合适的卡片和思想主题。";
+  detailEyebrow.textContent = "";
+  detailTitle.textContent = "";
+  detailHook.textContent = "";
+  detailSummary.textContent = "";
   syncDetailDescriptions();
+  updateConversationHeadVisibility();
+}
+
+function updateConversationHeadVisibility() {
+  const head = document.querySelector(".conversation__head");
+  if (!head) return;
+  const hasAny = ["detail-eyebrow", "detail-title", "detail-hook", "detail-summary"]
+    .some((id) => {
+      const el = document.getElementById(id);
+      return el && el.textContent.trim().length > 0;
+    });
+  head.classList.toggle("conversation__head--empty", !hasAny);
 }
 
 function applySavedDetail(session) {
@@ -433,11 +521,12 @@ function applySavedDetail(session) {
   }
 
   const detailMeta = session.detailMeta || {};
-  detailEyebrow.textContent = detailMeta.eyebrow || "OPEN QUESTION / CHINESE THOUGHT COACH";
-  detailTitle.textContent = detailMeta.title || "继续上次对话";
-  detailHook.textContent = detailMeta.hook || "继续回到你上次聊到的地方。";
-  detailSummary.textContent = detailMeta.summary || "";
+  detailEyebrow.textContent = "";
+  detailTitle.textContent = detailMeta.title || "";
+  detailHook.textContent = "";
+  detailSummary.textContent = "";
   syncDetailDescriptions();
+  updateConversationHeadVisibility();
 }
 
 function resumeSavedConversation() {
@@ -465,7 +554,7 @@ function persistChatSession() {
   const snapshot = buildChatSessionSnapshot();
   if (!snapshot) return;
 
-  const storage = getSessionStorage();
+  const storage = getPersistentStorage();
   if (!storage) return;
 
   try {
@@ -479,7 +568,7 @@ function persistChatSession() {
 
 function clearSavedSession() {
   resumeSession = null;
-  const storage = getSessionStorage();
+  const storage = getPersistentStorage();
 
   try {
     if (storage) {
@@ -514,7 +603,7 @@ function buildChatSessionSnapshot() {
 }
 
 function loadSavedSession() {
-  const storage = getSessionStorage();
+  const storage = getPersistentStorage();
   if (!storage) return null;
 
   try {
@@ -552,7 +641,7 @@ function loadSavedSession() {
   }
 }
 
-function getSessionStorage() {
+function getPersistentStorage() {
   if (typeof window === "undefined" || !window.localStorage) {
     return null;
   }
@@ -639,10 +728,91 @@ function syncDetailDescriptions() {
   detailSummary.hidden = !detailSummary.textContent.trim();
 }
 
+function animateLastAssistantMessage() {
+  const messageEls = messagesEl.querySelectorAll(".message--assistant");
+  const lastEl = messageEls[messageEls.length - 1];
+  if (!lastEl) return;
+
+  const fullHtml = lastEl.innerHTML;
+  lastEl.innerHTML = "";
+  lastEl.classList.add("message--typing");
+
+  const segments = fullHtml.split(/(<br>|<strong>.*?<\/strong>)/g).filter(Boolean);
+  let currentIndex = 0;
+
+  function showNextSegment() {
+    if (currentIndex >= segments.length) {
+      lastEl.classList.remove("message--typing");
+      scrollConversationToBottom();
+      return;
+    }
+
+    const segment = segments[currentIndex];
+    currentIndex += 1;
+
+    if (segment === "<br>" || segment.startsWith("<strong>")) {
+      lastEl.innerHTML += segment;
+      scrollConversationToBottom();
+      setTimeout(showNextSegment, segment === "<br>" ? 80 : 30);
+      return;
+    }
+
+    let charIndex = 0;
+    function typeChar() {
+      if (charIndex >= segment.length) {
+        setTimeout(showNextSegment, 20);
+        return;
+      }
+      const batchSize = Math.min(3, segment.length - charIndex);
+      lastEl.innerHTML += segment.slice(charIndex, charIndex + batchSize);
+      charIndex += batchSize;
+      scrollConversationToBottom();
+      setTimeout(typeChar, 18);
+    }
+    typeChar();
+  }
+
+  showNextSegment();
+}
+
 function formatMessage(text) {
-  return escapeHtml(text)
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\n/g, "<br>");
+  const escaped = escapeHtml(text);
+  const lines = escaped.split("\n");
+  const result = [];
+  let inList = false;
+
+  for (const line of lines) {
+    const listMatch = line.match(/^[-•]\s+(.+)/);
+    const quoteMatch = line.match(/^&gt;\s*(.+)/);
+
+    if (listMatch) {
+      if (!inList) {
+        result.push('<ul class="message-list">');
+        inList = true;
+      }
+      result.push(`<li>${applyInlineFormatting(listMatch[1])}</li>`);
+      continue;
+    }
+
+    if (inList) {
+      result.push("</ul>");
+      inList = false;
+    }
+
+    if (quoteMatch) {
+      result.push(`<blockquote class="message-quote">${applyInlineFormatting(quoteMatch[1])}</blockquote>`);
+      continue;
+    }
+
+    result.push(applyInlineFormatting(line));
+  }
+
+  if (inList) result.push("</ul>");
+  return result.join("<br>");
+}
+
+function applyInlineFormatting(text) {
+  return text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
 }
 
 function escapeHtml(text) {
@@ -718,7 +888,7 @@ function sendAnalyticsEvent(type, options = {}) {
   }).catch(() => {});
 }
 
-window.BOOK_OF_ELON_DEBUG = {
+if (location.hostname === "localhost" || location.hostname === "127.0.0.1") window.BOOK_OF_ELON_DEBUG = {
   cards,
   knowledgeBase,
   runtimeConfig,

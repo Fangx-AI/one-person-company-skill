@@ -14,7 +14,7 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;800&display=swap"
     rel="stylesheet"
   >
-  <link rel="stylesheet" href="./styles.css?v=20260329-security1">
+  <link rel="stylesheet" href="./styles.css?v=20260418-mem2">
 </head>
 <body>
   <div class="page-shell">
@@ -22,128 +22,194 @@
     <div class="ambient ambient-b"></div>
     <div class="noise"></div>
 
-    <main class="home-page">
-      <section class="hero" id="top">
-        <div class="hero-copy">
-          <p class="eyebrow">THE BOOK OF ELON / INTERACTIVE COACH</p>
-          <h1>和 The Book of Elon 对话</h1>
-          <p class="hero-subtitle">
-            把整本书拆成可点击的思想卡片。
-          </p>
-          <div class="hero-actions">
-            <button class="primary-button" id="random-card-btn">随机进入一张卡片</button>
-            <button class="secondary-button" id="ask-direct-btn">直接开始提问</button>
-          </div>
+    <header class="site-header" id="site-header">
+      <a class="site-header__brand" href="#top">
+        <span class="site-header__brand-mark">BoE</span>
+        <span class="site-header__brand-text">The Book of Elon</span>
+      </a>
+      <nav class="site-header__nav" id="site-header-nav">
+        <button class="site-header__login-btn" id="login-btn" type="button">登录</button>
+      </nav>
+    </header>
 
-          <section class="resume-conversation hidden" id="resume-conversation-block" aria-live="polite">
-            <div class="resume-conversation__copy">
-          <p class="resume-conversation__eyebrow">上次对话</p>
-              <div class="resume-conversation__heading">
-                <span class="resume-conversation__badge" id="resume-conversation-badge">继续对话</span>
-                <h2 class="resume-conversation__title" id="resume-conversation-title">继续上次对话</h2>
-              </div>
-              <p class="resume-conversation__meta" id="resume-conversation-meta"></p>
-              <p class="resume-conversation__hint" id="resume-conversation-hint"></p>
-            </div>
-            <div class="resume-conversation__actions">
-              <button class="primary-button" id="resume-conversation-btn" type="button">继续聊下去</button>
-              <button class="resume-conversation__dismiss" id="resume-conversation-dismiss-btn" type="button">清除记录</button>
-            </div>
-          </section>
-        </div>
+    <main class="home-min" id="top">
+      <section class="hero-min">
+        <div class="hero-min__inner">
+          <h1 class="hero-min__title">把你正在搞的事，<br>讲给它听。</h1>
+          <p class="hero-min__sub">它会用《埃隆之书》里的方式回应你。</p>
 
-        <div class="hero-floating-cards" id="hero-floating-cards"></div>
-      </section>
-
-      <section class="section-block" aria-labelledby="featured-title">
-        <div class="section-heading">
-          <p class="section-kicker">如果你还不知道先点哪张</p>
-          <h2 id="featured-title">先从这六张开始</h2>
-        </div>
-        <div class="featured-grid" id="featured-grid"></div>
-      </section>
-
-      <section class="section-block quick-ask-block" id="quick-ask">
-        <div class="section-heading">
-          <p class="section-kicker">不想选卡片也没关系</p>
-          <h2>也可以直接问</h2>
-        </div>
-
-        <div class="quick-ask-panel">
-          <div class="quick-ask-input-row">
-            <input
+          <div class="hero-min__composer">
+            <textarea
               id="quick-ask-input"
-              type="text"
-              placeholder="比如：我现在很迷茫，怎么判断自己做的事有没有价值？"
-              aria-label="直接提问输入框"
-            >
-            <button class="primary-button" id="quick-ask-submit">开始聊</button>
+              class="hero-min__input"
+              rows="1"
+              placeholder="比如：我做的事好像没人在乎，是不是该放弃？"
+              aria-label="问点什么"
+            ></textarea>
+            <button id="quick-ask-submit" class="hero-min__submit" type="button" aria-label="开始对话">
+              <span aria-hidden="true">↗</span>
+            </button>
           </div>
 
-          <div class="quick-chip-row" id="quick-chip-row"></div>
+          <div class="hero-min__chips" id="quick-chip-row" data-preserve-children="true">
+            <button type="button" class="chip-min" data-quick-ask="我做的事好像没什么人在乎，是不是该放弃？">没人在乎</button>
+            <button type="button" class="chip-min" data-quick-ask="我有想做的事，但一直拖着不开始。">一直拖着</button>
+            <button type="button" class="chip-min" data-quick-ask="家里人不支持我做这件事。">家里人不支持</button>
+            <button type="button" class="chip-min" data-quick-ask="我害怕失败，怎么行动？">害怕失败</button>
+            <button type="button" class="chip-min" data-quick-ask="我该追赚钱，还是追我想做成的事？">钱 vs 理想</button>
+            <button type="button" class="chip-min" data-quick-ask="我没自信，总觉得自己还不够。">没自信</button>
+          </div>
+
+          <div class="hero-min__resume hidden" id="resume-conversation-block">
+            <button class="resume-pill" id="resume-conversation-btn" type="button">
+              <span class="resume-pill__badge" id="resume-conversation-badge">继续</span>
+              <span class="resume-pill__title" id="resume-conversation-title">上次对话</span>
+              <span class="resume-pill__meta" id="resume-conversation-meta"></span>
+            </button>
+            <button class="resume-pill__close" id="resume-conversation-dismiss-btn" type="button" aria-label="清除上次记录">×</button>
+            <span class="visually-hidden" id="resume-conversation-hint"></span>
+          </div>
         </div>
       </section>
 
-      <section class="trust-note">
-        <p>
-          基于《The Book of Elon》的主题整理与中文解释，每张卡都保留原书英文锚点，方便快速理解、继续追问，并把书中的思想带回现实问题。
-        </p>
-      </section>
-
-      <section class="section-block topic-library-block" aria-labelledby="topic-library-title">
-        <div class="topic-library__header">
-          <div>
-            <p class="section-kicker">如果上面的 6 张还没点中你</p>
-            <h2 id="topic-library-title">继续往下找入口</h2>
-          </div>
-          <p class="topic-library__intro">
-            先从最贴近你当下的一组开始。
-          </p>
-        </div>
-        <div class="topic-library-groups" id="topic-library-groups"></div>
-      </section>
+      <footer class="footer-min">
+        <a class="footer-min__link" href="https://wwaly.lanzn.com/iMoWJ3lmlvcb" target="_blank" rel="noopener noreferrer">
+          下载《埃隆之书》中文版 PDF
+        </a>
+        <span class="footer-min__sep" aria-hidden="true">·</span>
+        <button type="button" class="footer-min__link footer-min__as-button" id="random-card-btn">想不出来？随机给我一张主题卡</button>
+        <span class="footer-min__sep" aria-hidden="true">·</span>
+        <button type="button" class="footer-min__link footer-min__as-button" id="ask-direct-btn">直接开始一段空白对话</button>
+      </footer>
     </main>
   </div>
 
-  <div class="detail-shell hidden" id="detail-shell" aria-hidden="true">
-    <div class="detail-backdrop" id="detail-backdrop"></div>
-    <section class="detail-panel" role="dialog" aria-modal="true" aria-labelledby="detail-title">
-      <button class="close-button" id="detail-close-btn" aria-label="关闭详情">×</button>
+  <section class="conversation hidden" id="detail-shell" aria-hidden="true" aria-labelledby="detail-title">
+    <span hidden id="detail-backdrop"></span>
 
-      <div class="detail-panel__header">
-        <p class="eyebrow" id="detail-eyebrow">当前主题</p>
-        <h2 id="detail-title"></h2>
-        <p class="detail-hook" id="detail-hook"></p>
-        <p class="detail-summary" id="detail-summary"></p>
+    <div class="conversation__topbar">
+      <button class="conversation__back" id="detail-close-btn" type="button" aria-label="返回首页">
+        <span aria-hidden="true">←</span>
+        <span>新对话</span>
+      </button>
+      <span class="conversation__brand">THE BOOK OF ELON</span>
+      <span class="conversation__topbar-spacer" aria-hidden="true"></span>
+    </div>
+
+    <div class="conversation__scroll" id="conversation-scroll">
+      <div class="conversation__inner">
+        <header class="conversation__head">
+          <p class="conversation__eyebrow" id="detail-eyebrow"></p>
+          <h1 class="conversation__title" id="detail-title"></h1>
+          <p class="conversation__hook" id="detail-hook"></p>
+          <p class="conversation__summary" id="detail-summary"></p>
+        </header>
+
+        <p class="conversation__system-note hidden" id="chat-system-note"></p>
+        <div class="conversation__messages" id="messages"></div>
       </div>
+    </div>
 
-      <div class="chat-layout">
-        <div class="chat-panel">
-          <p class="chat-system-note hidden" id="chat-system-note"></p>
-          <div class="messages" id="messages"></div>
+    <form class="conversation__composer" id="chat-form" autocomplete="off">
+      <div class="conversation__composer-inner">
+        <input
+          id="chat-input"
+          type="text"
+          autocomplete="off"
+          placeholder="继续问..."
+          aria-label="继续提问"
+        >
+        <button class="conversation__submit" id="chat-submit-btn" type="submit" aria-label="发送">
+          <span aria-hidden="true">↗</span>
+        </button>
+      </div>
+    </form>
+  </section>
 
-          <form class="chat-input-row" id="chat-form">
+  <div class="auth-modal hidden" id="auth-modal" aria-hidden="true">
+    <div class="auth-modal__backdrop" id="auth-modal-backdrop"></div>
+    <section class="auth-modal__panel" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+      <button class="auth-modal__close" id="auth-modal-close" aria-label="关闭">×</button>
+
+      <p class="eyebrow">登录 · 同时即注册</p>
+      <h2 id="auth-modal-title" class="auth-modal__title">把这场对话留下来</h2>
+      <p class="auth-modal__intro" id="auth-modal-intro">
+        手机号验证一下，你和它说过的话就都还在。换设备、关浏览器，回来接着聊。
+      </p>
+
+      <form class="auth-form" id="auth-form" autocomplete="off">
+        <div class="auth-form__step" id="auth-step-phone">
+          <label class="auth-form__label" for="auth-phone">手机号</label>
+          <div class="auth-form__row">
+            <span class="auth-form__prefix">+86</span>
             <input
-              id="chat-input"
-              type="text"
-              autocomplete="off"
-              placeholder="继续问，比如：这个观点怎么用在我现在的处境里？"
-              aria-label="聊天输入框"
+              id="auth-phone"
+              type="tel"
+              inputmode="numeric"
+              pattern="1[3-9][0-9]{9}"
+              maxlength="11"
+              placeholder="139 0000 0000"
+              autocomplete="tel-national"
+              required
             >
-            <button class="primary-button" id="chat-submit-btn" type="submit">发送</button>
-          </form>
+          </div>
+          <button class="primary-button auth-form__primary" id="auth-send-code" type="button">发送验证码</button>
         </div>
-      </div>
+
+        <div class="auth-form__step hidden" id="auth-step-code">
+          <p class="auth-form__sent" id="auth-sent-line">验证码已发送到 <strong id="auth-sent-phone"></strong></p>
+          <label class="auth-form__label" for="auth-code">6 位验证码</label>
+          <input
+            id="auth-code"
+            type="text"
+            inputmode="numeric"
+            pattern="[0-9]{6}"
+            maxlength="6"
+            placeholder="• • • • • •"
+            autocomplete="one-time-code"
+            class="auth-form__code-input"
+          >
+          <button class="primary-button auth-form__primary" id="auth-verify-code" type="button">验证 · 登录</button>
+          <button class="link-button auth-form__resend" id="auth-resend" type="button" disabled>
+            <span id="auth-resend-text">重新发送</span>
+            <span id="auth-resend-counter" class="auth-form__counter"></span>
+          </button>
+          <button class="link-button auth-form__change-phone" id="auth-change-phone" type="button">换个手机号</button>
+        </div>
+
+        <p class="auth-form__error hidden" id="auth-form-error"></p>
+        <p class="auth-form__dev-notice hidden" id="auth-form-dev-notice"></p>
+      </form>
     </section>
   </div>
 
-  <script src="./book-source.js?v=20260329-security1"></script>
-  <script src="./card-data.js?v=20260329-security1"></script>
-  <script src="./knowledge-base.js?v=20260329-security1"></script>
-  <script src="/config.js?v=20260329-security1"></script>
-  <script src="./model-client.js?v=20260329-security1"></script>
-  <script src="./reply-engine.js?v=20260329-security1"></script>
-  <script src="./app.js?v=20260329-security1"></script>
+  <div class="memory-modal hidden" id="memory-modal" aria-hidden="true">
+    <div class="memory-modal__backdrop" id="memory-modal-backdrop"></div>
+    <section class="memory-modal__panel" role="dialog" aria-modal="true" aria-labelledby="memory-modal-title">
+      <button class="memory-modal__close" id="memory-modal-close" aria-label="关闭">×</button>
+
+      <header class="memory-modal__head">
+        <p class="memory-modal__eyebrow">关于你 · AI 已经知道的</p>
+        <h2 id="memory-modal-title" class="memory-modal__title">你的轨迹</h2>
+      </header>
+
+      <div class="memory-modal__body" id="memory-modal-body">
+        <p class="memory-modal__loading">加载中…</p>
+      </div>
+
+      <footer class="memory-modal__footer">
+        <button type="button" class="memory-modal__logout" id="memory-modal-logout">登出</button>
+      </footer>
+    </section>
+  </div>
+
+  <script defer src="./card-data.js?v=20260418-mem1"></script>
+  <script defer src="./knowledge-base.js?v=20260418-mem1"></script>
+  <script defer src="/config.js?v=20260418-mem1"></script>
+  <script defer src="./model-client.js?v=20260418-mem1"></script>
+  <script defer src="./reply-engine.js?v=20260418-mem1"></script>
+  <script defer src="./auth-ui.js?v=20260418-mem1"></script>
+  <script defer src="./app.js?v=20260418-mem1"></script>
 </body>
 </html>
 

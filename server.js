@@ -2,13 +2,33 @@ const http = require("http");
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
+const zlib = require("zlib");
 
 const projectRoot = __dirname;
 const env = loadEnvFile(path.join(projectRoot, ".env"));
 
+for (const [key, value] of Object.entries(env)) {
+  if (process.env[key] === undefined) process.env[key] = value;
+}
+
+const authRoutes = require("./routes/auth");
+const meRoutes = require("./routes/me");
+const userSession = require("./auth/session");
+const dbSessions = require("./db/sessions");
+const dbUsers = require("./db/users");
+const dbGoals = require("./db/goals");
+const dbFacts = require("./db/facts");
+const factExtractor = require("./services/fact-extractor");
+const { getDb: getDatabase } = require("./db/database");
+getDatabase();
+
 const PORT = readNumberEnv("PORT", 3000, 1, 65535);
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || env.DEEPSEEK_API_KEY || "";
 const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || env.DEEPSEEK_MODEL || "deepseek-chat";
+const PROMPT_VERSION = (() => {
+  const raw = String(process.env.PROMPT_VERSION || env.PROMPT_VERSION || "v2").toLowerCase();
+  return raw === "v1" ? "v1" : "v2";
+})();
 const DEEPSEEK_MAX_TOKENS = readNumberEnv("DEEPSEEK_MAX_TOKENS", 700, 100, 2000);
 const DEEPSEEK_TEMPERATURE = readNumberEnv("DEEPSEEK_TEMPERATURE", 0.7, 0, 2);
 const UPSTREAM_TIMEOUT_MS = readNumberEnv("UPSTREAM_TIMEOUT_MS", 15000, 1000, 120000);
@@ -128,6 +148,11 @@ const server = http.createServer(async (request, response) => {
       });
     }
 
+    if (requestUrl.pathname === "/api/health") {
+      response.__meta.route = "api_health";
+      return sendJson(response, 200, buildDeepHealth({ requestId }));
+    }
+
     if (requestUrl.pathname === "/config.js") {
       response.__meta.route = "config";
       const sessionId = getOrCreateAnonymousSessionId(request);
@@ -145,6 +170,33 @@ const server = http.createServer(async (request, response) => {
     if (requestUrl.pathname === "/api/chat") {
       response.__meta.route = "api_chat";
       return handleChatRequest(request, response);
+    }
+
+    if (requestUrl.pathname.startsWith("/api/auth/")) {
+      response.__meta.route = `api_auth_${requestUrl.pathname.slice("/api/auth/".length)}`;
+      return authRoutes.handleAuthRequest({
+        request,
+        response,
+        requestUrl,
+        helpers: {
+          sendJson,
+          readJsonBody,
+          getClientIp,
+          isSecureRequest,
+          parseCookies,
+          anonSessionCookieName: CHAT_SESSION_COOKIE,
+        },
+      });
+    }
+
+    if (requestUrl.pathname.startsWith("/api/me/")) {
+      response.__meta.route = `api_me_${requestUrl.pathname.slice("/api/me/".length)}`;
+      return meRoutes.handleMeRequest({
+        request,
+        response,
+        requestUrl,
+        helpers: { sendJson, readJsonBody },
+      });
     }
 
     if (requestUrl.pathname === "/internal/analytics") {
@@ -199,6 +251,208 @@ server.on("error", (error) => {
 
 process.on("SIGINT", shutdown);
 process.on("SIGTERM", shutdown);
+
+const SESSION_REUSE_WINDOW_MS = 6 * 60 * 60 * 1000;
+
+function getCurrentUserIdFromRequest(request) {
+  try {
+    const token = userSession.extractTokenFromCookie(request.headers.cookie || "");
+    if (!token) return null;
+    const verified = userSession.verifyUserToken(token);
+    return verified ? verified.userId : null;
+  } catch {
+    return null;
+  }
+}
+
+function getOrCreateActiveSession({ userId, anonSessionId, cardId }) {
+  if (!userId && !anonSessionId) return null;
+
+  const db = getDatabase();
+  const now = Date.now();
+  const cutoff = now - SESSION_REUSE_WINDOW_MS;
+
+  let row = null;
+  if (userId) {
+    row = db
+      .prepare(
+        `SELECT * FROM chat_sessions
+         WHERE user_id = ?
+           AND ((? IS NULL AND card_id IS NULL) OR card_id = ?)
+           AND last_active_at >= ?
+         ORDER BY last_active_at DESC LIMIT 1`
+      )
+      .get(userId, cardId, cardId, cutoff);
+  } else {
+    row = db
+      .prepare(
+        `SELECT * FROM chat_sessions
+         WHERE anon_session_id = ? AND user_id IS NULL
+           AND ((? IS NULL AND card_id IS NULL) OR card_id = ?)
+           AND last_active_at >= ?
+         ORDER BY last_active_at DESC LIMIT 1`
+      )
+      .get(anonSessionId, cardId, cardId, cutoff);
+  }
+  if (row) return row;
+
+  return dbSessions.createSession({
+    userId: userId || null,
+    anonSessionId: userId ? null : anonSessionId,
+    cardId: cardId || null,
+  });
+}
+
+function buildUserMemorySnapshot(userId) {
+  if (!userId) return null;
+  let northStar = null;
+  let facts = [];
+  try {
+    const goal = dbGoals.getCurrent(userId);
+    if (goal?.north_star) northStar = goal.north_star;
+  } catch (err) {
+    logEvent("warning", "memory_snapshot_goal_failed", {
+      userId,
+      details: safeSlice(err?.message || String(err), 200),
+    });
+  }
+  try {
+    facts = dbFacts.listTopFacts(userId, 8) || [];
+  } catch (err) {
+    logEvent("warning", "memory_snapshot_facts_failed", {
+      userId,
+      details: safeSlice(err?.message || String(err), 200),
+    });
+  }
+  if (!northStar && (!facts || !facts.length)) return null;
+  return {
+    northStar: northStar ? safeSlice(northStar, 240) : null,
+    facts: facts.slice(0, 8).map((f) => ({
+      kind: String(f.kind || ""),
+      text: safeSlice(f.text, 200),
+    })),
+  };
+}
+
+function attachUserMemoryToBody(request, body) {
+  try {
+    const userId = getCurrentUserIdFromRequest(request);
+    if (!userId) return;
+    const memory = buildUserMemorySnapshot(userId);
+    if (!memory) return;
+    if (!isPlainObject(body.context)) body.context = {};
+    body.context.userMemory = memory;
+  } catch (err) {
+    logEvent("warning", "attach_user_memory_failed", {
+      details: safeSlice(err?.message || String(err), 200),
+    });
+  }
+}
+
+function scheduleFactExtraction({
+  userId,
+  sessionId,
+  userMessageId,
+  userText,
+  assistantText,
+}) {
+  if (!userId || !DEEPSEEK_API_KEY) return;
+  setImmediate(() => {
+    let northStarText = null;
+    try {
+      const goal = dbGoals.getCurrent(userId);
+      if (goal) northStarText = goal.north_star;
+    } catch (err) {
+      logEvent("warning", "fact_extract_lookup_goal_failed", {
+        userId,
+        details: safeSlice(err?.message || String(err), 200),
+      });
+    }
+    factExtractor
+      .extractFactsFromTurn({
+        userId,
+        sessionId,
+        userMessageId,
+        userText,
+        assistantText,
+        northStar: northStarText,
+        apiKey: DEEPSEEK_API_KEY,
+        model: DEEPSEEK_MODEL,
+        logger: logEvent,
+      })
+      .catch((err) => {
+        logEvent("warning", "fact_extract_unhandled", {
+          userId,
+          details: safeSlice(err?.message || String(err), 240),
+        });
+      });
+  });
+}
+
+function persistChatTurn({
+  request,
+  anonSessionId,
+  body,
+  replyText,
+  provider,
+  degraded,
+}) {
+  try {
+    let effectiveAnonId = anonSessionId;
+    if (!effectiveAnonId || effectiveAnonId === "local-dev") {
+      const cookies = parseCookies(request.headers.cookie || "");
+      effectiveAnonId = sanitizeSessionId(cookies[CHAT_SESSION_COOKIE]) || null;
+    }
+    if (!effectiveAnonId) return;
+
+    const lastUserMessage = Array.isArray(body?.messages)
+      ? [...body.messages].reverse().find((m) => m && m.role === "user")
+      : null;
+    if (!lastUserMessage || typeof lastUserMessage.content !== "string") return;
+
+    const userText = lastUserMessage.content.trim();
+    const replyTextTrimmed = String(replyText || "").trim();
+    if (!userText || !replyTextTrimmed) return;
+
+    const userId = getCurrentUserIdFromRequest(request);
+    const cardId = body?.context?.activeCard?.id || null;
+
+    const session = getOrCreateActiveSession({
+      userId,
+      anonSessionId: effectiveAnonId,
+      cardId,
+    });
+    if (!session) return;
+
+    const userMsg = dbSessions.appendMessage({
+      sessionId: session.id,
+      role: "user",
+      content: userText.slice(0, 4000),
+    });
+    dbSessions.appendMessage({
+      sessionId: session.id,
+      role: "assistant",
+      content: replyTextTrimmed.slice(0, 4000),
+      provider: provider || null,
+      degraded: Boolean(degraded),
+    });
+
+    if (userId) {
+      dbUsers.incrementChatTurns(userId, 1);
+      scheduleFactExtraction({
+        userId,
+        sessionId: session.id,
+        userMessageId: userMsg?.id || null,
+        userText,
+        assistantText: replyTextTrimmed,
+      });
+    }
+  } catch (err) {
+    logEvent("warning", "chat_persistence_failed", {
+      details: safeSlice(err?.message || String(err), 300),
+    });
+  }
+}
 
 async function handleChatRequest(request, response) {
   if (request.method !== "POST") {
@@ -280,6 +534,7 @@ async function handleChatRequest(request, response) {
   }
 
   const body = validation.payload;
+  attachUserMemoryToBody(request, body);
   const cachePolicy = getCachePolicy(body);
   response.__meta.cacheEligible = cachePolicy.eligible;
   response.__meta.cacheReason = cachePolicy.reason;
@@ -293,6 +548,14 @@ async function handleChatRequest(request, response) {
       provider: cachedReply.provider,
       degraded: false,
       cacheHit: true,
+    });
+    persistChatTurn({
+      request,
+      anonSessionId: securityCheck.sessionId,
+      body,
+      replyText: cachedReply.reply,
+      provider: cachedReply.provider,
+      degraded: false,
     });
     return sendJson(
       response,
@@ -309,16 +572,25 @@ async function handleChatRequest(request, response) {
   if (!DEEPSEEK_API_KEY) {
     response.__meta.provider = "local-fallback";
     response.__meta.degraded = true;
+    const fallbackReply = buildLocalFallbackReply(body, "missing_api_key");
     recordAnalyticsChatTurn(securityCheck.sessionId, request, {
       provider: "local-fallback",
       degraded: true,
       reason: "missing_api_key",
     });
+    persistChatTurn({
+      request,
+      anonSessionId: securityCheck.sessionId,
+      body,
+      replyText: fallbackReply,
+      provider: "local-fallback",
+      degraded: true,
+    });
     return sendJson(
       response,
       200,
       {
-        reply: buildLocalFallbackReply(body, "missing_api_key"),
+        reply: fallbackReply,
         provider: "local-fallback",
         model: "local-knowledge",
         degraded: true,
@@ -333,16 +605,25 @@ async function handleChatRequest(request, response) {
     response.__meta.provider = "local-fallback";
     response.__meta.degraded = true;
     response.__meta.error = "circuit_open";
+    const fallbackReply = buildLocalFallbackReply(body, "circuit_open");
     recordAnalyticsChatTurn(securityCheck.sessionId, request, {
       provider: "local-fallback",
       degraded: true,
       reason: "circuit_open",
     });
+    persistChatTurn({
+      request,
+      anonSessionId: securityCheck.sessionId,
+      body,
+      replyText: fallbackReply,
+      provider: "local-fallback",
+      degraded: true,
+    });
     return sendJson(
       response,
       200,
       {
-        reply: buildLocalFallbackReply(body, "circuit_open"),
+        reply: fallbackReply,
         provider: "local-fallback",
         model: "local-knowledge",
         degraded: true,
@@ -364,6 +645,14 @@ async function handleChatRequest(request, response) {
       provider: upstreamResult.provider,
       degraded: false,
       cacheHit: false,
+    });
+    persistChatTurn({
+      request,
+      anonSessionId: securityCheck.sessionId,
+      body,
+      replyText: upstreamResult.reply,
+      provider: upstreamResult.provider,
+      degraded: false,
     });
 
     return sendJson(
@@ -387,17 +676,26 @@ async function handleChatRequest(request, response) {
       code: error.code || "upstream_failed",
       details: error.details || safeSlice(error.message, 300),
     });
+    const fallbackReply = buildLocalFallbackReply(body, error.code || "upstream_unavailable");
     recordAnalyticsChatTurn(securityCheck.sessionId, request, {
       provider: "local-fallback",
       degraded: true,
       reason: error.code || "upstream_unavailable",
+    });
+    persistChatTurn({
+      request,
+      anonSessionId: securityCheck.sessionId,
+      body,
+      replyText: fallbackReply,
+      provider: "local-fallback",
+      degraded: true,
     });
 
     return sendJson(
       response,
       200,
       {
-        reply: buildLocalFallbackReply(body, error.code || "upstream_unavailable"),
+        reply: fallbackReply,
         provider: "local-fallback",
         model: "local-knowledge",
         degraded: true,
@@ -430,6 +728,29 @@ function buildUpstreamMessages(body) {
 
 function buildContextBlock(context) {
   const sections = [];
+
+  if (context.userMemory) {
+    const lines = ["关于用户（这位你已经聊过的人，请把它当成持续关系来回应，不要每次像第一次见）"];
+    if (context.userMemory.northStar) {
+      lines.push(`北极星目标：${context.userMemory.northStar}`);
+    }
+    if (Array.isArray(context.userMemory.facts) && context.userMemory.facts.length) {
+      const kindLabel = {
+        intend: "在打算",
+        blocker: "卡在",
+        deadline: "时间锚",
+        done: "已经做了",
+        belief: "相信",
+      };
+      lines.push("你已经知道关于他的事：");
+      for (const fact of context.userMemory.facts) {
+        const label = kindLabel[fact.kind] || fact.kind;
+        lines.push(`  - [${label}] ${fact.text}`);
+      }
+      lines.push("使用建议：当用户的话与上面的事相关时，主动援引（「上次你说…」），让他感到你记得；不要罗列，只在关键处点名。");
+    }
+    sections.push(lines.join("\n"));
+  }
 
   if (context.activeCard) {
     sections.push([
@@ -492,7 +813,9 @@ function buildContextBlock(context) {
   return sections.join("\n\n");
 }
 
-function serveStaticFile(requestPath, response) {
+const COMPRESSIBLE_EXTENSIONS = new Set([".html", ".css", ".js", ".json", ".md", ".svg"]);
+
+async function serveStaticFile(requestPath, response) {
   const normalizedPath = requestPath === "/" ? "/index.html" : requestPath;
   const safePath = path.normalize(normalizedPath).replace(/^(\.\.[/\\])+/, "");
   const filePath = path.join(projectRoot, safePath);
@@ -501,16 +824,46 @@ function serveStaticFile(requestPath, response) {
     return sendJson(response, 403, { error: "forbidden" });
   }
 
-  if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+  let stat;
+  try {
+    stat = await fs.promises.stat(filePath);
+  } catch (error) {
+    return sendJson(response, 404, { error: "not_found" });
+  }
+
+  if (stat.isDirectory()) {
     return sendJson(response, 404, { error: "not_found" });
   }
 
   const ext = path.extname(filePath).toLowerCase();
-  response.writeHead(200, {
+  const etag = `"${stat.mtimeMs.toString(36)}-${stat.size.toString(36)}"`;
+  const ifNoneMatch = response.__request.headers["if-none-match"];
+
+  if (ifNoneMatch && ifNoneMatch === etag) {
+    response.writeHead(304);
+    response.end();
+    return;
+  }
+
+  const headers = {
     ...buildSecurityHeaders(response.__request),
     "Content-Type": MIME_TYPES[ext] || "application/octet-stream",
     "Cache-Control": ext === ".html" ? "no-store" : "public, max-age=3600",
-  });
+    ETag: etag,
+  };
+
+  const acceptEncoding = String(response.__request.headers["accept-encoding"] || "");
+  const shouldCompress = COMPRESSIBLE_EXTENSIONS.has(ext) && stat.size > 1024;
+
+  if (shouldCompress && acceptEncoding.includes("gzip")) {
+    headers["Content-Encoding"] = "gzip";
+    headers["Vary"] = "Accept-Encoding";
+    response.writeHead(200, headers);
+    fs.createReadStream(filePath).pipe(zlib.createGzip({ level: 6 })).pipe(response);
+    return;
+  }
+
+  response.writeHead(200, headers);
   fs.createReadStream(filePath).pipe(response);
 }
 
@@ -525,6 +878,7 @@ function buildRuntimeConfigScript(sessionId) {
     analyticsHeartbeatMs: Math.max(30000, ANALYTICS_HEARTBEAT_MIN_INTERVAL_MS * 2),
     requestTimeoutMs: UPSTREAM_TIMEOUT_MS,
     chatSessionToken: createChatSessionToken(sessionId),
+    promptVersion: PROMPT_VERSION,
   })};`;
 }
 
@@ -976,6 +1330,77 @@ function markUpstreamSuccess() {
   circuitState.openedAt = 0;
 }
 
+// Deep health: ping DB + LLM 状态 + version + 表行数。
+// 给 uptime 监控、`/land-and-deploy` canary、运维排查使用。
+// 永远返回 HTTP 200，但内部 status 可能是 "ok" / "degraded" / "down"，
+// 外部监控应当读 body.status，不只是 HTTP code。
+function buildDeepHealth({ requestId }) {
+  const startedAtMs = Date.now();
+  let dbStatus = "ok";
+  let dbLatencyMs = 0;
+  let counts = null;
+  let dbError = null;
+
+  try {
+    const db = getDatabase();
+    const tDb = Date.now();
+    const ping = db.prepare("SELECT 1 AS ok").get();
+    dbLatencyMs = Date.now() - tDb;
+    if (!ping || ping.ok !== 1) throw new Error("db_ping_unexpected");
+    counts = {
+      users: db.prepare("SELECT COUNT(*) AS c FROM users").get().c,
+      chat_sessions: db.prepare("SELECT COUNT(*) AS c FROM chat_sessions").get().c,
+      messages: db.prepare("SELECT COUNT(*) AS c FROM messages").get().c,
+      facts: db.prepare("SELECT COUNT(*) AS c FROM facts").get().c,
+      goals: db.prepare("SELECT COUNT(*) AS c FROM goals").get().c,
+    };
+  } catch (err) {
+    dbStatus = "down";
+    dbError = String(err?.message || err).slice(0, 200);
+  }
+
+  const llmEnabled = Boolean(DEEPSEEK_API_KEY);
+  const circuitOpen = isCircuitOpen();
+  const llmStatus = !llmEnabled ? "disabled" : circuitOpen ? "circuit_open" : "ok";
+  const overall = dbStatus === "down" ? "down" : circuitOpen ? "degraded" : "ok";
+  const memoryMb = Math.round((process.memoryUsage().heapUsed / 1024 / 1024) * 10) / 10;
+
+  let version = "unknown";
+  try {
+    version = require("./package.json").version || "unknown";
+  } catch (_) {
+    /* ignore */
+  }
+
+  return {
+    status: overall,
+    timestamp: new Date().toISOString(),
+    uptime_seconds: Math.round(process.uptime()),
+    version,
+    promptVersion: PROMPT_VERSION,
+    model: llmEnabled ? DEEPSEEK_MODEL : null,
+    db: {
+      status: dbStatus,
+      latency_ms: dbLatencyMs,
+      counts,
+      error: dbError,
+    },
+    llm: {
+      status: llmStatus,
+      enabled: llmEnabled,
+      circuit_open: circuitOpen,
+      consecutive_failures: circuitState.consecutiveFailures,
+    },
+    process: {
+      pid: process.pid,
+      heap_mb: memoryMb,
+      node: process.version,
+    },
+    check_duration_ms: Date.now() - startedAtMs,
+    requestId,
+  };
+}
+
 function markUpstreamFailure(error) {
   if (!shouldCountFailureForCircuit(error)) {
     return;
@@ -1203,7 +1628,11 @@ function parseCookies(cookieHeader) {
     const key = part.slice(0, separatorIndex).trim();
     const value = part.slice(separatorIndex + 1).trim();
     if (!key) continue;
-    cookies[key] = decodeURIComponent(value);
+    try {
+      cookies[key] = decodeURIComponent(value);
+    } catch (error) {
+      cookies[key] = value;
+    }
   }
   return cookies;
 }
