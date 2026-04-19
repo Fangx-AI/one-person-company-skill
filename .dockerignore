@@ -1,7 +1,59 @@
+# ════════════════════════════════════════════════════════════════
+# .dockerignore — Book of Elon
+# ────────────────────────────────────────────────────────────────
+# CSO #4 HIGH 修复：之前漏了 data/ backups/ *.db 等。
+# 任何包含用户数据 / 秘密 / 本地状态的东西都不能进入 docker layer。
+# ════════════════════════════════════════════════════════════════
+
+# 版本控制 / IDE 元数据
 .git
+.gitignore
+.gitattributes
 .cursor
+.vscode
+.idea
+.DS_Store
+
+# 秘密 —— 永远不要 bake 进 image，运行时从 env 注入
 .env
+.env.*
+!.env.example
+!.env.production.example
+
+# Node 工件 —— 在 image 里 npm ci 重新装
 node_modules
+npm-debug.log
+yarn-error.log
+
+# 运行时数据 —— 千万不能进 image，否则你本地的用户库会被打包发布
+data/
+data/**
+backups/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite-journal
+
+# 本地 / 工具 / 报告产物
+.gstack/
+.claude/
 *.log
+logs/
+coverage/
+.nyc_output
+
+# 文档 / 工具脚本（运行时不需要）
+README.md
+CLAUDE.md
+DEPLOY_RUNBOOK.md
+DEPLOY_CHECKLIST.md
+CHANGELOG.md
+docs/
 reply-calibration-output.md
 deepseek-eval-output.md
+prompt-ab-output*
+
+# 测试产物
+test-output/
+*.test.js.snap

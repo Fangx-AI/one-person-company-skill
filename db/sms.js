@@ -114,8 +114,22 @@ function verifyCode(phone, code) {
     return { ok: false, reason: "too_many_attempts" };
   }
 
+  // SECURITY (CSO LOW): hash 比较走 crypto.timingSafeEqual。
+  // SHA256 的雪崩效应让纯字符串 === 实际泄漏的 timing 信号几乎为 0
+  // （攻击者不能控制 hash 输出），但我们仍然走 timing-safe 路径，
+  // 这是密码学比较的"始终走 const-time"卫生习惯，零成本。
   const expectedHash = hashCode(code);
-  const matches = expectedHash === row.code_hash;
+  const expectedBuf = Buffer.from(expectedHash, "hex");
+  let storedBuf;
+  try {
+    storedBuf = Buffer.from(String(row.code_hash || ""), "hex");
+  } catch {
+    storedBuf = Buffer.alloc(0);
+  }
+  const matches =
+    expectedBuf.length === storedBuf.length &&
+    expectedBuf.length > 0 &&
+    crypto.timingSafeEqual(expectedBuf, storedBuf);
 
   db.prepare(
     "UPDATE sms_codes SET attempts = attempts + 1 WHERE id = ?"

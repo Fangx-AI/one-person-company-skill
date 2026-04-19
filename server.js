@@ -20,6 +20,7 @@ const dbUsers = require("./db/users");
 const dbGoals = require("./db/goals");
 const dbFacts = require("./db/facts");
 const factExtractor = require("./services/fact-extractor");
+const systemPromptService = require("./services/system-prompt");
 const { getDb: getDatabase } = require("./db/database");
 getDatabase();
 
@@ -1062,11 +1063,23 @@ function validateChatBody(body) {
     });
   }
 
+  // SECURITY (CSO #2 HIGH): system prompt 必须由服务端权威决定，绝不接受客户端
+  // 注入。之前 body.systemPrompt 被原样传给 DeepSeek，等于把 bookofelon.cn 当成
+  // 免费 LLM 代理 + 借我们域名信誉跑攻击 prompt。promptVersion 是客户端"提示"
+  // 选 v1/v2，但模板内容只在服务端模块里。客户端发的 body.systemPrompt 在这里
+  // 被完全丢弃。新版本后，我们也保留 promptVersion 校验白名单，无效一律 v2。
+  const requestedVersion = String(body.promptVersion || PROMPT_VERSION || "v2")
+    .trim()
+    .toLowerCase();
+  const promptVersion = requestedVersion === "v1" ? "v1" : "v2";
+  const serverSystemPrompt = systemPromptService.getSystemPrompt(promptVersion);
+
   return {
     ok: true,
     payload: {
       model: DEEPSEEK_MODEL,
-      systemPrompt: safeSlice(body.systemPrompt, 4000).trim(),
+      systemPrompt: serverSystemPrompt,
+      promptVersion,
       messages: sanitizedMessages,
       context: sanitizeContext(body.context),
     },

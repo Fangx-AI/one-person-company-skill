@@ -60,6 +60,17 @@ sourceDb
       .pipe(outStream)
       .on("finish", () => {
         fs.unlinkSync(tmpUncompressed);
+
+        // CSO #6 (MED) 修复：备份里是全量用户数据（手机号 / 聊天明文 /
+        // 北极星 / 抽出的事实），默认 644 让同机其他 user 能读太宽。
+        // chmod 0600 → 只有 owner（跑 PM2 / cron 的用户）能读。
+        // Windows 下 chmod 部分语义会被忽略，不报错继续。
+        try {
+          fs.chmodSync(finalGz, 0o600);
+        } catch (chmodErr) {
+          console.warn(`  chmod 600 failed (${chmodErr.code || chmodErr.message}) — ignoring on non-POSIX FS`);
+        }
+
         const gzSize = fs.statSync(finalGz).size;
         const elapsedMs = Date.now() - startedAt;
         const ratio = ((1 - gzSize / tmpSize) * 100).toFixed(1);

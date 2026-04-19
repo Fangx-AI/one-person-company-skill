@@ -6,6 +6,43 @@ const goals = require("../db/goals");
 
 const PHONE_REGEX = /^1[3-9]\d{9}$/;
 
+// SECURITY (CSO LOW): verify-code 接口本身也加 IP 级 rate limit。
+// sms.js 里只限制单个 code 5 次失败就锁，但攻击者可以频繁调 verify-code
+// 制造日志噪声 / 让我们 DB 反复 SELECT。这里 in-memory 限频，每 IP 每 60s
+// 最多 30 次 verify-code 尝试。重启后清零（可接受，不影响正确性）。
+const VERIFY_IP_WINDOW_MS = 60_000;
+const VERIFY_IP_MAX_PER_WINDOW = 30;
+const verifyAttempts = new Map(); // ip -> { windowStart, count }
+
+function checkVerifyIpRate(ip) {
+  if (!ip || ip === "unknown") return { ok: true };
+  const now = Date.now();
+  const bucket = verifyAttempts.get(ip);
+  if (!bucket || now - bucket.windowStart >= VERIFY_IP_WINDOW_MS) {
+    verifyAttempts.set(ip, { windowStart: now, count: 1 });
+    return { ok: true };
+  }
+  bucket.count += 1;
+  if (bucket.count > VERIFY_IP_MAX_PER_WINDOW) {
+    return {
+      ok: false,
+      retryAfterSeconds: Math.max(
+        1,
+        Math.ceil((VERIFY_IP_WINDOW_MS - (now - bucket.windowStart)) / 1000)
+      ),
+    };
+  }
+  return { ok: true };
+}
+
+// 防止内存无限增长：每 5 分钟清一次过期条目
+setInterval(() => {
+  const cutoff = Date.now() - VERIFY_IP_WINDOW_MS * 2;
+  for (const [ip, bucket] of verifyAttempts.entries()) {
+    if (bucket.windowStart < cutoff) verifyAttempts.delete(ip);
+  }
+}, 5 * 60 * 1000).unref();
+
 async function handleAuthRequest({
   request,
   response,
@@ -26,6 +63,7 @@ async function handleAuthRequest({
       sendJson,
       readJsonBody,
       isSecureRequest,
+      getClientIp,
     });
   }
   if (path === "/api/auth/me" && method === "GET") {
@@ -92,7 +130,17 @@ async function handleVerifyCode({
   sendJson,
   readJsonBody,
   isSecureRequest,
+  getClientIp,
 }) {
+  const ip = (getClientIp && getClientIp(request)) || "unknown";
+  const ipCheck = checkVerifyIpRate(ip);
+  if (!ipCheck.ok) {
+    return sendJson(response, 429, {
+      error: "too_many_verify_attempts",
+      retryAfterSeconds: ipCheck.retryAfterSeconds,
+    });
+  }
+
   let body;
   try {
     body = await readJsonBody(request);

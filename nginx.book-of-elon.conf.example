@@ -1,7 +1,103 @@
+# ════════════════════════════════════════════════════════════════
+# nginx.book-of-elon.conf.example — Production-ready template
+# ────────────────────────────────────────────────────────────────
+# 用法（首次部署）：
+#   1. cp nginx.book-of-elon.conf.example /etc/nginx/conf.d/bookofelon.conf
+#   2. 把 server_name 换成你的域名
+#   3. 用 certbot 申请 Let's Encrypt 证书：
+#        sudo certbot --nginx -d bookofelon.cn -d www.bookofelon.cn
+#      certbot 会自动改写 ssl_certificate 路径
+#   4. sudo nginx -t && sudo systemctl reload nginx
+#
+# 设计要点（CSO #1/#5 修复 + 纵深防御）：
+#   - HTTP → HTTPS 强制跳转
+#   - HSTS preload 友好（max-age=2 年 + includeSubDomains）
+#   - deny block 兜底敏感路径（即便 Node 端已加白名单，nginx 多一层）
+#   - client_max_body_size 64k（chat 请求实际 < 16k）
+#   - proxy timeout 与上游 UPSTREAM_TIMEOUT_MS 对齐
+# ════════════════════════════════════════════════════════════════
+
+# ── HTTP → HTTPS 强制跳转 ──────────────────────────────────────
 server {
     listen 80;
-    server_name your-domain.com;
+    listen [::]:80;
+    server_name bookofelon.cn www.bookofelon.cn;
 
+    # certbot HTTP-01 验证留口
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+# ── HTTPS 主站 ──────────────────────────────────────────────────
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name bookofelon.cn www.bookofelon.cn;
+
+    # SSL —— certbot 会替换为真实路径
+    ssl_certificate     /etc/letsencrypt/live/bookofelon.cn/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/bookofelon.cn/privkey.pem;
+    ssl_session_timeout 1d;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_tickets off;
+
+    # 现代 cipher（去掉 TLS 1.0/1.1）
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305;
+    ssl_prefer_server_ciphers off;
+
+    # OCSP stapling
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    resolver 8.8.8.8 1.1.1.1 valid=300s;
+    resolver_timeout 5s;
+
+    # ── 安全头（与 Node 端 buildSecurityHeaders 重复，nginx 这里会被
+    # Node 的 add_header 覆盖；我们留着是给"绕过 Node 直接命中 nginx
+    # location"的兜底场景，比如 nginx 自己 serve 静态资源时）──
+    add_header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Permissions-Policy "geolocation=(), microphone=(), camera=()" always;
+
+    # ── 上传体积上限（chat 请求实际 < 16k；analytics 也很小）──
+    client_max_body_size 64k;
+    client_body_timeout 15s;
+    client_header_timeout 10s;
+
+    # ── deny block：CSO #1 已经在 Node 端加白名单了，这里是纵深防御 ──
+    # 万一未来 nginx 配置改成 root /app/ 直接 serve 静态文件，这些规则
+    # 仍然能挡住敏感路径。
+    location ~ ^/(data|db|scripts|services|auth|routes|node_modules|backups)/ {
+        deny all;
+        return 404;
+    }
+    # dotfile 全拦（.env / .git / .gstack 等）
+    location ~ /\. {
+        deny all;
+        return 404;
+    }
+    # 黑扩展名兜底
+    location ~ \.(db|env|log|md|sqlite|sh|bak)$ {
+        deny all;
+        return 404;
+    }
+
+    # gzip
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1000;
+    gzip_proxied any;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript image/svg+xml;
+    gzip_disable "msie6";
+
+    # ── 反代 Node ─────────────────────────────────────────────
     location / {
         proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;
@@ -11,7 +107,18 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Connection "";
         proxy_buffering off;
+
+        # 与 server.js UPSTREAM_TIMEOUT_MS=15000 对齐，留一点余量
         proxy_read_timeout 20s;
         proxy_send_timeout 20s;
+        proxy_connect_timeout 5s;
+    }
+
+    # ── 拦截内部分析端点：彻底不让公网命中 ──────────────────
+    # /internal/analytics 在 Node 端已校验 127.0.0.1 + 无 X-Forwarded-For，
+    # 但通过 nginx 反代后会带 X-Forwarded-For，导致 Node 一律 403。
+    # 这里直接在 nginx 层 return 404，避免任何公网请求落到 Node 上。
+    location ^~ /internal/ {
+        return 404;
     }
 }
