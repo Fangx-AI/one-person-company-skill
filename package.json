@@ -23,6 +23,7 @@
     "auth:smoke": "node scripts/smoke-auth.js",
     "persist:smoke": "node scripts/smoke-persistence.js",
     "northstar:smoke": "node scripts/smoke-northstar.js",
+    "static:smoke": "node scripts/smoke-static-security.js",
     "test:e2e": "node scripts/e2e-full-flow.js"
   },
   "dependencies": {

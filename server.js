@@ -14,6 +14,7 @@ for (const [key, value] of Object.entries(env)) {
 const authRoutes = require("./routes/auth");
 const meRoutes = require("./routes/me");
 const userSession = require("./auth/session");
+const smsSender = require("./auth/sms-sender");
 const dbSessions = require("./db/sessions");
 const dbUsers = require("./db/users");
 const dbGoals = require("./db/goals");
@@ -21,6 +22,15 @@ const dbFacts = require("./db/facts");
 const factExtractor = require("./services/fact-extractor");
 const { getDb: getDatabase } = require("./db/database");
 getDatabase();
+
+// 启动期校验：生产环境若 SMS_PROVIDER 不是 aliyun 或 ALIYUN_* 不全，
+// 这里就会抛错让 PM2 标记 errored，不会把 OTP-leak 的服务暴露出去。
+// 顺便把启动时的 provider 模式打到日志里，便于运维确认。
+const __smsProviderInfo = smsSender.assertProviderUsable();
+if (__smsProviderInfo.production && __smsProviderInfo.provider !== "aliyun") {
+  console.error("[boot] FATAL: production refused to start with SMS provider:", __smsProviderInfo.provider);
+  process.exit(1);
+}
 
 const PORT = readNumberEnv("PORT", 3000, 1, 65535);
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || env.DEEPSEEK_API_KEY || "";
@@ -78,13 +88,35 @@ const MIME_TYPES = {
   ".css": "text/css; charset=utf-8",
   ".js": "application/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8",
-  ".md": "text/markdown; charset=utf-8",
   ".png": "image/png",
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
   ".webp": "image/webp",
   ".svg": "image/svg+xml",
+  ".ico": "image/x-icon",
+  ".woff": "font/woff",
+  ".woff2": "font/woff2",
+  ".ttf": "font/ttf",
+  ".otf": "font/otf",
 };
+
+// 静态资源安全策略：精确路径白名单。
+// 之前 serveStaticFile 只校验路径不逃出 projectRoot，但 projectRoot 内部
+// 就有 .env / data/app.db / server.js / package.json / CLAUDE.md 等敏感
+// 文件，全部都能被任意人 GET 下来。
+//
+// 我们只服务客户端真正需要的资源。新增前端文件时，必须把它的路径加进来，
+// 否则上线就 404。这个"明确报错胜过悄悄泄漏"的取舍是有意的。
+const STATIC_FILE_ALLOW = new Set([
+  "/index.html",
+  "/styles.css",
+  "/app.js",
+  "/auth-ui.js",
+  "/card-data.js",
+  "/knowledge-base.js",
+  "/model-client.js",
+  "/reply-engine.js",
+]);
 
 const rateLimitStore = new Map();
 const responseCache = new Map();
@@ -875,10 +907,28 @@ function buildContextBlock(context) {
   return sections.join("\n\n");
 }
 
-const COMPRESSIBLE_EXTENSIONS = new Set([".html", ".css", ".js", ".json", ".md", ".svg"]);
+const COMPRESSIBLE_EXTENSIONS = new Set([".html", ".css", ".js", ".json", ".svg"]);
+
+function isStaticPathAllowed(normalizedPath) {
+  // 路径在白名单里就放行，否则一律 404。
+  // 把 path.normalize 的结果也校验一遍，挡 /data/../server.js 这种穿越后
+  // 才落到允许名单里的情况。
+  if (STATIC_FILE_ALLOW.has(normalizedPath)) {
+    const collapsed = path.posix.normalize(normalizedPath);
+    if (collapsed === normalizedPath) return { ok: true };
+    return { ok: false, reason: "normalized_mismatch" };
+  }
+  return { ok: false, reason: "not_in_allowlist" };
+}
 
 async function serveStaticFile(requestPath, response) {
   const normalizedPath = requestPath === "/" ? "/index.html" : requestPath;
+
+  const allowCheck = isStaticPathAllowed(normalizedPath);
+  if (!allowCheck.ok) {
+    return sendJson(response, 404, { error: "not_found" });
+  }
+
   const safePath = path.normalize(normalizedPath).replace(/^(\.\.[/\\])+/, "");
   const filePath = path.join(projectRoot, safePath);
 
