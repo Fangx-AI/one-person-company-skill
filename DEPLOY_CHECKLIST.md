@@ -99,10 +99,12 @@ pm2 status
 
 - 用真手机号点"登录"，确认能在 30 秒内收到 6 位验证码（并且短信落款是审核通过的签名，不是 `<请填真签名>`）
 - 输入验证码后能进入"我的路径"
-- "我的路径"右上角能看到 totalChatTurns / sessions / facts
-- **登录前聊的对话**应该能在登录后的 dashboard 里看到（`claimAnonSessions` 工作）
-- 登出后再登入，DB 里的对话历史仍然在
+- 设置北极星目标后，"我的路径"能看到该目标
+- **匿名期间聊的对话**应该**不出现**在登录后的"我的路径"里（产品决策：匿名数据不归户，与 ChatGPT/Claude/Gemini 行业惯例一致）
+- 登录后聊的对话才会被 AI 记忆并出现在 dashboard
+- 登出后再登入，**登录后**聊的历史仍然在；匿名期间的不在
 - `/api/me/import-local-session` 应该返回 404（确认接口已撤回）
+- verify-code 响应里 `claimedAnonSessions` 应该恒为 0
 
 ## 7.6 数据持久化确认
 

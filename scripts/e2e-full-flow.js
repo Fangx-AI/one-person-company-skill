@@ -21,11 +21,12 @@
 //   ⑤ Aliyun key 轮换（运维事项，不在测试范围）
 //   ⑥ import-local-session 已撤回，应当 404
 //
-// 覆盖的产品行为：
-//   - 匿名 chat 落库
-//   - 登录后 claimAnonSessions 把匿名 chat 过户给账号
-//   - dashboard 能看到（包括匿名聊的 + 登录后聊的）
-//   - 退出 / 重登 → 仍能看到（跨 session 持久化）
+// 覆盖的产品行为（按用户决策：匿名数据不归户，与行业惯例一致）：
+//   - 匿名 chat 落库（按 anon_id 索引，不归任何用户）
+//   - 登录后 verify-code 响应里 claimedAnonSessions === 0
+//   - dashboard.sessions **不包含**匿名期间聊的 cardId
+//   - 登录后聊的才进 dashboard.sessions
+//   - 退出 / 重登 → 已属于账号的 chat 仍能看到（跨 session 持久化）
 // ════════════════════════════════════════════════════════════════
 
 const http = require("http");
@@ -169,8 +170,8 @@ async function main() {
   assert(typeof anonChat1.json?.persistence_reason === "undefined", "无 persistence_reason 字段（写入成功）");
   console.log(`  → reply head: ${anonChat1.json.reply.slice(0, 40)}...`);
 
-  // ═══ TEST 2: 登录 → claim → dashboard 看到匿名聊的内容 ═══
-  section("2. 登录 + claimAnonSessions（同浏览器过户）+ dashboard 看到刚才的对话");
+  // ═══ TEST 2: 登录 → 验证 dashboard 看不到匿名期间的对话（产品决策） ═══
+  section("2. 登录后 dashboard 不应包含匿名 session（产品决策：匿名数据不归户）");
   const TEST_PHONE = "13900" + Math.floor(100000 + Math.random() * 900000);
   console.log(`  → using phone: ${TEST_PHONE}`);
 
@@ -192,7 +193,11 @@ async function main() {
     body: { phone: TEST_PHONE, code },
   });
   assert(verifyRes.status === 200 && verifyRes.json?.ok, "verify-code OK");
-  // 服务端会下发 user session cookie，需要叠加到匿名 cookie 上
+  // verify-code 响应里的 claimedAnonSessions 必须是 0（已停用 claim）
+  assert(
+    verifyRes.json?.claimedAnonSessions === 0,
+    `claimedAnonSessions=0（不再归户）— got ${verifyRes.json?.claimedAnonSessions}`
+  );
   const authedJar = joinCookies(verifyRes.headers["set-cookie"], anon.cookieJar);
   console.log(`  → authed cookie set, user.id=${verifyRes.json.user.id}`);
 
@@ -202,13 +207,19 @@ async function main() {
   });
   assert(dash1.status === 200, "dashboard 200");
   assert(Array.isArray(dash1.json?.sessions), "sessions is array");
-  assert(dash1.json.sessions.length >= 1, `dashboard 至少 1 条 session（claim 工作）— 实际 ${dash1.json.sessions.length}`);
-  const claimedSession = dash1.json.sessions.find((s) => s.cardId === "e2e-anon-card");
-  assert(claimedSession, "找到 cardId=e2e-anon-card 的 session（即匿名时聊的那条）");
-  assert(claimedSession?.turnCount === 2, `claimed session turnCount=2 (got ${claimedSession?.turnCount})`);
+  // 关键断言：匿名期间聊的 cardId 不应出现在登录后的 dashboard
+  const leakedAnon = dash1.json.sessions.find((s) => s.cardId === "e2e-anon-card");
+  assert(
+    !leakedAnon,
+    `dashboard.sessions 不应包含 e2e-anon-card（匿名数据不归户）— 实际 ${dash1.json.sessions.length} 条`
+  );
+  assert(
+    dash1.json.sessions.length === 0,
+    `新用户登录后 dashboard.sessions 应为空 — got ${dash1.json.sessions.length}`
+  );
 
-  // ═══ TEST 3: 登录后再聊 → dashboard 看到两条 session ═══
-  section("3. 登录后再聊一条 → dashboard 看到累积的对话");
+  // ═══ TEST 3: 登录后聊一条 → dashboard 只看到登录后这一条 ═══
+  section("3. 登录后聊一条 → dashboard 只看到登录后这一条（不混入匿名期间的）");
   const loggedChat = await request({
     path: "/api/chat",
     method: "POST",
@@ -220,14 +231,22 @@ async function main() {
   assert(loggedChat.status === 200 && loggedChat.json?.reply, "logged-in chat OK");
   assert(loggedChat.json?.persistence_ok !== false, "登录后 chat persistence_ok 不为 false");
 
-  // 等一下让服务端事务提交完
   await new Promise((r) => setTimeout(r, 200));
 
   const dash2 = await request({
     path: "/api/me/dashboard",
     headers: { Cookie: authedJar },
   });
-  assert(dash2.json.sessions.length >= 2, `dashboard >= 2 sessions（got ${dash2.json.sessions.length}）`);
+  assert(
+    dash2.json.sessions.length === 1,
+    `dashboard 恰好 1 条 session（只有登录后聊的）— got ${dash2.json.sessions.length}`
+  );
+  const authedSession = dash2.json.sessions.find((s) => s.cardId === "e2e-authed-card");
+  assert(authedSession, "登录后聊的 e2e-authed-card 出现在 dashboard");
+  assert(
+    !dash2.json.sessions.find((s) => s.cardId === "e2e-anon-card"),
+    "匿名期间的 e2e-anon-card 仍然不在 dashboard"
+  );
   const userTurnsAfter = dash2.json?.user?.totalChatTurns || 0;
   assert(userTurnsAfter >= 1, `user.totalChatTurns >= 1 (got ${userTurnsAfter})`);
 
@@ -247,10 +266,9 @@ async function main() {
     : String(clearedCookieHeaders || "");
   assert(/Max-Age=0/.test(clearedJoined), "logout 下发 Max-Age=0（让浏览器丢 cookie）");
 
-  // 跨 session 持久化的真正等价命题：直接读 DB，验证 anon 期间写入的消息
-  // 已经被 claim 转到了 user.id 名下并永久存活。TEST 2/3 已经覆盖这一点
-  // （dashboard.sessions 里看到了 e2e-anon-card），这里再加一次显式 readback。
-  console.log("  → DB 持久化已由 TEST 2/3 的 dashboard readback 覆盖（card e2e-anon-card 已过户给 user）");
+  // 跨 session 持久化对**登录后的对话**有效——TEST 3 已经验证 dashboard
+  // readback。匿名期间的对话按产品决策不归户，跨 session 也不会出现。
+  console.log("  → 登录态 chat 的跨 session 持久化已由 TEST 3 的 dashboard readback 覆盖");
 
   // ═══ TEST 5: 撤回验证 — import-local-session 应当 404 ═══
   section("5. import-local-session 接口已撤回 → 401 / 404");

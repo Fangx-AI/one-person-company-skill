@@ -3,7 +3,6 @@ const smsSender = require("../auth/sms-sender");
 const sms = require("../db/sms");
 const users = require("../db/users");
 const goals = require("../db/goals");
-const sessions = require("../db/sessions");
 
 const PHONE_REGEX = /^1[3-9]\d{9}$/;
 
@@ -26,10 +25,7 @@ async function handleAuthRequest({
       response,
       sendJson,
       readJsonBody,
-      getClientIp,
       isSecureRequest,
-      parseCookies,
-      anonSessionCookieName,
     });
   }
   if (path === "/api/auth/me" && method === "GET") {
@@ -96,8 +92,6 @@ async function handleVerifyCode({
   sendJson,
   readJsonBody,
   isSecureRequest,
-  parseCookies,
-  anonSessionCookieName,
 }) {
   let body;
   try {
@@ -124,27 +118,12 @@ async function handleVerifyCode({
   const user = users.findOrCreateByPhone(phone);
   users.touchLastSeen(user.id);
 
-  let claimedSessions = 0;
-  try {
-    const cookies = parseCookies(request.headers.cookie || "");
-    const anonSessionId = cookies[anonSessionCookieName];
-    if (anonSessionId) {
-      claimedSessions = sessions.claimAnonSessions(user.id, anonSessionId);
-    }
-  } catch (err) {
-    // 之前是直接吞掉，等于"匿名→账号"过户失败完全无声。现在落日志，不影响主流
-    // 程，但运维会在监控里看到 claim_anon_sessions_failed 频次跳。
-    if (typeof console !== "undefined" && console.warn) {
-      console.warn(
-        "[auth] claim_anon_sessions_failed",
-        JSON.stringify({
-          userId: user.id,
-          phone: phone.slice(0, 3) + "****" + phone.slice(7),
-          err: String((err && err.message) || err).slice(0, 200),
-        })
-      );
-    }
-  }
+  // 产品决策：匿名期间聊的对话不归户给账号。这与行业惯例一致 —— ChatGPT /
+  // Claude / Gemini 登录后都不会把游客时的对话同步到账号下。匿名 session 留
+  // 在 DB 里按 anon_id 索引，永远不挂到 user_id 上，最终随 anon cookie 失效
+  // 自然过期。db/sessions.js::claimAnonSessions 仍然保留为函数，但**不再被
+  // 任何 HTTP 路径调用**。如果未来要做"游客一键导入"功能，需要先和产品确认。
+  const claimedSessions = 0;
 
   const token = session.createUserToken(user.id);
   const setCookie = session.buildSetCookie(token, {
