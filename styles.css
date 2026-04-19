@@ -1614,21 +1614,30 @@ button {
 .auth-modal__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(4, 6, 12, 0.78);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  /* 用径向渐变中心稍亮、边缘几乎纯黑 — 制造「焦点」感而不是均匀灰幕 */
+  background:
+    radial-gradient(ellipse at center, rgba(20, 26, 44, 0.70) 0%, rgba(2, 4, 10, 0.96) 60%),
+    rgba(2, 4, 10, 0.96);
+  backdrop-filter: blur(28px) saturate(140%);
+  -webkit-backdrop-filter: blur(28px) saturate(140%);
 }
 
 .auth-modal__panel {
   position: relative;
   width: 100%;
-  max-width: 440px;
-  padding: 2rem clamp(1.4rem, 3vw, 2.2rem);
-  background: var(--panel-main);
-  border: 1px solid var(--panel-border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow);
-  animation: authModalIn 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  max-width: 420px;
+  padding: 2.2rem clamp(1.6rem, 3vw, 2.4rem);
+  /* 面板自身用细微的玻璃质感渐变，制造从顶部受光的感觉 */
+  background:
+    linear-gradient(180deg, rgba(28, 34, 56, 0.92) 0%, rgba(14, 18, 30, 0.96) 100%);
+  border: 1px solid rgba(168, 190, 255, 0.14);
+  border-radius: 20px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,    /* 顶部高光 */
+    0 0 0 1px rgba(0, 0, 0, 0.4),                /* 外边深色描边，加层次 */
+    0 24px 60px -12px rgba(0, 0, 0, 0.6),        /* 投影 */
+    0 0 80px -20px rgba(120, 150, 220, 0.25);    /* 蓝色光晕 */
+  animation: authModalIn 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.2);
 }
 
 @keyframes authModalIn {
@@ -2646,9 +2655,11 @@ button {
 .memory-modal__backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(4, 6, 12, 0.78);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background:
+    radial-gradient(ellipse at center, rgba(20, 26, 44, 0.70) 0%, rgba(2, 4, 10, 0.96) 60%),
+    rgba(2, 4, 10, 0.96);
+  backdrop-filter: blur(28px) saturate(140%);
+  -webkit-backdrop-filter: blur(28px) saturate(140%);
 }
 
 .memory-modal__panel {
@@ -2658,12 +2669,17 @@ button {
   max-height: min(86vh, 760px);
   display: flex;
   flex-direction: column;
-  background: var(--panel-main);
-  border: 1px solid var(--panel-border);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow);
+  background:
+    linear-gradient(180deg, rgba(28, 34, 56, 0.92) 0%, rgba(14, 18, 30, 0.96) 100%);
+  border: 1px solid rgba(168, 190, 255, 0.14);
+  border-radius: 20px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 0 0 1px rgba(0, 0, 0, 0.4),
+    0 24px 60px -12px rgba(0, 0, 0, 0.6),
+    0 0 80px -20px rgba(120, 150, 220, 0.25);
   overflow: hidden;
-  animation: authModalIn 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  animation: authModalIn 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.2);
 }
 
 .memory-modal__close {
