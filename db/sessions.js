@@ -82,6 +82,81 @@ function appendMessage({
   return db.prepare("SELECT * FROM messages WHERE id = ?").get(messageId);
 }
 
+// appendTurn — 把 user + assistant 两条消息和 chat_sessions.turn_count 的更新
+// 全部包在一个 SQLite transaction 里。任何一步失败都会原子性回滚，不会留下
+// "用户消息存了、AI 回复没存" 这种半残骸。这是聊天持久化的核心契约。
+function appendTurn({
+  sessionId,
+  userContent,
+  assistantContent,
+  assistantProvider = null,
+  assistantDegraded = false,
+  assistantTokenCount = null,
+}) {
+  const db = getDb();
+  const now = Date.now();
+
+  const tx = db.transaction(() => {
+    const session = db
+      .prepare("SELECT turn_count FROM chat_sessions WHERE id = ?")
+      .get(sessionId);
+    if (!session) {
+      throw new Error("session_not_found");
+    }
+
+    const userTurnIndex = session.turn_count;
+    const assistantTurnIndex = session.turn_count + 1;
+
+    const userResult = db
+      .prepare(
+        `INSERT INTO messages(
+           session_id, role, content, turn_index,
+           created_at, provider, degraded, token_count
+         ) VALUES(?, ?, ?, ?, ?, ?, ?, ?)`
+      )
+      .run(sessionId, "user", userContent, userTurnIndex, now, null, 0, null);
+
+    const assistantResult = db
+      .prepare(
+        `INSERT INTO messages(
+           session_id, role, content, turn_index,
+           created_at, provider, degraded, token_count
+         ) VALUES(?, ?, ?, ?, ?, ?, ?, ?)`
+      )
+      .run(
+        sessionId,
+        "assistant",
+        assistantContent,
+        assistantTurnIndex,
+        now,
+        assistantProvider,
+        assistantDegraded ? 1 : 0,
+        assistantTokenCount
+      );
+
+    db.prepare(
+      `UPDATE chat_sessions
+       SET turn_count = turn_count + 2, last_active_at = ?
+       WHERE id = ?`
+    ).run(now, sessionId);
+
+    return {
+      userMessageId: userResult.lastInsertRowid,
+      assistantMessageId: assistantResult.lastInsertRowid,
+    };
+  });
+
+  const ids = tx();
+  return {
+    userMessage: db
+      .prepare("SELECT * FROM messages WHERE id = ?")
+      .get(ids.userMessageId),
+    assistantMessage: db
+      .prepare("SELECT * FROM messages WHERE id = ?")
+      .get(ids.assistantMessageId),
+  };
+}
+
 function getRecentMessages(sessionId, limit = 20) {
   return getDb()
     .prepare(
@@ -111,6 +186,7 @@ module.exports = {
   getById,
   listForUser,
   appendMessage,
+  appendTurn,
   getRecentMessages,
   claimAnonSessions,
 };

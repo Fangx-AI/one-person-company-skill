@@ -131,8 +131,19 @@ async function handleVerifyCode({
     if (anonSessionId) {
       claimedSessions = sessions.claimAnonSessions(user.id, anonSessionId);
     }
-  } catch {
-    /* ignore claim failures */
+  } catch (err) {
+    // 之前是直接吞掉，等于"匿名→账号"过户失败完全无声。现在落日志，不影响主流
+    // 程，但运维会在监控里看到 claim_anon_sessions_failed 频次跳。
+    if (typeof console !== "undefined" && console.warn) {
+      console.warn(
+        "[auth] claim_anon_sessions_failed",
+        JSON.stringify({
+          userId: user.id,
+          phone: phone.slice(0, 3) + "****" + phone.slice(7),
+          err: String((err && err.message) || err).slice(0, 200),
+        })
+      );
+    }
   }
 
   const token = session.createUserToken(user.id);

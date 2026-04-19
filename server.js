@@ -389,6 +389,19 @@ function scheduleFactExtraction({
   });
 }
 
+// persistChatTurn — 把这一轮对话（user msg + assistant msg + 计数器）原子性
+// 写入 SQLite。
+//
+// 返回值约定（被调用者必须用来决定要不要在 response 里带 persistence_ok=false）：
+//   { ok: true,  reason: "stored" }      正常写入了
+//   { ok: true,  reason: "no_session" }  匿名 cookie 缺失，连会话都建不出来 — 历史
+//                                        上这就是"静默丢"的根，现在显式上报，
+//                                        前端要在第二轮发现并给用户弹 toast
+//   { ok: true,  reason: "empty" }       user 或 assistant 文本是空的，无须存
+//   { ok: false, reason: "...err..." }   appendTurn 抛了异常，已经回滚
+//
+// 注意：fact extraction 和 user.total_chat_turns 是"派生数据"，写失败不影响主
+// 体的"对话已存"语义，所以分开 try/catch、不影响 ok 判定。
 function persistChatTurn({
   request,
   anonSessionId,
@@ -397,61 +410,93 @@ function persistChatTurn({
   provider,
   degraded,
 }) {
+  let effectiveAnonId = anonSessionId;
+  if (!effectiveAnonId || effectiveAnonId === "local-dev") {
+    const cookies = parseCookies(request.headers.cookie || "");
+    effectiveAnonId = sanitizeSessionId(cookies[CHAT_SESSION_COOKIE]) || null;
+  }
+  if (!effectiveAnonId) {
+    return { ok: true, reason: "no_session" };
+  }
+
+  const lastUserMessage = Array.isArray(body?.messages)
+    ? [...body.messages].reverse().find((m) => m && m.role === "user")
+    : null;
+  if (!lastUserMessage || typeof lastUserMessage.content !== "string") {
+    return { ok: true, reason: "empty" };
+  }
+
+  const userText = lastUserMessage.content.trim();
+  const replyTextTrimmed = String(replyText || "").trim();
+  if (!userText || !replyTextTrimmed) {
+    return { ok: true, reason: "empty" };
+  }
+
+  const userId = getCurrentUserIdFromRequest(request);
+  const cardId = body?.context?.activeCard?.id || null;
+
+  let session;
+  let turn;
   try {
-    let effectiveAnonId = anonSessionId;
-    if (!effectiveAnonId || effectiveAnonId === "local-dev") {
-      const cookies = parseCookies(request.headers.cookie || "");
-      effectiveAnonId = sanitizeSessionId(cookies[CHAT_SESSION_COOKIE]) || null;
-    }
-    if (!effectiveAnonId) return;
-
-    const lastUserMessage = Array.isArray(body?.messages)
-      ? [...body.messages].reverse().find((m) => m && m.role === "user")
-      : null;
-    if (!lastUserMessage || typeof lastUserMessage.content !== "string") return;
-
-    const userText = lastUserMessage.content.trim();
-    const replyTextTrimmed = String(replyText || "").trim();
-    if (!userText || !replyTextTrimmed) return;
-
-    const userId = getCurrentUserIdFromRequest(request);
-    const cardId = body?.context?.activeCard?.id || null;
-
-    const session = getOrCreateActiveSession({
+    session = getOrCreateActiveSession({
       userId,
       anonSessionId: effectiveAnonId,
       cardId,
     });
-    if (!session) return;
+    if (!session) {
+      logEvent("warning", "chat_persistence_no_session", {
+        anonSessionId: effectiveAnonId,
+        userId,
+      });
+      return { ok: false, reason: "no_session_after_get_or_create" };
+    }
 
-    const userMsg = dbSessions.appendMessage({
+    turn = dbSessions.appendTurn({
       sessionId: session.id,
-      role: "user",
-      content: userText.slice(0, 4000),
+      userContent: userText.slice(0, 4000),
+      assistantContent: replyTextTrimmed.slice(0, 4000),
+      assistantProvider: provider || null,
+      assistantDegraded: Boolean(degraded),
     });
-    dbSessions.appendMessage({
-      sessionId: session.id,
-      role: "assistant",
-      content: replyTextTrimmed.slice(0, 4000),
-      provider: provider || null,
-      degraded: Boolean(degraded),
+  } catch (err) {
+    logEvent("error", "chat_persistence_failed", {
+      anonSessionId: effectiveAnonId,
+      userId: userId || null,
+      sessionId: session ? session.id : null,
+      details: safeSlice(err?.message || String(err), 300),
     });
+    return {
+      ok: false,
+      reason: safeSlice(err?.code || err?.message || "persist_error", 80),
+    };
+  }
 
-    if (userId) {
+  if (userId) {
+    try {
       dbUsers.incrementChatTurns(userId, 1);
+    } catch (err) {
+      logEvent("warning", "chat_turn_counter_failed", {
+        userId,
+        details: safeSlice(err?.message || String(err), 240),
+      });
+    }
+    try {
       scheduleFactExtraction({
         userId,
         sessionId: session.id,
-        userMessageId: userMsg?.id || null,
+        userMessageId: turn.userMessage ? turn.userMessage.id : null,
         userText,
         assistantText: replyTextTrimmed,
       });
+    } catch (err) {
+      logEvent("warning", "fact_extract_schedule_failed", {
+        userId,
+        details: safeSlice(err?.message || String(err), 240),
+      });
     }
-  } catch (err) {
-    logEvent("warning", "chat_persistence_failed", {
-      details: safeSlice(err?.message || String(err), 300),
-    });
   }
+
+  return { ok: true, reason: "stored" };
 }
 
 async function handleChatRequest(request, response) {
@@ -549,7 +594,7 @@ async function handleChatRequest(request, response) {
       degraded: false,
       cacheHit: true,
     });
-    persistChatTurn({
+    const persistRes = persistChatTurn({
       request,
       anonSessionId: securityCheck.sessionId,
       body,
@@ -564,6 +609,7 @@ async function handleChatRequest(request, response) {
         ...cachedReply,
         cached: true,
         requestId: response.__meta.requestId,
+        ...persistenceMeta(persistRes),
       },
       rateLimitHeaders
     );
@@ -578,7 +624,7 @@ async function handleChatRequest(request, response) {
       degraded: true,
       reason: "missing_api_key",
     });
-    persistChatTurn({
+    const persistRes = persistChatTurn({
       request,
       anonSessionId: securityCheck.sessionId,
       body,
@@ -596,6 +642,7 @@ async function handleChatRequest(request, response) {
         degraded: true,
         reason: "missing_api_key",
         requestId: response.__meta.requestId,
+        ...persistenceMeta(persistRes),
       },
       rateLimitHeaders
     );
@@ -611,7 +658,7 @@ async function handleChatRequest(request, response) {
       degraded: true,
       reason: "circuit_open",
     });
-    persistChatTurn({
+    const persistRes = persistChatTurn({
       request,
       anonSessionId: securityCheck.sessionId,
       body,
@@ -629,6 +676,7 @@ async function handleChatRequest(request, response) {
         degraded: true,
         reason: "circuit_open",
         requestId: response.__meta.requestId,
+        ...persistenceMeta(persistRes),
       },
       rateLimitHeaders
     );
@@ -646,7 +694,7 @@ async function handleChatRequest(request, response) {
       degraded: false,
       cacheHit: false,
     });
-    persistChatTurn({
+    const persistRes = persistChatTurn({
       request,
       anonSessionId: securityCheck.sessionId,
       body,
@@ -663,6 +711,7 @@ async function handleChatRequest(request, response) {
         cached: false,
         degraded: false,
         requestId: response.__meta.requestId,
+        ...persistenceMeta(persistRes),
       },
       rateLimitHeaders
     );
@@ -682,7 +731,7 @@ async function handleChatRequest(request, response) {
       degraded: true,
       reason: error.code || "upstream_unavailable",
     });
-    persistChatTurn({
+    const persistRes = persistChatTurn({
       request,
       anonSessionId: securityCheck.sessionId,
       body,
@@ -701,10 +750,23 @@ async function handleChatRequest(request, response) {
         degraded: true,
         reason: error.code || "upstream_unavailable",
         requestId: response.__meta.requestId,
+        ...persistenceMeta(persistRes),
       },
       rateLimitHeaders
     );
   }
+}
+
+// persistenceMeta — 把 persistChatTurn 的返回值转成 response 多余的 keys。
+// 只有真正失败（DB 异常、appendTurn 抛错）才会带 persistence_ok=false 上去，
+// 让前端在用户面前 toast。匿名 cookie 缺失等"还能聊但不会落库"的场景不报错，
+// 因为那是设计层面的取舍——访客模式本来就不存。
+function persistenceMeta(result) {
+  if (!result || result.ok === true) return {};
+  return {
+    persistence_ok: false,
+    persistence_reason: result.reason || "unknown",
+  };
 }
 
 function buildUpstreamMessages(body) {

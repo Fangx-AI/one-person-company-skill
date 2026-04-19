@@ -77,7 +77,10 @@ function recordSent(phone, ip) {
 
 function createCode(phone, ip) {
   const db = getDb();
-  const code = String(Math.floor(100000 + Math.random() * 900000));
+  // 必须用 crypto.randomInt（CSPRNG），不要用 Math.random — 后者非密码学安全，
+  // 极端情况下输出可被预测/逆推。这里的 6 位数字用作短信验证码，强度直接等同于
+  // 你账号系统的强度，必须用密码学随机源生成。
+  const code = String(crypto.randomInt(100000, 1000000));
   const codeHash = hashCode(code);
   const now = Date.now();
   const expiresAt = now + CODE_TTL_MS;

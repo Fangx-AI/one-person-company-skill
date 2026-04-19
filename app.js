@@ -59,6 +59,7 @@ let isReplyPending = false;
 let resumeSession = loadSavedSession();
 let expandedTopicGroupIds = new Set();
 let currentChatSystemNotice = "";
+let persistenceWarningShown = false;
 let lockedBodyScrollY = 0;
 let analyticsHeartbeatTimer = 0;
 let analyticsTrackingStarted = false;
@@ -389,6 +390,18 @@ async function pushUserMessage(text) {
     currentChatSystemNotice = assistantResult.degraded ? assistantResult.notice : "";
     pendingMessage.text = assistantResult.text;
     delete pendingMessage.pending;
+
+    // 服务端写库失败时立刻提示用户——别让他以为存好了第二天回来看不到。
+    // 节流到一次会话只弹一次，避免连环失败时刷屏。
+    if (assistantResult.persistenceFailed && !persistenceWarningShown) {
+      persistenceWarningShown = true;
+      if (typeof window.bookOfElonToast === "function") {
+        window.bookOfElonToast(
+          "这条对话暂时没保存到服务器，刷新或稍后再试。",
+          { variant: "warning", ttlMs: 6000 }
+        );
+      }
+    }
   } catch (error) {
     console.error("Chat reply failed:", error);
     pendingMessage.text = "抱歉，回复生成失败了。你可以再试一次，或者换个方式描述你的问题。";

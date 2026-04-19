@@ -14,6 +14,8 @@ async function generateAssistantReply(userText, card) {
       text: fallbackReply,
       degraded: true,
       notice: buildDegradedNotice("missing_runtime"),
+      persistenceFailed: false,
+      persistenceReason: "",
     };
   }
 
@@ -45,6 +47,10 @@ async function generateAssistantReply(userText, card) {
       text: data.reply.trim(),
       degraded: Boolean(data.degraded),
       notice: data.degraded ? buildDegradedNotice(data.reason) : "",
+      // 服务端 persistChatTurn 失败时会带 persistence_ok=false。前端拿到要让用户
+      // 看见——这是 P0 审计后的契约：不能再悄悄丢消息了。
+      persistenceFailed: data.persistence_ok === false,
+      persistenceReason: data.persistence_reason || "",
     };
   } catch (error) {
     console.warn("DeepSeek request failed, falling back to local reply.", error);
@@ -53,6 +59,8 @@ async function generateAssistantReply(userText, card) {
       text: fallbackReply,
       degraded: true,
       notice: buildDegradedNotice(fallbackReason, error),
+      persistenceFailed: false,
+      persistenceReason: "",
     };
   } finally {
     clearTimeout(timeoutId);
