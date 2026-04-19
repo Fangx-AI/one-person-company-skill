@@ -506,12 +506,6 @@
     renderHeader();
     renderHero();
 
-    // 把登录前在 localStorage 里的访客对话灌到这个账号下，让"昨天聊的怎么没了"
-    // 这种问题不再发生。fire-and-forget — 失败不影响登录主流程。
-    importLocalSessionAfterLogin().catch((err) => {
-      console.warn("local session import failed:", err);
-    });
-
     setTimeout(() => {
       const banner = createToast(
         state.northStar
@@ -525,68 +519,6 @@
         setTimeout(() => banner.remove(), 400);
       }, 3500);
     }, 200);
-  }
-
-  // 登录后从 localStorage 读访客阶段的对话，调 /api/me/import-local-session 灌进
-  // 这个账号的 chat_sessions。服务端有"已经有 history 就跳过"的保护，所以同一
-  // 个账号反复登录不会重复堆。
-  async function importLocalSessionAfterLogin() {
-    if (!window.localStorage) return;
-    let raw;
-    try {
-      raw = window.localStorage.getItem("book-of-elon-chat-session-v1");
-    } catch {
-      return;
-    }
-    if (!raw) return;
-
-    let parsed;
-    try {
-      parsed = JSON.parse(raw);
-    } catch {
-      return;
-    }
-    if (!parsed || !Array.isArray(parsed.chatMessages)) return;
-
-    const messages = parsed.chatMessages
-      .filter(
-        (m) =>
-          m &&
-          (m.role === "user" || m.role === "assistant") &&
-          typeof m.text === "string" &&
-          m.text.trim().length > 0
-      )
-      .slice(0, 100);
-
-    if (messages.length === 0) return;
-
-    try {
-      const res = await fetch("/api/me/import-local-session", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chatMessages: messages,
-          cardId: parsed.currentCardId || null,
-          savedAt: parsed.savedAt || null,
-        }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (data && data.ok && data.imported > 0) {
-        // 转移成功后清掉 localStorage 副本，下次登录就不会重复弹了
-        try {
-          window.localStorage.removeItem("book-of-elon-chat-session-v1");
-        } catch {}
-        if (typeof window.bookOfElonToast === "function") {
-          window.bookOfElonToast(
-            `已把你登录前的 ${data.imported} 条对话保存到账号下。`,
-            { ttlMs: 4500 }
-          );
-        }
-      }
-    } catch (err) {
-      console.warn("import-local-session network error:", err);
-    }
   }
 
   function createToast(text, variant) {
