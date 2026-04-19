@@ -55,6 +55,47 @@ cp .env.production.example .env
 - `PORT`
 - 各类超时、限流、缓存参数
 
+### 必填的账号系统密钥
+
+```bash
+# 生成一个 64 位 16 进制随机串，写入 .env
+SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+echo "USER_SESSION_SECRET=$SECRET" >> .env
+```
+
+**警告**：`USER_SESSION_SECRET` 一旦上线**不要再改**，否则所有用户登录态
+会立即失效，需要重新短信验证。如果丢了，你只能重新生成一个，并通知用户重登。
+
+### 必填的 Aliyun 短信
+
+```env
+SMS_PROVIDER=aliyun
+ALIYUN_ACCESS_KEY_ID=LTAIxxxxxxxxxxxxxxxx
+ALIYUN_ACCESS_KEY_SECRET=xxxxxxxxxxxxxxxxxxxx
+ALIYUN_SMS_SIGN_NAME=方智云创                # 阿里云审核通过的签名
+ALIYUN_SMS_TEMPLATE_CODE=SMS_xxxxxxxx        # 已审核通过的模板编号
+```
+
+如果不配置 `SMS_PROVIDER` 或 `ALIYUN_*` 任何一项缺失，服务器会退回 mock 模式：
+**验证码会以明文出现在 `/api/auth/send-code` 的响应 body 里**。生产环境
+绝对不能允许这种情况，`npm run preflight:prod` 会拦住缺配置的启动。
+
+### 数据库初始化
+
+第一次部署或换机器：
+
+```bash
+npm run db:init
+```
+
+每次部署：服务进程启动时会自动跑 `db/auto-migrate.js`，缺表/缺列幂等补齐，
+不需要手工。也可以提前 dry-run 看一下：
+
+```bash
+npm run db:migrate          # dry-run，只打印
+npm run db:migrate:apply    # 真跑（会先备份）
+```
+
 ## 4. 上线前自检
 
 严格生产模式自检：
@@ -145,10 +186,27 @@ curl -I https://your-domain.com
 
 ## 9. 线上冒烟
 
-本机冒烟：
+本机冒烟（按推荐顺序跑一遍）：
 
 ```bash
-npm run smoke:chat
+npm run smoke:chat        # /api/chat 走通
+npm run auth:smoke        # 短信发送 / 验证码 / 登录 / 登出（mock 模式才能跑）
+npm run persist:smoke     # 聊天落库 + claim
+npm run northstar:smoke   # 北极星目标 + dashboard
+```
+
+> `auth:smoke` 只能在 `SMS_PROVIDER=mock` 下跑，因为它要从响应里读 devCode。
+> 生产环境不能临时切到 mock，所以这条只在 staging 或 dev 跑。
+> 真要在生产验证短信，最直接的办法是用真手机号走一遍登录页面。
+
+完整端到端 30 个断言（建议在 staging 跑）：
+
+```bash
+# 启动一个隔离 dev server，参数见脚本顶部注释
+$env:E2E_BASE='http://localhost:3033'
+node scripts/e2e-full-flow.js
+# 或者
+npm run test:e2e
 ```
 
 浏览器联调：
@@ -161,6 +219,9 @@ npm run smoke:chat
 - 匿名续聊正常
 - 主题库展开正常
 - 异常时会显示轻量降级提示
+- **登录走通**：手机号 → 收到真短信 → 6 位验证码 → 进入"我的路径"
+- **持久化走通**：登录前聊一条 → 登录 → 在右上角"我的路径"里能看到那条对话
+- **AI 记忆走通**：登录后再聊一条 → 退出账号 → 重登 → AI 还能模糊记得你之前说过什么
 
 ## 10. 上线后观察
 
@@ -195,15 +256,32 @@ curl http://127.0.0.1:3000/ready
 - `.env`
 - Nginx 站点配置
 - 证书相关目录
+- **`./data/app.db` —— 用户和对话全在这里**
 
-一次最简单的备份方式：
+一次最简单的配置备份方式：
 
 ```bash
 cp .env ".env.backup.$(date +%Y%m%d-%H%M%S)"
 sudo cp /etc/nginx/sites-available/default "/etc/nginx/sites-available/default.backup.$(date +%Y%m%d-%H%M%S)"
 ```
 
-如果你准备更新代码，建议先留一个旧版本目录，例如：
+### 数据库自动备份（必做）
+
+仓库里的 `scripts/backup-db.js` 用 SQLite 的 `.backup()` API 做热备份，
+然后 gzip + 轮转。挂一条 cron：
+
+```bash
+( crontab -l 2>/dev/null; \
+  echo "0 */4 * * * cd /root/skill_The_book_of_Elon && /usr/bin/node scripts/backup-db.js >> /var/log/boe-backup.log 2>&1" \
+) | crontab -
+crontab -l
+```
+
+每 4 小时一次，备份文件落到 `./data/backups/app-<ISO timestamp>.db.gz`，
+默认保留最近若干份（看脚本里的 `RETAIN_COUNT`）。建议同时把 `./data/backups/`
+目录定期 rsync 到一个异地（比如 OSS 或者另一台机器）。
+
+如果你要改代码 / 升级，建议先留一个旧版本目录：
 
 ```bash
 cp -r /root/skill_The_book_of_Elon "/root/skill_The_book_of_Elon.backup.$(date +%Y%m%d-%H%M%S)"
@@ -211,10 +289,32 @@ cp -r /root/skill_The_book_of_Elon "/root/skill_The_book_of_Elon.backup.$(date +
 
 如果更新后出问题，最快的回滚方式就是：
 
-1. 停掉当前进程
+1. 停掉当前进程：`pm2 stop book-of-elon`
 2. 切回上一份备份目录
-3. 重新 `pm2 start ecosystem.config.js`
-4. 再做一次 `/health` 和 `/ready` 检查
+3. 如果数据有损坏，从 `./data/backups/` 拿一份 `.db.gz` 解压回 `./data/app.db`
+4. 重新 `pm2 start ecosystem.config.js` 或 `pm2 reload book-of-elon`
+5. 再做一次 `/health` 和 `/ready` 检查
+
+## 11.5 一键部署脚本
+
+仓库内 `scripts/deploy.sh` 已经把以下步骤串好：
+
+1. 预检环境（node / pm2 版本、磁盘）
+2. 部署前 DB 备份
+3. `git pull --ff-only`
+4. `npm ci`
+5. 迁移 dry-run
+6. 迁移 apply
+7. `pm2 reload book-of-elon --update-env`
+8. 健康检查 + 烟测
+
+服务器上：
+
+```bash
+cd /root/skill_The_book_of_Elon
+chmod +x scripts/deploy.sh
+bash scripts/deploy.sh
+```
 
 ## 12. 当前架构边界
 

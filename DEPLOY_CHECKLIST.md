@@ -5,7 +5,9 @@
 - 使用 Node.js `>=20`
 - 已配置 `.env` 或等价的生产环境变量
 - 如果目标是完整聊天体验，必须配置 `DEEPSEEK_API_KEY`
-- 生产环境建议配置 `SESSION_TOKEN_SECRET`
+- **必须**配置 `USER_SESSION_SECRET`（账号系统签名密钥，64 位 hex）
+- **必须**配置 `SESSION_TOKEN_SECRET`（匿名 chat token 签名）
+- **必须**配置 `SMS_PROVIDER=aliyun` + `ALIYUN_ACCESS_KEY_ID` + `ALIYUN_ACCESS_KEY_SECRET` + `ALIYUN_SMS_SIGN_NAME` + `ALIYUN_SMS_TEMPLATE_CODE`，否则验证码会以明文返回
 
 ## 2. 配置自检
 
@@ -91,6 +93,30 @@ pm2 status
 - `/config.js` 必须通过同源服务提供，不能只丢静态文件
 - 直接跨站或裸调 `/api/chat` 会被服务端拒绝
 - 浏览器长时间等待时不会无限转圈，超时后会回落到本地知识回复
+- 聊天落库失败时，响应里 `persistence_ok=false`，前端会弹一个橙色 toast
+
+## 7.5 账号系统确认
+
+- 用真手机号点"登录"，确认能在 30 秒内收到 6 位验证码（并且短信落款是审核通过的签名，不是 `<请填真签名>`）
+- 输入验证码后能进入"我的路径"
+- "我的路径"右上角能看到 totalChatTurns / sessions / facts
+- **登录前聊的对话**应该能在登录后的 dashboard 里看到（`claimAnonSessions` 工作）
+- 登出后再登入，DB 里的对话历史仍然在
+- `/api/me/import-local-session` 应该返回 404（确认接口已撤回）
+
+## 7.6 数据持久化确认
+
+- `./data/app.db` 文件存在且有合理大小
+- `./data/backups/` 里有最近的 `.db.gz`（确认 cron 在跑）
+- `crontab -l` 里有 `node scripts/backup-db.js`
+- `tail -f /var/log/boe-backup.log` 能看到正常输出，没有 `Error`
+
+## 7.7 安全确认
+
+- `.env` 不在 Git 历史里（`git log --all --full-history -- .env`）
+- Aliyun AccessKey 是专用 RAM 子账号的，权限只有 SMS（最小权限原则）
+- 如果有泄漏过的旧 AccessKey，已经在阿里云控制台**禁用并删除**（不只是禁用）
+- `MONITOR_USERNAME` / `MONITOR_PASSWORD` 不是默认占位值
 
 ## 8. 上线前确认
 

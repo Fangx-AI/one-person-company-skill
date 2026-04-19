@@ -22,7 +22,8 @@
     "db:migrate:apply": "node scripts/migrate.js --apply",
     "auth:smoke": "node scripts/smoke-auth.js",
     "persist:smoke": "node scripts/smoke-persistence.js",
-    "northstar:smoke": "node scripts/smoke-northstar.js"
+    "northstar:smoke": "node scripts/smoke-northstar.js",
+    "test:e2e": "node scripts/e2e-full-flow.js"
   },
   "dependencies": {
     "better-sqlite3": "^12.9.0"
