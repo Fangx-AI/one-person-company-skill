@@ -52,12 +52,14 @@ HTTP_OK=$?
 #   green  → status=ok + db ok + llm ∈ {ok, idle, stale_ok}（不计 reload）
 #   yellow → status=degraded 且 db.status=ok（LLM 漂了，记录但不 reload）
 #   red    → curl 失败 / status=down / db.status=down（累计 → reload）
+# 顶层 "status" 是 body 第一个字段（紧跟 timestamp），用 "status":"X","timestamp"
+# 锚定区分；否则 grep -q '"status":"ok"' 会被嵌套字段（db.status / llm.status）误匹。
 state="red"
 if [ -n "$BODY" ]; then
   has_top_ok=0
   has_top_degraded=0
-  echo "$BODY" | grep -q '"status":"ok"' && has_top_ok=1
-  echo "$BODY" | grep -q '"status":"degraded"' && has_top_degraded=1
+  echo "$BODY" | grep -q '"status":"ok","timestamp"' && has_top_ok=1
+  echo "$BODY" | grep -q '"status":"degraded","timestamp"' && has_top_degraded=1
   has_db_ok=0
   echo "$BODY" | grep -q '"db":{"status":"ok"' && has_db_ok=1
 
