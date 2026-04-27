@@ -42,6 +42,11 @@
 | **Wave 3** | CI 兜底 + 运维监控 + runbooks 全 + .env 加固 | ~9 h | 防回归 + 余额监控 + 5 份 runbook | ✅ 完成 |
 | **Wave 4** | server.js 拆解 + staging 环境 | 1-2 d | 长期可维护性 | ⬜ 待启动 |
 
+### 还在挂着的事（Wave 3 收尾后）
+
+- **R-25 / R-02 重启**（🔴 P0，10 min）：daily-report 第一次跑挖出 `.env` 里 `DEEPSEEK_API_KEY` 仍是占位符 `disabled_due_to_abuse`。`/api/health` 的 `llm.status=ok` 只反映模块加载、不代表 key 真有效。需要在 DeepSeek 控制台生成新 key → `vi /root/skill_The_book_of_Elon/.env` → `pm2 reload book-of-elon --update-env` → 跑一次 `bash scripts/ops/daily-report.sh` 看 `total_balance` 能不能取到。流程见 `docs/runbooks/env-management.md` § "key 轮换"。
+- **R-22**（30 天后再跑 `/cso`，2026-05-27）
+
 详见 §7 Remediation Roadmap 和 `docs/superpowers/plans/`：
 - `2026-04-27-phase-c-frontend-backend-split.md`（Wave 2 Phase C 详细计划）
 - `2026-04-27-wave-3-ops-and-ci.md`（Wave 3 详细计划）
@@ -967,7 +972,7 @@ scripts/cleanup-claimed-sessions.js  (~10 天前加)
 | 编号 | 优先级 | 维度 | 工作 | 工时 | 依赖 | 状态 |
 |---|---|---|---|---|---|---|
 | **R-01** | 🔴 P0 | 安全/成本 | 实施 cost guardrails（A/B/C/D/E） | 3-4 h | — | ✅ Wave 1 (`aa9a8d6` + 部署) |
-| **R-02** | 🔴 P0 | 安全/成本 | 恢复 DEEPSEEK_API_KEY（依赖 R-01 完成） | 5 min | R-01 | ✅ 已恢复（health 显示 `llm.status=ok`） |
+| **R-02** | 🔴 P0 | 安全/成本 | 恢复 DEEPSEEK_API_KEY（依赖 R-01 完成） | 5 min | R-01 | ⏳ **重启**：Wave 3 R-14 daily-report 第一次跑挖出真相 — `.env` 里的 key 仍为 `disabled_due_to_abuse` 占位符；`/api/health` 的 `llm.status=ok` 只反映 module loaded，不是 key 真的有效。需重新生成并写入。详见 R-25 |
 | **R-03** | 🟡 P1 | 安全 | `.env` 加固：永远 600 + 不进 git + cron 自动校正 | 30 min | — | ✅ Wave 3。决策不迁 `/etc/`（收益<成本）；上 `scripts/ops/check-env-perms.sh` cron + `docs/runbooks/env-management.md` SOP |
 | **R-04** | 🟡 P1 | 文件/目录 | 数据 JSON 化：`book-source.js` / `card-data.js` 转 `web/*.json` | 45 min | — | ✅ Wave 2 Phase C-2 (`26b3ea0`)。`knowledge-base.js` 是逻辑库保持 .js |
 | **R-05** | 🟡 P1 | 文件/目录 | 重组 `scripts/` 为 `ops/` / `tools/` / `calibration/` | 1 h | — | ✅ Wave 2 Phase B + Wave 3 R-24（calibration 进了 `tests/calibration/` 而非 `scripts/`，更贴定位） |
@@ -986,10 +991,11 @@ scripts/cleanup-claimed-sessions.js  (~10 天前加)
 | **R-18** | 🟠 P2 | 部署/运维 | 加 GitHub Actions CI（preflight + smoke） | 1 h | R-17 | ✅ Wave 3。`.github/workflows/ci.yml` 4 个 job 并行：lint-preflight / unit-smoke / integration-smoke / docker-build |
 | **R-19** | 🟠 P2 | 部署/运维 | staging 环境（同机器子域名） | 4 h | R-18 | ⬜ Wave 4 |
 | **R-20** | 🟢 P3 | 代码/架构 | `server.js` 拆解为 `routes/` × 5 + `services/` × 3 + `middleware/` | 1-2 d | R-08（测试结构稳定后） | ⬜ Wave 4 |
-| **R-21** | 🟢 P3 | 部署/运维 | DR 演练（恢复一次备份） | 1 h | — | 🟢 Wave 3 服务器侧执行（演练记录写进 `incident-db-corruption.md` §8） |
+| **R-21** | ✅ P3 | 部署/运维 | DR 演练（恢复一次备份） | 1 h | — | ✅ Wave 3 完成（2026-04-27 演练 PASS：`integrity_check=ok` + schema 与 prod sha256 一致；脚本固化到 `scripts/ops/dr-drill.js`，记录见 `incident-db-corruption.md` §8） |
 | **R-22** | 🟢 P3 | 安全 | 30 天后再跑 `/cso` 看回归 | 30 min | — | ⬜ 2026-05-27 |
 | **R-23** | 🔴 P0 | 安全/Bug | 修 `/book-source.js → 404` 静默 bug：白名单加 `/book-source.js` | 5 min | R-06 | ✅ Wave 2 Phase C-1 (`b8831f7`)。Phase C-2 后该 URL 已废弃为 404（数据走 `/book-source.json`）|
 | **R-24** | 🟡 P1 | 文件/目录 | 把 calibration tools (`reply-calibration.js` / `deepseek-eval.js`) 搬到 `tests/calibration/` 或 `scripts/tools/calibration/` | 30 min | R-04 | ✅ Wave 3。5 个文件（含 test-set.json + output md）git mv 到 `tests/calibration/`；`projectRoot` 回退 2 级；package.json scripts + .gitignore + .dockerignore 同步更新 |
+| **R-25** | 🔴 P0 | 安全/成本 | 修正 R-02 误判：DeepSeek API key 实际仍是占位符 `disabled_due_to_abuse`，需重新生成有效 key 并写入 `.env`，重启 PM2 后再次跑 daily-report 验证余额能取到 | 10 min | R-14 | ⏳ Wave 3 daily-report 跑通后发现，待用户在 DeepSeek 控制台生成 key（旧 key 因被用 4 元/小时风控了）；流程见 `docs/runbooks/env-management.md` § "key 轮换" |
 
 ### 7.2 推荐执行波次
 

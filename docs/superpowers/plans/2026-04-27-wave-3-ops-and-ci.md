@@ -200,4 +200,8 @@ CI 跑 degraded 模式（`DEEPSEEK_API_KEY` 留空），这样不需要在 GH se
 ---
 
 > Status: drafted 2026-04-27 → executed same day. All in-scope items ✅.  
-> 服务器端动作（cron 安装 + DR 演练）在 commit & push 之后单独执行。
+> 服务器端动作 2026-04-27 完成：
+> - `git pull` 拉到 `ee9c7f9`
+> - 3 条 cron 装好（health 1-min / daily 09:00 / env-perms 03:00）已在 `crontab -l` 里看到
+> - **R-21 DR 演练 PASS**：恢复最新 backup `app-2026-04-27T08-00-01.db.gz`，`integrity_check=ok` + schema sha256 与 prod 一致；演练逻辑固化到 `scripts/ops/dr-drill.js`（`npm run db:dr-drill`）
+> - **意外收获**：daily-report.sh 第一次跑就抓到 `.env` 里 `DEEPSEEK_API_KEY` 仍是占位符 `disabled_due_to_abuse`（R-02 之前误判已恢复，因为 `llm.status=ok` 只看模块加载状态）。新增 R-25 跟进；同时 `daily-report.sh` 加了占位符显式跳过逻辑 + 用 `tail -n1` 取后定义覆盖语义

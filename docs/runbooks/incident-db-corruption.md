@@ -186,7 +186,7 @@ SQLITE_DB_PATH=/tmp/post-restore-smoke.db npm run smoke:db
 
 | 日期 | 演练内容 | backup 文件 | 恢复用时 | 数据完整性 | 备注 |
 |---|---|---|---|---|---|
-| 2026-04-27 | Wave 3 R-21 首次演练（计划） | TBD | TBD | TBD | TBD |
+| 2026-04-27 | Wave 3 R-21 首次演练 | `app-2026-04-27T08-00-01.db.gz` (42 KB) | < 1 s | `integrity_check=ok` + schema sha256 与 prod 一致 | `npm run db:dr-drill` 一次性跑通；`smoke:db` 也在恢复出的临时库上 PASS。复演命令落到 `scripts/ops/dr-drill.js`。 |
 
 ---
 

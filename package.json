@@ -43,7 +43,8 @@
     "db:smoke": "node tests/smoke/db.js",
     "db:backup": "node scripts/ops/backup-db.js",
     "db:migrate": "node scripts/ops/migrate.js",
-    "db:migrate:apply": "node scripts/ops/migrate.js --apply"
+    "db:migrate:apply": "node scripts/ops/migrate.js --apply",
+    "db:dr-drill": "node scripts/ops/dr-drill.js"
   },
   "dependencies": {
     "better-sqlite3": "^12.9.0"

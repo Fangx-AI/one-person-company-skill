@@ -30,12 +30,22 @@ TS_TAG="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 OUT="$LOG_DIR/daily-${DATE_TAG}.log"
 
 # ───────── 读 DeepSeek key（不打印） ─────────
+# 注意：用 tail -n1 而不是 head -n1。shell 风格 env 加载是"后定义覆盖前定义"，
+# 万一 .env 里残留了占位符（比如紧急封禁时写的 disabled_due_to_abuse），实际生效
+# 的应该是文件最后一条 — 我们要跟应用看到的值保持一致。
 DEEPSEEK_API_KEY=""
+DEEPSEEK_API_KEY_REASON=""
 ENV_FILE="$PROJECT_ROOT/.env"
 if [ -f "$ENV_FILE" ]; then
-  # 不 source（避免 env 里其他变量污染脚本）；用 grep 抠出 key
-  DEEPSEEK_API_KEY="$(grep -E '^DEEPSEEK_API_KEY=' "$ENV_FILE" 2>/dev/null | head -n1 | sed -E 's/^DEEPSEEK_API_KEY=//; s/^"//; s/"$//')"
+  DEEPSEEK_API_KEY="$(grep -E '^DEEPSEEK_API_KEY=' "$ENV_FILE" 2>/dev/null | tail -n1 | sed -E 's/^DEEPSEEK_API_KEY=//; s/^"//; s/"$//')"
 fi
+# 占位符显式跳过（不要去敲 DeepSeek 浪费一次 401 + 误导日报）
+case "$DEEPSEEK_API_KEY" in
+  ""|disabled_*|placeholder*|REPLACE_ME*)
+    DEEPSEEK_API_KEY_REASON="(skipped: key looks like placeholder/disabled)"
+    DEEPSEEK_API_KEY=""
+    ;;
+esac
 
 {
   echo "════════════════════════════════════════════════════════════════"
@@ -73,7 +83,7 @@ fi
       fi
     fi
   else
-    echo "(skipped: DEEPSEEK_API_KEY 未在 ${ENV_FILE} 中找到)"
+    echo "${DEEPSEEK_API_KEY_REASON:-(skipped: DEEPSEEK_API_KEY 未在 ${ENV_FILE} 中找到)}"
   fi
   echo ""
   echo ""
