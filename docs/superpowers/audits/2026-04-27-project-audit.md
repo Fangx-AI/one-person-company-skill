@@ -44,7 +44,10 @@
 
 ### 还在挂着的事（Wave 3 收尾后）
 
-- **R-25 / R-02 重启**（🔴 P0，10 min）：daily-report 第一次跑挖出 `.env` 里 `DEEPSEEK_API_KEY` 仍是占位符 `disabled_due_to_abuse`。`/api/health` 的 `llm.status=ok` 只反映模块加载、不代表 key 真有效。需要在 DeepSeek 控制台生成新 key → `vi /root/skill_The_book_of_Elon/.env` → `pm2 reload book-of-elon --update-env` → 跑一次 `bash scripts/ops/daily-report.sh` 看 `total_balance` 能不能取到。流程见 `docs/runbooks/env-management.md` § "key 轮换"。
+- **R-25 / R-02 重启**（🔴 P0，**严重程度高于初判**）：daily-report 第一次跑挖出 `.env` 里 `DEEPSEEK_API_KEY` 仍是占位符 `disabled_due_to_abuse`，且通过 admin-report 日志看到 **2026-04-25 ~ 现在所有用户对话都走 `[FALLBACK]`**（包括登录用户 #1 的"我想辞职"也只拿到了静态回复）。意味着站点用户体验已经默默降级 2+ 天而无人察觉。
+  - 修复路径：DeepSeek 控制台生成新 key → `vi /root/skill_The_book_of_Elon/.env` → `pm2 reload book-of-elon --update-env` → `bash scripts/ops/daily-report.sh` 验证 `total_balance` 能取到 → 主站发一句 "你好" 看返回的不再是 `[FALLBACK]`
+  - 还要追查：为什么 `/api/health` 的 `llm.status=ok / consecutive_failures=0` 在 DeepSeek 持续 401 的情况下没翻车？这个 health 信号正在撒谎。属于 Wave 4 R-26（健康检查可信度）的伏笔
+  - 流程见 `docs/runbooks/env-management.md` § "key 轮换"
 - **R-22**（30 天后再跑 `/cso`，2026-05-27）
 
 详见 §7 Remediation Roadmap 和 `docs/superpowers/plans/`：
@@ -995,7 +998,8 @@ scripts/cleanup-claimed-sessions.js  (~10 天前加)
 | **R-22** | 🟢 P3 | 安全 | 30 天后再跑 `/cso` 看回归 | 30 min | — | ⬜ 2026-05-27 |
 | **R-23** | 🔴 P0 | 安全/Bug | 修 `/book-source.js → 404` 静默 bug：白名单加 `/book-source.js` | 5 min | R-06 | ✅ Wave 2 Phase C-1 (`b8831f7`)。Phase C-2 后该 URL 已废弃为 404（数据走 `/book-source.json`）|
 | **R-24** | 🟡 P1 | 文件/目录 | 把 calibration tools (`reply-calibration.js` / `deepseek-eval.js`) 搬到 `tests/calibration/` 或 `scripts/tools/calibration/` | 30 min | R-04 | ✅ Wave 3。5 个文件（含 test-set.json + output md）git mv 到 `tests/calibration/`；`projectRoot` 回退 2 级；package.json scripts + .gitignore + .dockerignore 同步更新 |
-| **R-25** | 🔴 P0 | 安全/成本 | 修正 R-02 误判：DeepSeek API key 实际仍是占位符 `disabled_due_to_abuse`，需重新生成有效 key 并写入 `.env`，重启 PM2 后再次跑 daily-report 验证余额能取到 | 10 min | R-14 | ⏳ Wave 3 daily-report 跑通后发现，待用户在 DeepSeek 控制台生成 key（旧 key 因被用 4 元/小时风控了）；流程见 `docs/runbooks/env-management.md` § "key 轮换" |
+| **R-25** | 🔴 P0 | 安全/成本 | 修正 R-02 误判：`.env` 中 `DEEPSEEK_API_KEY` 实际仍是占位符 `disabled_due_to_abuse`；后果：站点 2+ 天对所有用户走 `[FALLBACK]`（通过 admin-report 实证）。需重新生成 key + 重启 + 验证 | 15 min | R-14 | ⏳ Wave 3 daily-report 跑通后发现；流程见 `docs/runbooks/env-management.md` § "key 轮换" |
+| **R-26** | 🟠 P2 | 部署/运维 | `/api/health` 的 `llm.status=ok / consecutive_failures=0` 在 DeepSeek 持续 401 的情况下没翻车 — health 信号撒谎。改成"过去 N 分钟内有真实成功调用才算 ok"或在启动时跑一次 ping | 1-2 h | R-25 | ⬜ Wave 4。R-25 的伏笔：health 不能只看模块加载，得看上游真实调用结果 |
 
 ### 7.2 推荐执行波次
 
