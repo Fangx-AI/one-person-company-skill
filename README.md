@@ -102,7 +102,7 @@ curl -s http://127.0.0.1:3000/api/health | python3 -m json.tool
 ```bash
 ssh root@bookofelon.cn
 cd /root/skill_The_book_of_Elon
-bash scripts/deploy.sh
+bash scripts/ops/deploy.sh
 ```
 
 完整流程（首次装机 / 例行发布 / 回滚 / 备份）见 [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)。

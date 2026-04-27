@@ -16,7 +16,7 @@
 // 这个测试是单元级，直接 require server 是不行的（会启动监听端口）。
 // 我们直接测 services/system-prompt.js 和 model-client 的 V1/V2 一致性。
 
-const systemPrompt = require("../services/system-prompt");
+const systemPrompt = require("../../services/system-prompt");
 
 let failures = 0;
 function assert(cond, msg) {

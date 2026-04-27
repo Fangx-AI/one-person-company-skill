@@ -20,7 +20,7 @@ const fs = require("fs");
 
 process.env.PORT = process.env.PORT || "3099";
 // 强制隔离 DB：永远不允许把测试数据写到生产 app.db。
-const TEST_DB_PATH = path.join(__dirname, "..", "data", "test.db");
+const TEST_DB_PATH = path.join(__dirname, "..", "..", "data", "test.db");
 process.env.SQLITE_DB_PATH = process.env.SQLITE_DB_PATH || TEST_DB_PATH;
 if (path.basename(process.env.SQLITE_DB_PATH) === "app.db") {
   console.error(
@@ -39,9 +39,9 @@ if (fs.existsSync(process.env.SQLITE_DB_PATH)) {
   fs.unlinkSync(process.env.SQLITE_DB_PATH);
 }
 
-const session = require(path.join(__dirname, "..", "auth", "session"));
-const dbUsers = require(path.join(__dirname, "..", "db", "users"));
-const dbFacts = require(path.join(__dirname, "..", "db", "facts"));
+const session = require(path.join(__dirname, "..", "..", "auth", "session"));
+const dbUsers = require(path.join(__dirname, "..", "..", "db", "users"));
+const dbFacts = require(path.join(__dirname, "..", "..", "db", "facts"));
 
 const BASE = `http://127.0.0.1:${process.env.PORT}`;
 let passed = 0;

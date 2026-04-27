@@ -102,8 +102,12 @@ function assert(cond, msg) {
     "/routes/auth.js",
     "/routes/me.js",
     "/services/fact-extractor.js",
-    "/scripts/cleanup-claimed-sessions.js",
-    "/scripts/backup-db.js",
+    "/scripts/ops/backup-db.js",
+    "/scripts/ops/migrate.js",
+    "/scripts/tools/cleanup-claimed-sessions.js",
+    "/scripts/tools/admin-report.js",
+    "/tests/smoke/cost-control.js",
+    "/tests/e2e/full-flow.js",
 
     // 黑扩展名 —— 哪怕在根目录也不行
     "/server.js",

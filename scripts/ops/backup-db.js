@@ -27,7 +27,7 @@ const zlib = require("zlib");
 const Database = require("better-sqlite3");
 
 const DB_PATH =
-  process.env.SQLITE_DB_PATH || path.join(__dirname, "..", "data", "app.db");
+  process.env.SQLITE_DB_PATH || path.join(__dirname, "..", "..", "data", "app.db");
 const BACKUP_DIR =
   process.env.BACKUP_DIR || path.join(path.dirname(DB_PATH), "backups");
 const MAX_TOTAL_BACKUPS = Number(process.env.BACKUP_MAX || 32);

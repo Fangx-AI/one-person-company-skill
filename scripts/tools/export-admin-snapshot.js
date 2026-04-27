@@ -32,7 +32,7 @@ const MAX_MESSAGES = Number(process.env.SNAPSHOT_MAX_MESSAGES || 30000);
 const MAX_SESSIONS = Number(process.env.SNAPSHOT_MAX_SESSIONS || 10000);
 
 function resolveDbPath() {
-  const dataDir = path.join(__dirname, "..", "data");
+  const dataDir = path.join(__dirname, "..", "..", "data");
   const candidates = [
     process.env.SQLITE_DB_PATH,
     path.join(dataDir, "app.db"),

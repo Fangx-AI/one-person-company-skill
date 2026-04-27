@@ -12,21 +12,38 @@
     "preflight": "node preflight-check.js",
     "preflight:degraded": "node preflight-check.js --allow-degraded",
     "preflight:prod": "node preflight-check.js --strict-production",
+
     "smoke:chat": "node deepseek-smoke-test.js",
+    "smoke:auth": "node tests/smoke/auth.js",
+    "smoke:db": "node tests/smoke/db.js",
+    "smoke:persistence": "node tests/smoke/persistence.js",
+    "smoke:northstar": "node tests/smoke/northstar.js",
+    "smoke:cost": "node tests/smoke/cost-control.js",
+    "smoke:static": "node tests/smoke/static-security.js",
+    "smoke:prompt": "node tests/smoke/prompt-injection.js",
+
+    "auth:smoke": "node tests/smoke/auth.js",
+    "persist:smoke": "node tests/smoke/persistence.js",
+    "northstar:smoke": "node tests/smoke/northstar.js",
+    "cost:smoke": "node tests/smoke/cost-control.js",
+    "static:smoke": "node tests/smoke/static-security.js",
+    "prompt:smoke": "node tests/smoke/prompt-injection.js",
+
     "test:reply": "node reply-calibration.js",
     "test:deepseek": "node deepseek-eval.js",
-    "db:init": "node scripts/init-db.js",
-    "db:smoke": "node scripts/smoke-db.js",
-    "db:backup": "node scripts/backup-db.js",
-    "db:migrate": "node scripts/migrate.js",
-    "db:migrate:apply": "node scripts/migrate.js --apply",
-    "auth:smoke": "node scripts/smoke-auth.js",
-    "persist:smoke": "node scripts/smoke-persistence.js",
-    "northstar:smoke": "node scripts/smoke-northstar.js",
-    "static:smoke": "node scripts/smoke-static-security.js",
-    "prompt:smoke": "node scripts/smoke-prompt-injection.js",
-    "cost:smoke": "node scripts/smoke-cost-control.js",
-    "test:e2e": "node scripts/e2e-full-flow.js"
+    "test:e2e": "node tests/e2e/full-flow.js",
+    "test:integration": "node tests/e2e/integration-memory.js",
+    "test:fact-extractor": "node tests/e2e/fact-extractor.js",
+
+    "probe:live-chat": "node tests/probe/live-chat.js",
+    "probe:prompt-injection": "node tests/probe/prompt-injection-live.js",
+    "probe:min": "node tests/probe/min.js",
+
+    "db:init": "node scripts/ops/init-db.js",
+    "db:smoke": "node tests/smoke/db.js",
+    "db:backup": "node scripts/ops/backup-db.js",
+    "db:migrate": "node scripts/ops/migrate.js",
+    "db:migrate:apply": "node scripts/ops/migrate.js --apply"
   },
   "dependencies": {
     "better-sqlite3": "^12.9.0"

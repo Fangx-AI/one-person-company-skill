@@ -138,10 +138,10 @@ npm run preflight:prod         # 严格生产模式（缺关键 env 直接拒启
 
 ```bash
 cd /root/skill_The_book_of_Elon
-bash scripts/deploy.sh
+bash scripts/ops/deploy.sh
 ```
 
-`scripts/deploy.sh` 是 canonical 路径。10 步流水线：
+`scripts/ops/deploy.sh` 是 canonical 路径。10 步流水线：
 
 1. 预检环境（node / pm2 / 磁盘）
 2. 部署前 DB 备份（即便不动 DB 也总是先备份）
@@ -162,7 +162,7 @@ bash scripts/deploy.sh
 cd /root/skill_The_book_of_Elon
 git fetch --all --prune && git pull --ff-only
 npm ci --omit=dev
-npm run db:migrate                        # dry-run
+npm run db:migrate                        # dry-run（→ scripts/ops/migrate.js）
 npm run db:migrate:apply                  # 真跑（自带 .backup-<ts>）
 pm2 reload book-of-elon --update-env
 sleep 3
@@ -272,7 +272,7 @@ pm2 reload book-of-elon --update-env
 
 ### 6.2 自动热备份
 
-`scripts/backup-db.js` 用 SQLite `.backup()` API（不卡 server）+ gzip + 轮转。
+`scripts/ops/backup-db.js` 用 SQLite `.backup()` API（不卡 server）+ gzip + 轮转。
 
 ```bash
 # 手动跑一次试试
@@ -284,7 +284,7 @@ npm run db:backup
 
 ```bash
 ( crontab -l 2>/dev/null
-  echo "0 */4 * * * cd /root/skill_The_book_of_Elon && /usr/bin/node scripts/backup-db.js >> /var/log/boe-backup.log 2>&1"
+  echo "0 */4 * * * cd /root/skill_The_book_of_Elon && /usr/bin/node scripts/ops/backup-db.js >> /var/log/boe-backup.log 2>&1"
 ) | crontab -
 crontab -l   # 确认
 ```
@@ -392,7 +392,7 @@ ssh -L 3201:127.0.0.1:3201 root@bookofelon.cn
 
 ## §A Security Pre-flight Checklist
 
-每次大改前过一遍（自动化版本：考虑加入 `scripts/deploy.sh` 第 0 步）：
+每次大改前过一遍（自动化版本：考虑加入 `scripts/ops/deploy.sh` 第 0 步）：
 
 - [ ] `.env` 不在 git 历史里：`git log --all --full-history -- .env`
 - [ ] Aliyun AccessKey 是专用 RAM 子账号，权限只有 SMS

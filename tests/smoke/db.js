@@ -2,19 +2,19 @@
 const fs = require("fs");
 const path = require("path");
 
-const TEST_DB_PATH = path.join(__dirname, "..", "data", "smoke.db");
+const TEST_DB_PATH = path.join(__dirname, "..", "..", "data", "smoke.db");
 process.env.SQLITE_DB_PATH = TEST_DB_PATH;
 
 if (fs.existsSync(TEST_DB_PATH)) {
   fs.unlinkSync(TEST_DB_PATH);
 }
 
-const users = require("../db/users");
-const goals = require("../db/goals");
-const facts = require("../db/facts");
-const sessions = require("../db/sessions");
-const sms = require("../db/sms");
-const { closeDb } = require("../db/database");
+const users = require("../../db/users");
+const goals = require("../../db/goals");
+const facts = require("../../db/facts");
+const sessions = require("../../db/sessions");
+const sms = require("../../db/sms");
+const { closeDb } = require("../../db/database");
 
 function assert(cond, msg) {
   if (!cond) {

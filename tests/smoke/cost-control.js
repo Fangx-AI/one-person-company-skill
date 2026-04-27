@@ -17,7 +17,7 @@ process.env.DAILY_TOTAL_TOKEN_BUDGET = "10000";
 process.env.DAILY_TOKEN_PER_IP = "1000";
 process.env.DAILY_ANON_CHAT_PER_SESSION = "3";
 
-const cc = require("../services/cost-control");
+const cc = require("../../services/cost-control");
 
 let passed = 0;
 let failed = 0;

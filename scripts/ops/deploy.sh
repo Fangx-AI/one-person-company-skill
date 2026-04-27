@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # ════════════════════════════════════════════════════════════════
-# scripts/deploy.sh — bookofelon.cn 一键部署
+# scripts/ops/deploy.sh — bookofelon.cn 一键部署
 # ────────────────────────────────────────────────────────────────
-# 在服务器上执行：cd /path/to/repo && bash scripts/deploy.sh
+# 在服务器上执行：cd /path/to/repo && bash scripts/ops/deploy.sh
 #
 # 会做这些事（每一步失败都立刻退出，不会留半成品）：
 #   1. 健康预检：进程在跑、git tree 干净、磁盘有空间
@@ -85,12 +85,12 @@ ok "依赖装好"
 
 # ───────── 5. 迁移 dry-run ─────────
 step "5/10  迁移 dry-run"
-SQLITE_DB_PATH="$DB_PATH" node scripts/migrate.js
+SQLITE_DB_PATH="$DB_PATH" node scripts/ops/migrate.js
 ok "dry-run 完成（上面是即将执行的 ALTER TABLE 列表）"
 
 # ───────── 6. 真迁移 ─────────
 step "6/10  迁移 apply"
-SQLITE_DB_PATH="$DB_PATH" node scripts/migrate.js --apply
+SQLITE_DB_PATH="$DB_PATH" node scripts/ops/migrate.js --apply
 ok "迁移完成"
 
 # ───────── 7. PM2 reload ─────────

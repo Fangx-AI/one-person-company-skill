@@ -5,7 +5,7 @@
 //
 // 加 --dry-run 默认，必须 --apply 才真删。
 
-const { getDb } = require("../db/database");
+const { getDb } = require("../../db/database");
 
 const DRY = !process.argv.includes("--apply");
 const KNOWN_TEST_PHONES = [

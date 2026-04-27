@@ -51,7 +51,7 @@
                │
                ↓
 ┌────────────────────────────────────────────────────────────┐
-│  cron: scripts/backup-db.js  4h 一次 → data/backups/*.gz   │
+│  cron: scripts/ops/backup-db.js  4h 一次 → data/backups/*.gz │
 └────────────────────────────────────────────────────────────┘
 ```
 
@@ -102,13 +102,23 @@ prompts/
   system-prompt-v1.md    # 旧版（保留对照）
   system-prompt-v2.md    # 当前默认（Elon 强势风格）
 
-scripts/                 # 待重组 (R-05, Wave 2 Phase B)
-  init-db.js             # 第一次部署
-  migrate.js             # 手工迁移（dry-run / apply）
-  backup-db.js           # 热备份 + gzip + 轮转
-  deploy.sh              # 一键部署
-  smoke-*.js             # 各类冒烟（auth / persistence / northstar / cost / static / prompt）
-  e2e-full-flow.js       # 30 个断言 e2e
+scripts/                 # R-05 重组（Wave 2 Phase B 已完成）
+  ops/                   # 日常运维必跑（deploy / backup / migrate / init-db）
+    deploy.sh            # 一键部署
+    backup-db.js         # 热备份 + gzip + 轮转
+    init-db.js           # 第一次部署
+    migrate.js           # 手工迁移（dry-run / apply）
+  tools/                 # 一次性工具（admin-report / db-peek / cleanup-claimed-sessions / ...）
+    admin-report.js
+    export-admin-snapshot.js
+    cleanup-claimed-sessions.js
+    clean-test-pollution.js
+    db-peek.js
+
+tests/                   # R-08 重组（Wave 2 Phase B 已完成）
+  smoke/                 # 单功能快速冒烟（auth / db / persistence / northstar / cost / static / prompt）
+  e2e/                   # 端到端 / 集成（full-flow / integration-memory / fact-extractor / jsdom-click）
+  probe/                 # 线上 / 实时探针（live-chat / prompt-injection-live / min）
 
 data/
   app.db                 # SQLite 主库（备份这个！）

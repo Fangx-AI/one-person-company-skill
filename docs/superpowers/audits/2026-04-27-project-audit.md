@@ -968,10 +968,10 @@ scripts/cleanup-claimed-sessions.js  (~10 天前加)
 | **R-02** | 🔴 P0 | 安全/成本 | 恢复 DEEPSEEK_API_KEY（依赖 R-01 完成） | 5 min | R-01 | ✅ 已恢复（health 显示 `llm.status=ok`） |
 | **R-03** | 🟡 P1 | 安全 | `.env` 迁到 `/etc/book-of-elon/.env` + `chmod 600` | 30 min | — | ⬜ Wave 3 |
 | **R-04** | 🟡 P1 | 文件/目录 | 删 working tree 里的 `output.md` | 5 min | — | ⬜ Wave 2 Phase B 顺手做 |
-| **R-05** | 🟡 P1 | 文件/目录 | 重组 `scripts/` 为 `ops/` / `tools/` / `calibration/` | 1 h | — | ⬜ Wave 2 Phase B |
+| **R-05** | 🟡 P1 | 文件/目录 | 重组 `scripts/` 为 `ops/` / `tools/` / `calibration/` | 1 h | — | 🟢 Wave 2 Phase B（ops/ + tools/ 完成；calibration/ 留 Phase C） |
 | **R-06** | 🟡 P1 | 文件/目录 | `book-source.js` / `card-data.js` / `knowledge-base.js` 转 JSON 移到 `data/` | 45 min | — | ⬜ Wave 2 Phase C |
 | **R-07** | 🟡 P1 | 文件/目录 | 把 `reply-engine.js` `model-client.js` 移到 `services/` | 30 min | — | ⬜ Wave 2 Phase C |
-| **R-08** | 🟡 P1 | 文件/目录 | 测试 smoke 移到 `tests/` | 1 h | R-05 | ⬜ Wave 2 Phase B |
+| **R-08** | 🟡 P1 | 文件/目录 | 测试 smoke 移到 `tests/` | 1 h | R-05 | 🟢 Wave 2 Phase B（tests/{smoke,e2e,probe}/ 全部建立） |
 | **R-09** | 🟡 P1 | 文档 | 合并 3 份 DEPLOY 文档为 `docs/DEPLOYMENT.md` | 2 h | — | 🟢 Wave 2 Phase A |
 | **R-10** | 🟡 P1 | 文档 | 6 份 .md 移到 `docs/`（OBSERVABILITY、launch-plan、reply-strategy、prompt-ab、reply-calib-output 删除） | 30 min | — | 🟢 Wave 2 Phase A（移到 archive/quality/，未删） |
 | **R-11** | 🟡 P1 | 文档 | 写 `docs/ARCHITECTURE.md`（从 CLAUDE.md §3 抽出 + 加 mermaid） | 1 h | — | 🟢 Wave 2 Phase A |

@@ -1,4 +1,4 @@
-const { getDb } = require("../db/database");
+const { getDb } = require("../../db/database");
 const db = getDb();
 
 console.log("=== 最近 facts (top 6) ===");

@@ -7,7 +7,7 @@
 //
 // 注意：这里**只**做向前兼容的 ALTER TABLE ADD COLUMN（idempotent）和
 // CREATE TABLE IF NOT EXISTS（idempotent）。任何破坏性的 schema 变更
-// 必须走 scripts/migrate.js 离线脚本，不要塞进自动迁移。
+// 必须走 scripts/ops/migrate.js 离线脚本，不要塞进自动迁移。
 //
 // 设计动机参见 P0 审计 ②③：之前生产 DB 老 schema 缺列时，应用层默默
 // 写失败、用户看不到——必须 fail-fast。
@@ -116,7 +116,7 @@ function runAutoMigrate(db, { logger = console } = {}) {
       `[auto-migrate] FAIL — schema still incomplete after auto-migrate. ` +
       `missing tables=[${stillMissing.tables.join(",")}] ` +
       `missing columns=[${stillMissing.columns.join(",")}]. ` +
-      `Refusing to start. Run \`node scripts/migrate.js --apply\` manually.`;
+      `Refusing to start. Run \`node scripts/ops/migrate.js --apply\` manually.`;
     throw new Error(msg);
   }
 

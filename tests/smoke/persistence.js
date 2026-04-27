@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const http = require("http");
-const { getDb } = require("../db/database");
+const { getDb } = require("../../db/database");
 
 const BASE = "http://localhost:3000";
 

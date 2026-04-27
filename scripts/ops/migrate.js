@@ -22,8 +22,8 @@ const Database = require("better-sqlite3");
 
 const DRY = !process.argv.includes("--apply");
 const DB_PATH =
-  process.env.SQLITE_DB_PATH || path.join(__dirname, "..", "data", "app.db");
-const SCHEMA_PATH = path.join(__dirname, "..", "db", "schema.sql");
+  process.env.SQLITE_DB_PATH || path.join(__dirname, "..", "..", "data", "app.db");
+const SCHEMA_PATH = path.join(__dirname, "..", "..", "db", "schema.sql");
 
 if (!fs.existsSync(DB_PATH)) {
   console.error(`DB not found: ${DB_PATH}`);

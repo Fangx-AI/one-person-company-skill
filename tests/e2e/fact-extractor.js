@@ -2,7 +2,7 @@
 const assert = require("assert");
 const path = require("path");
 
-const ext = require(path.join(__dirname, "..", "services", "fact-extractor.js"));
+const ext = require(path.join(__dirname, "..", "..", "services", "fact-extractor.js"));
 const { parseExtractionResponse, isDuplicate, normaliseForDedup, shouldExtract, buildUserPrompt } = ext._internal;
 
 let pass = 0;

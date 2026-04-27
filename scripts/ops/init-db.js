@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const path = require("path");
-const { getDb, getSchemaVersion, DB_PATH, closeDb } = require("../db/database");
+const { getDb, getSchemaVersion, DB_PATH, closeDb } = require("../../db/database");
 
 function main() {
   console.log("─".repeat(60));

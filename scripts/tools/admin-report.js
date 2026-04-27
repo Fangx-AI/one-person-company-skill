@@ -31,7 +31,7 @@ try {
 }
 
 // ---------- 0. 定位数据库 ----------
-const projectRoot = path.resolve(__dirname, "..");
+const projectRoot = path.resolve(__dirname, "..", "..");
 function resolveDbPath() {
   const fromEnv = process.env.SQLITE_DB_PATH;
   if (fromEnv && fs.existsSync(fromEnv)) return fromEnv;
