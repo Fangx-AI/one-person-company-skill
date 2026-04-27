@@ -4,10 +4,13 @@
 # ────────────────────────────────────────────────────────────────
 # 每分钟 cron 跑一次，curl /api/health。
 #
-# 行为：
-#   - status=ok + db.status=ok + llm.status 不为 down → 静默退出 0
-#   - 其他情况 → 写一行到 /var/log/book-of-elon/health.log
-#   - 连续 3 次非 ok（用 state file 计数）→ pm2 reload + 写 incident.log
+# 行为（R-26 后细化）：
+#   - HTTP 200 + status=ok + db.status=ok + llm.status ∈ {ok, idle, stale_ok}
+#     → 静默退出 0（idle/stale_ok 是"暂无近时调用"的良性状态）
+#   - status=degraded（LLM 上游 401/网络抖）→ log + 不计入 reload threshold
+#       reload 改不了上游 key，只会刷日志；这个交给 daily-report 提醒人换 key
+#   - HTTP 失败 / status=down / db.status=down → 计入 fail count，连续 3 次 reload
+#   - 任何写入都进 /var/log/book-of-elon/{health,incident}.log
 #
 # 安装：
 #   chmod +x scripts/ops/health-check.sh
@@ -45,29 +48,47 @@ log_incident() { echo "[$(ts)] $1" >> "$INCIDENT_LOG"; }
 BODY="$(curl -sS --max-time 5 "$HEALTH_URL" 2>/dev/null || true)"
 HTTP_OK=$?
 
-# 判定：HTTP 拿到 + status=ok + db.status=ok 才算绿
-is_ok=0
+# 判定 3 类：
+#   green  → status=ok + db ok + llm ∈ {ok, idle, stale_ok}（不计 reload）
+#   yellow → status=degraded 且 db.status=ok（LLM 漂了，记录但不 reload）
+#   red    → curl 失败 / status=down / db.status=down（累计 → reload）
+state="red"
 if [ -n "$BODY" ]; then
-  if echo "$BODY" | grep -q '"status":"ok"' \
-     && echo "$BODY" | grep -q '"db":{"status":"ok"'; then
-    is_ok=1
+  has_top_ok=0
+  has_top_degraded=0
+  echo "$BODY" | grep -q '"status":"ok"' && has_top_ok=1
+  echo "$BODY" | grep -q '"status":"degraded"' && has_top_degraded=1
+  has_db_ok=0
+  echo "$BODY" | grep -q '"db":{"status":"ok"' && has_db_ok=1
+
+  if [ "$has_top_ok" = "1" ] && [ "$has_db_ok" = "1" ]; then
+    state="green"
+  elif [ "$has_top_degraded" = "1" ] && [ "$has_db_ok" = "1" ]; then
+    state="yellow"
   fi
 fi
 
-# ───────── 绿：清零计数 静默退出 ─────────
-if [ "$is_ok" = "1" ]; then
+# ───────── green：清零 + 静默 ─────────
+if [ "$state" = "green" ]; then
   echo 0 > "$STATE_FILE"
   exit 0
 fi
 
-# ───────── 红：累计 + 决定是否 reload ─────────
+body_excerpt="$(echo "$BODY" | tr -d '\r\n' | cut -c 1-200)"
+
+# ───────── yellow：记 + 不计 reload threshold ─────────
+if [ "$state" = "yellow" ]; then
+  log_health "DEGRADED (LLM 漂了，不 reload；body=${body_excerpt})"
+  # 不动 STATE_FILE — yellow 不应导致最终触发 reload
+  exit 0
+fi
+
+# ───────── red：累计 + 可能 reload ─────────
 prev_fails=0
 [ -f "$STATE_FILE" ] && prev_fails=$(cat "$STATE_FILE" 2>/dev/null || echo 0)
 fails=$((prev_fails + 1))
 echo "$fails" > "$STATE_FILE"
 
-# 简易截取一段 body 摘要，避免日志爆炸
-body_excerpt="$(echo "$BODY" | tr -d '\r\n' | cut -c 1-200)"
 log_health "FAIL #${fails} curl_exit=${HTTP_OK} body_excerpt=${body_excerpt:-<empty>}"
 
 if [ "$fails" -lt "$RELOAD_THRESHOLD" ]; then

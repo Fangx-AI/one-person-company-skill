@@ -56,6 +56,14 @@ const CHAT_CACHE_TTL_MS = readNumberEnv("CHAT_CACHE_TTL_MS", 120000, 0, 3600000)
 const CHAT_CACHE_MAX_ENTRIES = readNumberEnv("CHAT_CACHE_MAX_ENTRIES", 300, 1, 5000);
 const CIRCUIT_BREAKER_FAIL_THRESHOLD = readNumberEnv("CIRCUIT_BREAKER_FAIL_THRESHOLD", 5, 1, 100);
 const CIRCUIT_BREAKER_COOLDOWN_MS = readNumberEnv("CIRCUIT_BREAKER_COOLDOWN_MS", 30000, 1000, 600000);
+// R-26: /api/health.llm 不再撒谎 — 用一个滚动窗口看"过去 N 分钟里上游真的活着吗"
+// 默认 5 分钟，刚好覆盖一次 pm2 reload + 一两个用户请求；最长 24h（兜底场景）
+const LLM_HEALTH_WINDOW_MS = readNumberEnv("LLM_HEALTH_WINDOW_MS", 5 * 60 * 1000, 60 * 1000, 24 * 60 * 60 * 1000);
+const LLM_TELEMETRY_MAX_SAMPLES = 100;
+// 启动时主动 ping 一次 /user/balance 验证 key 是否真的能用（0 token 成本）
+// 默认开。生产事故场景：要求 4 月 25 日那个"key 占位符 + 用户全部走 fallback"再发生时，
+// 启动后几秒就能在 health 里看到 status=degraded 而不是 ok。
+const LLM_BOOT_PROBE_ENABLED = String(process.env.LLM_BOOT_PROBE_ENABLED ?? "1") !== "0";
 const SLOW_REQUEST_THRESHOLD_MS = readNumberEnv("SLOW_REQUEST_THRESHOLD_MS", 4000, 100, 120000);
 const CLEANUP_INTERVAL_MS = 30000;
 const CHAT_TOKEN_TTL_MS = readNumberEnv("CHAT_TOKEN_TTL_MS", 6 * 60 * 60 * 1000, 60000, 7 * 24 * 60 * 60 * 1000);
@@ -134,6 +142,20 @@ const responseCache = new Map();
 const circuitState = {
   consecutiveFailures: 0,
   openedAt: 0,
+};
+
+// R-26: LLM 真实可用性遥测。circuitState 只反映"连续失败计数"，不反映
+// "成功是不是真的在发生"。这个 ring buffer 记录最近 N 次上游交互（含 chat
+// 调用 + 启动时的 balance probe），让 /api/health 能基于"过去 5 分钟有没有
+// 真实成功"给出诚实信号。
+const llmTelemetry = {
+  samples: [],            // [{ ts, ok, code, status }]
+  totalSuccess: 0,
+  totalFailure: 0,
+  lastSuccessAt: 0,
+  lastFailureAt: 0,
+  lastFailureCode: null,
+  lastFailureStatus: null,
 };
 const analyticsState = loadAnalyticsState();
 let lastCleanupAt = 0;
@@ -282,7 +304,20 @@ server.listen(PORT, () => {
     cacheTtlMs: CHAT_CACHE_TTL_MS,
     cacheMaxEntries: CHAT_CACHE_MAX_ENTRIES,
     slowRequestThresholdMs: SLOW_REQUEST_THRESHOLD_MS,
+    llmHealthWindowMs: LLM_HEALTH_WINDOW_MS,
+    llmBootProbeEnabled: LLM_BOOT_PROBE_ENABLED,
   });
+
+  // R-26: 启动后立刻探一次上游。失败也只是 telemetry 写一笔，不阻塞 listen。
+  // 这把 4 月 25 日那种"key 是占位符 → 用户全走 fallback → health 永远 ok"的
+  // 静默降级窗口从"无限"压缩到"几秒钟内 health 就显示 degraded"。
+  if (LLM_BOOT_PROBE_ENABLED) {
+    probeUpstreamReady().catch((err) => {
+      logEvent("warn", "upstream_probe_unhandled", {
+        msg: safeSlice(String(err?.message || err), 200),
+      });
+    });
+  }
 });
 
 server.on("error", (error) => {
@@ -1565,6 +1600,132 @@ function isCircuitOpen() {
 function markUpstreamSuccess() {
   circuitState.consecutiveFailures = 0;
   circuitState.openedAt = 0;
+  recordLlmCall({ ok: true });
+}
+
+// R-26: 把"过去 N 分钟里上游真的活着吗"压缩成 health 信号
+function summarizeLlmHealth() {
+  const now = Date.now();
+  const llmEnabled = Boolean(DEEPSEEK_API_KEY);
+  const circuitOpen = isCircuitOpen();
+
+  const cutoff = now - LLM_HEALTH_WINDOW_MS;
+  let recentSuccess = 0;
+  let recentFailure = 0;
+  for (const s of llmTelemetry.samples) {
+    if (s.ts < cutoff) continue;
+    if (s.ok) recentSuccess += 1;
+    else recentFailure += 1;
+  }
+  const recentTotal = recentSuccess + recentFailure;
+
+  let status;
+  let reason = null;
+  if (!llmEnabled) {
+    status = "disabled";
+    reason = "no_api_key";
+  } else if (circuitOpen) {
+    status = "circuit_open";
+    reason = `consecutive_failures=${circuitState.consecutiveFailures}`;
+  } else if (recentTotal === 0) {
+    // 窗口内零调用 — 可能刚启动 / probe 还没回来 / 真的没流量
+    if (llmTelemetry.totalSuccess === 0 && llmTelemetry.totalFailure === 0) {
+      status = "idle";
+      reason = "no_calls_yet";
+    } else if ((llmTelemetry.lastSuccessAt || 0) >= (llmTelemetry.lastFailureAt || 0)) {
+      status = "stale_ok";
+      reason = "no_recent_calls_last_was_ok";
+    } else {
+      status = "stale_degraded";
+      reason = "no_recent_calls_last_was_failure";
+    }
+  } else if (recentSuccess > 0) {
+    status = "ok";
+  } else {
+    // 窗口内全军覆没 — 这正是 4 月 25 日那种"key 占位符"状态需要被看见的瞬间
+    status = "degraded";
+    reason = `${recentFailure}_failures_no_success_in_${Math.round(LLM_HEALTH_WINDOW_MS / 60000)}min`;
+  }
+
+  return {
+    status,
+    enabled: llmEnabled,
+    circuit_open: circuitOpen,
+    consecutive_failures: circuitState.consecutiveFailures,
+    window_ms: LLM_HEALTH_WINDOW_MS,
+    recent: {
+      ok: recentSuccess,
+      failed: recentFailure,
+      total: recentTotal,
+    },
+    last_success_at: llmTelemetry.lastSuccessAt
+      ? new Date(llmTelemetry.lastSuccessAt).toISOString()
+      : null,
+    last_failure_at: llmTelemetry.lastFailureAt
+      ? new Date(llmTelemetry.lastFailureAt).toISOString()
+      : null,
+    last_failure_code: llmTelemetry.lastFailureCode,
+    last_failure_status: llmTelemetry.lastFailureStatus,
+    reason,
+  };
+}
+
+// R-26: 启动时主动 ping /user/balance（0 token 成本），把"key 是否能用"这件
+// 事在用户发出第一个请求之前就敲定。失败也直接进 telemetry，让 health 立刻
+// 显示 degraded 而不是 idle/ok。
+async function probeUpstreamReady() {
+  if (!DEEPSEEK_API_KEY) {
+    logEvent("info", "upstream_probe_skipped", { reason: "no_api_key" });
+    return;
+  }
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
+  try {
+    const res = await fetch("https://api.deepseek.com/user/balance", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+        Accept: "application/json",
+      },
+      signal: controller.signal,
+    });
+    if (res.ok) {
+      recordLlmCall({ ok: true, status: res.status });
+      logEvent("info", "upstream_probe_ok", { status: res.status });
+    } else {
+      const body = safeSlice(await res.text(), 200);
+      recordLlmCall({ ok: false, status: res.status, code: "probe_http_error" });
+      logEvent("error", "upstream_probe_failed", { status: res.status, body });
+    }
+  } catch (err) {
+    const code = err?.name === "AbortError" ? "probe_timeout" : (err?.code || "probe_error");
+    recordLlmCall({ ok: false, code });
+    logEvent("error", "upstream_probe_error", {
+      code,
+      msg: safeSlice(String(err?.message || err), 200),
+    });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// R-26: 把"是否记入 telemetry"和"是否触发熔断"拆开。telemetry 永远记录所有
+// 调用结果，让 health 不再撒谎；熔断只对真正能让上游"短期不可用"的失败计数。
+function recordLlmCall({ ok, code = null, status = null, ts = null }) {
+  const now = ts || Date.now();
+  llmTelemetry.samples.push({ ts: now, ok: !!ok, code: code || null, status: status || null });
+  if (llmTelemetry.samples.length > LLM_TELEMETRY_MAX_SAMPLES) {
+    llmTelemetry.samples.shift();
+  }
+  if (ok) {
+    llmTelemetry.totalSuccess += 1;
+    llmTelemetry.lastSuccessAt = now;
+  } else {
+    llmTelemetry.totalFailure += 1;
+    llmTelemetry.lastFailureAt = now;
+    llmTelemetry.lastFailureCode = code || null;
+    llmTelemetry.lastFailureStatus = status || null;
+  }
 }
 
 // Deep health: ping DB + LLM 状态 + version + 表行数。
@@ -1596,10 +1757,13 @@ function buildDeepHealth({ requestId }) {
     dbError = String(err?.message || err).slice(0, 200);
   }
 
-  const llmEnabled = Boolean(DEEPSEEK_API_KEY);
-  const circuitOpen = isCircuitOpen();
-  const llmStatus = !llmEnabled ? "disabled" : circuitOpen ? "circuit_open" : "ok";
-  const overall = dbStatus === "down" ? "down" : circuitOpen ? "degraded" : "ok";
+  // R-26: llm.status 不再只看 enabled/circuit_open，要看真实最近调用结果
+  const llm = summarizeLlmHealth();
+  const overall = dbStatus === "down"
+    ? "down"
+    : (llm.status === "circuit_open" || llm.status === "degraded")
+      ? "degraded"
+      : "ok";
   const memoryMb = Math.round((process.memoryUsage().heapUsed / 1024 / 1024) * 10) / 10;
 
   let version = "unknown";
@@ -1615,19 +1779,14 @@ function buildDeepHealth({ requestId }) {
     uptime_seconds: Math.round(process.uptime()),
     version,
     promptVersion: PROMPT_VERSION,
-    model: llmEnabled ? DEEPSEEK_MODEL : null,
+    model: llm.enabled ? DEEPSEEK_MODEL : null,
     db: {
       status: dbStatus,
       latency_ms: dbLatencyMs,
       counts,
       error: dbError,
     },
-    llm: {
-      status: llmStatus,
-      enabled: llmEnabled,
-      circuit_open: circuitOpen,
-      consecutive_failures: circuitState.consecutiveFailures,
-    },
+    llm,
     cost: costControl.snapshot(),
     process: {
       pid: process.pid,
@@ -1640,6 +1799,16 @@ function buildDeepHealth({ requestId }) {
 }
 
 function markUpstreamFailure(error) {
+  // R-26: 先无条件落 telemetry — 不管熔断要不要数，health 都要看见。
+  // 这正是 4 月 25 日漏判的核心：当时 401 因 status<500 被排除出熔断计数，
+  // 同时也没单独的可见性，导致 health 永远 ok。
+  const upstreamStatus = Number(error?.details?.upstreamStatus) || null;
+  recordLlmCall({
+    ok: false,
+    code: error?.code || "unknown",
+    status: upstreamStatus,
+  });
+
   if (!shouldCountFailureForCircuit(error)) {
     return;
   }
@@ -1935,9 +2104,18 @@ function shouldCountFailureForCircuit(error) {
 
   if (error.code === "upstream_http_error") {
     const upstreamStatus = Number(error.details?.upstreamStatus || 0);
-    if (upstreamStatus && upstreamStatus < 500 && upstreamStatus !== 408) {
-      return false;
-    }
+    if (!upstreamStatus) return true;
+    // 触发熔断的 status:
+    //   5xx — 上游真的挂了
+    //   408 — 上游超时
+    //   401/402/403 — 我方 key 失效 / 余额不足 / 权限被吊销，
+    //                 R-26 修：这种"对所有用户都同样不可用"的状态也应触发熔断+告警，
+    //                 而不是被当成"单次客户端 4xx"忽略掉
+    if (upstreamStatus >= 500) return true;
+    if (upstreamStatus === 408) return true;
+    if (upstreamStatus === 401 || upstreamStatus === 402 || upstreamStatus === 403) return true;
+    // 其余 4xx (400/404/429 等) 通常是单次请求的 payload/限流问题，不熔断
+    return false;
   }
 
   return true;

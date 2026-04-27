@@ -11,12 +11,24 @@
 ## 0. 一句话决策树
 
 ```
-/api/health 看到 llm.circuit_open=true
-  ├ 余额还有钱           → §3 等冷却 / 看 DeepSeek 状态页
-  ├ 余额 < 5 元          → §4 充值 + 临时降级文案
-  ├ DeepSeek 真的炸了    → §5 公告 + 调长降级时间 + 备选模型评估
-  └ 是我们自己 key 被封  → §6 联系厂商 + rotate
+/api/health → llm.status
+  ├ "ok"                  → 没事
+  ├ "idle"                → 启动后还没真请求过 — 等一两分钟再看
+  ├ "stale_ok"            → 5 min 内没人调用，最后一次是成功 — 通常没事
+  ├ "stale_degraded"      → 5 min 内没人调用，最后一次失败 — 看 last_failure_*
+  ├ "degraded"            → 5 min 内有调用且全部失败 — 立刻看 last_failure_status
+  │   ├ status=401  → §6 key 失效（我们自己原因，联系厂商或 rotate）
+  │   ├ status=402  → §4 余额不足（充值）
+  │   ├ status=403  → §6 key 被封
+  │   ├ status=5xx  → §5 上游故障（等 / 公告 / 备选评估）
+  │   └ status=null → 网络/超时（看 last_failure_code）
+  ├ "circuit_open"        → 连续 5 次失败已熔断；30 秒冷却后会自动 half-open
+  └ "disabled"            → DEEPSEEK_API_KEY 没配（不是事故，是状态）
 ```
+
+> **注意**：4 月 25 日那次"key 占位符 + 用户全走 fallback"事件后，R-26 给了
+> health 一个**真实的滚动窗口信号**。如果你看到 `llm.status === "ok"`，那是
+> 真的有近 5 分钟内成功调用。不会再像以前那样静默撒谎。
 
 ---
 
@@ -24,7 +36,8 @@
 
 任一项进本 runbook：
 
-- `/api/health` 返回 `llm.circuit_open: true` 持续 > 1 分钟
+- `/api/health` 返回 `llm.status` ∈ {`degraded`, `circuit_open`, `stale_degraded`}（R-26 后的真实信号）
+- `/api/health` 返回 `llm.circuit_open: true` 持续 > 1 分钟（旧字段，仍保留）
 - `pm2 logs` 里 `upstream_request_failed` 或 `upstream_timeout` 突然集中（>5/分钟）
 - 用户报"AI 没回答 / 一直转圈"
 - DeepSeek 控制台显示余额 ≤ 5 元 / API 调用全 4xx 5xx

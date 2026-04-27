@@ -999,7 +999,7 @@ scripts/cleanup-claimed-sessions.js  (~10 天前加)
 | **R-23** | 🔴 P0 | 安全/Bug | 修 `/book-source.js → 404` 静默 bug：白名单加 `/book-source.js` | 5 min | R-06 | ✅ Wave 2 Phase C-1 (`b8831f7`)。Phase C-2 后该 URL 已废弃为 404（数据走 `/book-source.json`）|
 | **R-24** | 🟡 P1 | 文件/目录 | 把 calibration tools (`reply-calibration.js` / `deepseek-eval.js`) 搬到 `tests/calibration/` 或 `scripts/tools/calibration/` | 30 min | R-04 | ✅ Wave 3。5 个文件（含 test-set.json + output md）git mv 到 `tests/calibration/`；`projectRoot` 回退 2 级；package.json scripts + .gitignore + .dockerignore 同步更新 |
 | **R-25** | 🔴 P0 | 安全/成本 | 修正 R-02 误判：`.env` 中 `DEEPSEEK_API_KEY` 实际仍是占位符 `disabled_due_to_abuse`；后果：站点 2+ 天对所有用户走 `[FALLBACK]`（通过 admin-report 实证）。需重新生成 key + 重启 + 验证 | 15 min | R-14 | ⏳ Wave 3 daily-report 跑通后发现；流程见 `docs/runbooks/env-management.md` § "key 轮换" |
-| **R-26** | 🟠 P2 | 部署/运维 | `/api/health` 的 `llm.status=ok / consecutive_failures=0` 在 DeepSeek 持续 401 的情况下没翻车 — health 信号撒谎。改成"过去 N 分钟内有真实成功调用才算 ok"或在启动时跑一次 ping | 1-2 h | R-25 | ⬜ Wave 4。R-25 的伏笔：health 不能只看模块加载，得看上游真实调用结果 |
+| **R-26** | 🟠 P2 | 部署/运维 | `/api/health` 的 `llm.status=ok / consecutive_failures=0` 在 DeepSeek 持续 401 的情况下没翻车 — health 信号撒谎。改成"过去 N 分钟内有真实成功调用才算 ok"或在启动时跑一次 ping | 1-2 h | R-25 | ✅ Wave 4 提前完成。`server.js` 加了 `llmTelemetry` 滚动窗口（默认 5 min / 100 samples）+ 启动时 `probeUpstreamReady()` 主动 ping `/user/balance`（0 token）。新 `llm.status` 6 态：`ok` / `idle` / `stale_ok` / `stale_degraded` / `degraded` / `circuit_open` / `disabled`，附 `recent.{ok,failed,total}` + `last_failure_{code,status}` + `reason`。`health-check.sh` 区分 yellow（degraded，不 reload）/ red（down，触发 reload）。runbook `incident-deepseek-down.md` 决策树改写。本地两次启动测试通过：无 key → `idle/no_calls_yet`；坏 key → `degraded/last_failure_status=401`。 |
 
 ### 7.2 推荐执行波次
 
