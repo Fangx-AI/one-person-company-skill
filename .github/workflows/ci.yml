@@ -1,0 +1,233 @@
+name: CI
+
+# Wave 3 R-18: GitHub Actions 兜底。每次 push 到 main / 任何 PR 自动跑 preflight
+# + 离线 smoke + 起 server 跑在线 smoke。3 个 job 并行，主线 ~2-3 分钟出结果。
+#
+# 设计原则：
+#   1. 不依赖 GH Secrets 里的 DEEPSEEK_API_KEY —— 全跑 degraded 模式
+#      （chat 走本地 fallback，不打真 LLM）。这样 fork / 外部 PR 也能跑。
+#   2. SQLite 临时库走 process.env.SQLITE_DB_PATH 指到 /tmp，不污染 repo。
+#   3. 任何一个 step red，整个 commit 标 ✗，但不阻塞 push（main 不开
+#      branch protection，这是单人/小团队的妥协）。
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  # ──────────────────────────────────────────────────────────
+  # Job 1: 静态检查 + preflight
+  # 不需要起服务，纯文件级。最快最先红。
+  # ──────────────────────────────────────────────────────────
+  lint-and-preflight:
+    name: Lint & Preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps (ci, locked)
+        run: npm ci
+
+      - name: Syntax check — server / preflight / monitor
+        run: |
+          node --check server.js
+          node --check preflight-check.js
+          node --check monitor-server.js
+          node --check ecosystem.config.js
+
+      - name: Syntax check — services / db / routes / auth
+        run: |
+          for f in services/*.js db/*.js routes/*.js auth/*.js; do
+            node --check "$f"
+          done
+
+      - name: Syntax check — tests
+        run: |
+          for f in tests/smoke/*.js tests/e2e/*.js tests/probe/*.js tests/calibration/*.js; do
+            node --check "$f"
+          done
+
+      - name: Syntax check — frontend (web/)
+        run: |
+          for f in web/*.js; do
+            node --check "$f"
+          done
+
+      - name: Validate JSON assets
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('web/cards.json','utf8')); console.log('cards.json OK')"
+          node -e "JSON.parse(require('fs').readFileSync('web/book-source.json','utf8')); console.log('book-source.json OK')"
+          node -e "JSON.parse(require('fs').readFileSync('tests/calibration/reply-test-set.json','utf8')); console.log('reply-test-set.json OK')"
+
+      - name: Preflight (degraded mode)
+        env:
+          DAILY_TOTAL_TOKEN_BUDGET: '2000000'
+          DAILY_TOKEN_PER_IP: '50000'
+          DAILY_ANON_CHAT_PER_SESSION: '20'
+          DEEPSEEK_MAX_TOKENS: '400'
+          DEEPSEEK_TEMPERATURE: '0.7'
+          UPSTREAM_TIMEOUT_MS: '30000'
+          CHAT_RATE_LIMIT_WINDOW_MS: '60000'
+          CHAT_RATE_LIMIT_MAX_REQUESTS: '20'
+          CHAT_BURST_WINDOW_MS: '5000'
+          CHAT_BURST_MAX_REQUESTS: '5'
+          CHAT_CACHE_TTL_MS: '300000'
+          CHAT_CACHE_MAX_ENTRIES: '500'
+          CIRCUIT_BREAKER_FAIL_THRESHOLD: '5'
+          CIRCUIT_BREAKER_COOLDOWN_MS: '60000'
+          SLOW_REQUEST_THRESHOLD_MS: '5000'
+          CHAT_TOKEN_TTL_MS: '86400000'
+        run: node preflight-check.js --allow-degraded
+
+  # ──────────────────────────────────────────────────────────
+  # Job 2: 离线 smoke
+  # 不需要起 HTTP server，全是纯函数 + SQLite 内存级测试。
+  # ──────────────────────────────────────────────────────────
+  unit-smoke:
+    name: Unit Smoke (cost / prompt / db)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Cost control smoke
+        run: npm run cost:smoke
+
+      - name: Prompt injection smoke
+        run: npm run prompt:smoke
+
+      - name: DB smoke
+        env:
+          SQLITE_DB_PATH: /tmp/ci-smoke.db
+          SKIP_AUTO_MIGRATE: '1'
+        run: npm run smoke:db
+
+  # ──────────────────────────────────────────────────────────
+  # Job 3: 在线 smoke (起 server + 跑 static-security + 健康检查)
+  # 起 server in degraded 模式 (无 DEEPSEEK_API_KEY)，等它绿，
+  # 然后跑 static:smoke，最后 curl /api/health 确认 200 ok。
+  # 这是 R-23 那种"本地没事生产 404"事故的兜底。
+  # ──────────────────────────────────────────────────────────
+  integration-smoke:
+    name: Integration Smoke (server + static)
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Boot server in background (degraded)
+        env:
+          NODE_ENV: development
+          PORT: '3010'
+          SQLITE_DB_PATH: /tmp/ci-server.db
+          DAILY_TOTAL_TOKEN_BUDGET: '2000000'
+          DAILY_TOKEN_PER_IP: '50000'
+          DAILY_ANON_CHAT_PER_SESSION: '20'
+          DEEPSEEK_MAX_TOKENS: '400'
+          # NODE_ENV=development + 未设 SMS_PROVIDER ⇒ getProvider() auto-fallback 到
+          # mock（auth/sms-sender.js:50），不会因为 SMS 配置抛错阻止 boot。
+        run: |
+          node server.js > /tmp/server.log 2>&1 &
+          echo $! > /tmp/server.pid
+          # 等服务就绪：最多 15 秒，每 0.5 秒探一次
+          for i in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:3010/api/health >/dev/null 2>&1; then
+              echo "server up after ${i}*0.5s"
+              break
+            fi
+            sleep 0.5
+          done
+          if ! curl -sf http://127.0.0.1:3010/api/health >/dev/null 2>&1; then
+            echo "✗ server failed to come up; last log:"
+            tail -100 /tmp/server.log
+            exit 1
+          fi
+
+      - name: Health check (must be ok + db ok)
+        run: |
+          BODY=$(curl -s http://127.0.0.1:3010/api/health)
+          echo "$BODY" | head -c 800
+          echo ""
+          echo "$BODY" | grep -q '"status":"ok"' || (echo "✗ status not ok"; exit 1)
+          echo "$BODY" | grep -q '"db":{"status":"ok"' || (echo "✗ db not ok"; exit 1)
+          echo "✓ health green"
+
+      - name: Static security smoke
+        env:
+          SMOKE_BASE: http://127.0.0.1:3010
+        run: npm run static:smoke
+
+      - name: Headless DOM smoke (jsdom-click)
+        env:
+          SMOKE_BASE: http://127.0.0.1:3010/
+        run: |
+          # jsdom 不在 prod deps 里，CI 临时装一次（不进 lockfile）
+          npm install --no-save jsdom
+          node tests/e2e/jsdom-click.js
+
+      - name: Tail server log (always)
+        if: always()
+        run: tail -200 /tmp/server.log || true
+
+      - name: Stop server
+        if: always()
+        run: |
+          if [ -f /tmp/server.pid ]; then
+            kill "$(cat /tmp/server.pid)" 2>/dev/null || true
+          fi
+
+  # ──────────────────────────────────────────────────────────
+  # Job 4: Docker build 验证 (R-16 决策保留 Dockerfile)
+  # 不 push，只确认 Dockerfile 还能构建 —— 防止 npm ci 失败、
+  # COPY 路径漂移、用户权限错误这种悄悄烂掉的问题。
+  # ──────────────────────────────────────────────────────────
+  docker-build:
+    name: Docker Build Smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image (no push)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: book-of-elon:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
