@@ -959,30 +959,33 @@ scripts/cleanup-claimed-sessions.js  (~10 天前加)
 
 ### 7.1 优先级一览
 
-| 编号 | 优先级 | 维度 | 工作 | 工时 | 依赖 |
-|---|---|---|---|---|---|
-| **R-01** | 🔴 P0 | 安全/成本 | 实施 cost guardrails（A/B/C/D/E） | 3-4 h | — |
-| **R-02** | 🔴 P0 | 安全/成本 | 恢复 DEEPSEEK_API_KEY（依赖 R-01 完成） | 5 min | R-01 |
-| **R-03** | 🟡 P1 | 安全 | `.env` 迁到 `/etc/book-of-elon/.env` + `chmod 600` | 30 min | — |
-| **R-04** | 🟡 P1 | 文件/目录 | 删 working tree 里的 `output.md` | 5 min | — |
-| **R-05** | 🟡 P1 | 文件/目录 | 重组 `scripts/` 为 `ops/` / `tools/` / `calibration/` | 1 h | — |
-| **R-06** | 🟡 P1 | 文件/目录 | `book-source.js` / `card-data.js` / `knowledge-base.js` 转 JSON 移到 `data/` | 45 min | — |
-| **R-07** | 🟡 P1 | 文件/目录 | 把 `reply-engine.js` `model-client.js` 移到 `services/` | 30 min | — |
-| **R-08** | 🟡 P1 | 文件/目录 | 测试 smoke 移到 `tests/` | 1 h | R-05 |
-| **R-09** | 🟡 P1 | 文档 | 合并 3 份 DEPLOY 文档为 `docs/DEPLOYMENT.md` | 2 h | — |
-| **R-10** | 🟡 P1 | 文档 | 6 份 .md 移到 `docs/`（OBSERVABILITY、launch-plan、reply-strategy、prompt-ab、reply-calib-output 删除） | 30 min | — |
-| **R-11** | 🟡 P1 | 文档 | 写 `docs/ARCHITECTURE.md`（从 CLAUDE.md §3 抽出 + 加 mermaid） | 1 h | — |
-| **R-12** | 🟡 P1 | 文档 | 写 `docs/runbooks/` × 5 份 | 1.5 h | — |
-| **R-13** | 🟡 P1 | 文档 | `README.md` 精简到 ~3 KB | 30 min | R-09, R-11 |
-| **R-14** | 🟡 P1 | 部署/运维 | 健康检查 cron + DeepSeek 余额监控 | 1.5 h | — |
-| **R-15** | 🟡 P1 | 部署/运维 | `.gitignore` 补强 | 5 min | — |
-| **R-16** | 🟠 P2 | 部署/运维 | 决策 Docker 路径：保留+加 CI 或删除 | 1 h | — |
-| **R-17** | 🟠 P2 | 部署/运维 | git config + commit message convention（写到 CONTRIBUTING.md） | 30 min | — |
-| **R-18** | 🟠 P2 | 部署/运维 | 加 GitHub Actions CI（preflight + smoke） | 1 h | R-17 |
-| **R-19** | 🟠 P2 | 部署/运维 | staging 环境（同机器子域名） | 4 h | R-18 |
-| **R-20** | 🟢 P3 | 代码/架构 | `server.js` 拆解为 `routes/` × 5 + `services/` × 3 + `middleware/` | 1-2 d | R-08（测试结构稳定后） |
-| **R-21** | 🟢 P3 | 部署/运维 | DR 演练（恢复一次备份） | 1 h | — |
-| **R-22** | 🟢 P3 | 安全 | 30 天后再跑 `/cso` 看回归 | 30 min | — |
+> **进度跟踪**（更新于 2026-04-27 Wave 2 Phase A 完成）：
+> ✅ = 已完成并部署 / 验证；🟢 = 已完成代码改动待提交；⏳ = 进行中；⬜ = 未开始
+
+| 编号 | 优先级 | 维度 | 工作 | 工时 | 依赖 | 状态 |
+|---|---|---|---|---|---|---|
+| **R-01** | 🔴 P0 | 安全/成本 | 实施 cost guardrails（A/B/C/D/E） | 3-4 h | — | ✅ Wave 1 (`aa9a8d6` + 部署) |
+| **R-02** | 🔴 P0 | 安全/成本 | 恢复 DEEPSEEK_API_KEY（依赖 R-01 完成） | 5 min | R-01 | ✅ 已恢复（health 显示 `llm.status=ok`） |
+| **R-03** | 🟡 P1 | 安全 | `.env` 迁到 `/etc/book-of-elon/.env` + `chmod 600` | 30 min | — | ⬜ Wave 3 |
+| **R-04** | 🟡 P1 | 文件/目录 | 删 working tree 里的 `output.md` | 5 min | — | ⬜ Wave 2 Phase B 顺手做 |
+| **R-05** | 🟡 P1 | 文件/目录 | 重组 `scripts/` 为 `ops/` / `tools/` / `calibration/` | 1 h | — | ⬜ Wave 2 Phase B |
+| **R-06** | 🟡 P1 | 文件/目录 | `book-source.js` / `card-data.js` / `knowledge-base.js` 转 JSON 移到 `data/` | 45 min | — | ⬜ Wave 2 Phase C |
+| **R-07** | 🟡 P1 | 文件/目录 | 把 `reply-engine.js` `model-client.js` 移到 `services/` | 30 min | — | ⬜ Wave 2 Phase C |
+| **R-08** | 🟡 P1 | 文件/目录 | 测试 smoke 移到 `tests/` | 1 h | R-05 | ⬜ Wave 2 Phase B |
+| **R-09** | 🟡 P1 | 文档 | 合并 3 份 DEPLOY 文档为 `docs/DEPLOYMENT.md` | 2 h | — | 🟢 Wave 2 Phase A |
+| **R-10** | 🟡 P1 | 文档 | 6 份 .md 移到 `docs/`（OBSERVABILITY、launch-plan、reply-strategy、prompt-ab、reply-calib-output 删除） | 30 min | — | 🟢 Wave 2 Phase A（移到 archive/quality/，未删） |
+| **R-11** | 🟡 P1 | 文档 | 写 `docs/ARCHITECTURE.md`（从 CLAUDE.md §3 抽出 + 加 mermaid） | 1 h | — | 🟢 Wave 2 Phase A |
+| **R-12** | 🟡 P1 | 文档 | 写 `docs/runbooks/` × 5 份 | 1.5 h | — | ⏳ 1/5 写完（incident-cost-spike，`0107de7`） |
+| **R-13** | 🟡 P1 | 文档 | `README.md` 精简到 ~3 KB | 30 min | R-09, R-11 | 🟢 Wave 2 Phase A |
+| **R-14** | 🟡 P1 | 部署/运维 | 健康检查 cron + DeepSeek 余额监控 | 1.5 h | — | ⬜ Wave 3 |
+| **R-15** | 🟡 P1 | 部署/运维 | `.gitignore` 补强 | 5 min | — | ✅ Wave 1 (`d97db61`) |
+| **R-16** | 🟠 P2 | 部署/运维 | 决策 Docker 路径：保留+加 CI 或删除 | 1 h | — | ⬜ Wave 3 |
+| **R-17** | 🟠 P2 | 部署/运维 | git config + commit message convention（写到 CONTRIBUTING.md） | 30 min | — | ⬜ Wave 3 |
+| **R-18** | 🟠 P2 | 部署/运维 | 加 GitHub Actions CI（preflight + smoke） | 1 h | R-17 | ⬜ Wave 3 |
+| **R-19** | 🟠 P2 | 部署/运维 | staging 环境（同机器子域名） | 4 h | R-18 | ⬜ Wave 4 |
+| **R-20** | 🟢 P3 | 代码/架构 | `server.js` 拆解为 `routes/` × 5 + `services/` × 3 + `middleware/` | 1-2 d | R-08（测试结构稳定后） | ⬜ Wave 4 |
+| **R-21** | 🟢 P3 | 部署/运维 | DR 演练（恢复一次备份） | 1 h | — | ⬜ Wave 3 |
+| **R-22** | 🟢 P3 | 安全 | 30 天后再跑 `/cso` 看回归 | 30 min | — | ⬜ 2026-05-27 |
 
 ### 7.2 推荐执行波次
 

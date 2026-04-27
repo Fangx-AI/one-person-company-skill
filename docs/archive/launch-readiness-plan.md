@@ -1,3 +1,11 @@
+> **⚠️ ARCHIVED 2026-04-27 — historical only.**
+>
+> 这是上线前一次性的 readiness plan，所有项目都已经 ship。
+> 后续的项目级跟踪请看 `docs/superpowers/audits/`。
+> 归档目录说明见 [archive/README.md](./README.md)。
+
+---
+
 # Launch Readiness Plan
 
 ## 当前状态

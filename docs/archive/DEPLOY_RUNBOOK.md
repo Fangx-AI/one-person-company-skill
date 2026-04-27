@@ -1,3 +1,10 @@
+> **⚠️ ARCHIVED 2026-04-27 — see [docs/DEPLOYMENT.md](../DEPLOYMENT.md) instead.**
+>
+> 这份装机 runbook 已被合并进 `docs/DEPLOYMENT.md` §1（First-time setup）+ §3（Routine deploy）。
+> 保留仅供历史溯源。归档目录说明见 [archive/README.md](./README.md)。
+
+---
+
 # Deploy Runbook
 
 这是一份适合当前项目的单机上线步骤，默认目标环境为：

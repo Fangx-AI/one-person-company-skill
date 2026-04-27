@@ -249,7 +249,7 @@ pm2 reload book-of-elon --update-env
 
 ### 8.7 修了 chat UI，AI 回复看着不对
 检查 `prompts/system-prompt-v2.md` 是不是被改了。这是 v2 强势 Elon 风格的
-single source of truth。改之前先读 `prompt-ab-report.md` 看历史评测。
+single source of truth。改之前先读 `docs/quality/prompt-ab-report.md` 看历史评测。
 
 ---
 

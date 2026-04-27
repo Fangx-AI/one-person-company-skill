@@ -112,7 +112,8 @@ function assert(cond, msg) {
     "/package-lock.json",
     "/README.md",
     "/CLAUDE.md",
-    "/DEPLOY_RUNBOOK.md",
+    "/docs/DEPLOYMENT.md",
+    "/docs/ARCHITECTURE.md",
     "/Dockerfile",
     "/nginx.book-of-elon.conf.example",
 

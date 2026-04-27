@@ -1,3 +1,10 @@
+> **⚠️ ARCHIVED 2026-04-27 — see [docs/DEPLOYMENT.md](../DEPLOYMENT.md) instead.**
+>
+> 这份文档是 2026-04 一次性发布的精准操作手册，已被合并进 `docs/DEPLOYMENT.md`。
+> 保留仅供历史溯源。归档目录说明见 [archive/README.md](./README.md)。
+
+---
+
 # DEPLOY.md — 把"账号 + 记忆系统"发布到 bookofelon.cn
 
 > 这一份是**本次发布**的精准操作手册。基础环境装机/Nginx/PM2 装好之后的常规

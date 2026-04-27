@@ -1,3 +1,10 @@
+> **⚠️ ARCHIVED 2026-04-27 — see [docs/DEPLOYMENT.md](../DEPLOYMENT.md) instead.**
+>
+> 这份 checklist 已被合并进 `docs/DEPLOYMENT.md` §A（Security pre-flight）+ §6（Backup）。
+> 保留仅供历史溯源。归档目录说明见 [archive/README.md](./README.md)。
+
+---
+
 # Deploy Checklist
 
 ## 1. 环境准备

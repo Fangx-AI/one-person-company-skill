@@ -1,3 +1,10 @@
+> **⚠️ ARCHIVED 2026-04-27 — see [docs/DEPLOYMENT.md §B](../DEPLOYMENT.md#b-observability-reference合自原-observabilitymd) instead.**
+>
+> 这份观测指南已被合并进 `docs/DEPLOYMENT.md` §B（Observability reference）。
+> 保留仅供历史溯源。归档目录说明见 [archive/README.md](./README.md)。
+
+---
+
 # Observability Guide
 
 ## 当前日志形态

@@ -342,7 +342,7 @@ async function main() {
   lines.push(`| 平均字数 | ${Math.round(v1TotalChars / TEST_CASES.length)} | ${Math.round(v2TotalChars / TEST_CASES.length)} |`);
   lines.push("");
 
-  const reportPath = path.join(__dirname, "..", "prompt-ab-report.md");
+  const reportPath = path.join(__dirname, "..", "docs", "quality", "prompt-ab-report.md");
   fs.writeFileSync(reportPath, lines.join("\n"), "utf8");
 
   console.log("");
