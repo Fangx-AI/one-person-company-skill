@@ -21,6 +21,7 @@ const dbGoals = require("./db/goals");
 const dbFacts = require("./db/facts");
 const factExtractor = require("./services/fact-extractor");
 const systemPromptService = require("./services/system-prompt");
+const costControl = require("./services/cost-control");
 const { getDb: getDatabase } = require("./db/database");
 getDatabase();
 
@@ -715,9 +716,70 @@ async function handleChatRequest(request, response) {
     );
   }
 
+  // R-01: 成本守门 — 在真正打 LLM 之前，按全站 / 单 IP / 匿名身份三道闸。
+  // 任何一道触发 → 走本地 fallback（200 + degraded），让 UX 平滑，但 logEvent
+  // warning 让运维感知。详见 services/cost-control.js。
+  const isAuthenticated = Boolean(getCurrentUserIdFromRequest(request));
+  const costCheck = costControl.preflightChat({
+    ip: response.__meta.clientIp,
+    anonSessionId: securityCheck.sessionId,
+    isAuthenticated,
+  });
+  if (!costCheck.ok) {
+    response.__meta.provider = "local-fallback";
+    response.__meta.degraded = true;
+    response.__meta.error = costCheck.reason;
+    logEvent("warning", "cost_guardrail_triggered", {
+      requestId: response.__meta.requestId,
+      reason: costCheck.reason,
+      clientIp: response.__meta.clientIp,
+      isAuthenticated,
+      retryAfterSeconds: costCheck.retryAfterSeconds,
+    });
+    const fallbackReply = buildLocalFallbackReply(body, costCheck.reason);
+    recordAnalyticsChatTurn(securityCheck.sessionId, request, {
+      provider: "local-fallback",
+      degraded: true,
+      reason: costCheck.reason,
+    });
+    const persistRes = persistChatTurn({
+      request,
+      anonSessionId: securityCheck.sessionId,
+      body,
+      replyText: fallbackReply,
+      provider: "local-fallback",
+      degraded: true,
+    });
+    return sendJson(
+      response,
+      200,
+      {
+        reply: fallbackReply,
+        provider: "local-fallback",
+        model: "local-knowledge",
+        degraded: true,
+        reason: costCheck.reason,
+        hint: costCheck.hint,
+        retryAfterSeconds: costCheck.retryAfterSeconds,
+        requestId: response.__meta.requestId,
+        ...persistenceMeta(persistRes),
+      },
+      {
+        ...rateLimitHeaders,
+        "Retry-After": String(costCheck.retryAfterSeconds || 60),
+      }
+    );
+  }
+
   try {
     const upstreamResult = await requestDeepSeek(body);
     markUpstreamSuccess();
+    if (upstreamResult.usage && upstreamResult.usage.total_tokens) {
+      costControl.recordTokenUsage({
+        ip: response.__meta.clientIp,
+        totalTokens: upstreamResult.usage.total_tokens,
+      });
+    }
     if (cachePolicy.eligible) {
       setCachedReply(cacheKey, upstreamResult);
     }
@@ -1136,17 +1198,35 @@ async function handleAnalyticsEventRequest(request, response) {
   });
 }
 
+// COST CONTROL (R-01 D): 收紧用户输入上限。
+// - 单条上限从 2500 → 800 字符（合理对话不会超）
+// - 历史窗口 10 条 → 8 条（最近上下文足够）
+// - 总字符上限 5000：超过时从最旧的开始截断（保留最新对话）
+// 目的：把每次 LLM 调用的 input token 大致钉在 ≤ 1500 token，
+// 配合 max_tokens=400 让单次成本可预测。
+const MESSAGE_CONTENT_MAX = 800;
+const MESSAGE_HISTORY_MAX = 8;
+const MESSAGES_TOTAL_CHARS_MAX = 5000;
+
 function sanitizeMessages(messages) {
   if (!Array.isArray(messages)) return [];
 
-  return messages
-    .slice(-10)
+  const trimmed = messages
+    .slice(-MESSAGE_HISTORY_MAX)
     .filter((message) => message && (message.role === "user" || message.role === "assistant"))
     .map((message) => ({
       role: message.role,
-      content: safeSlice(message.content, 2500).trim(),
+      content: safeSlice(message.content, MESSAGE_CONTENT_MAX).trim(),
     }))
     .filter((message) => message.content);
+
+  // 总字符上限：从最旧丢，保留最新（最后一条 user 必须在）
+  let total = trimmed.reduce((sum, m) => sum + m.content.length, 0);
+  while (total > MESSAGES_TOTAL_CHARS_MAX && trimmed.length > 1) {
+    total -= trimmed[0].content.length;
+    trimmed.shift();
+  }
+  return trimmed;
 }
 
 function sanitizeContext(context) {
@@ -1228,10 +1308,21 @@ async function requestDeepSeek(body) {
       throw createAppError("empty_upstream_reply");
     }
 
+    // R-01: 把 DeepSeek 返回的 usage 透出给上层 cost-control 累计。
+    // DeepSeek API 响应 schema: { usage: { prompt_tokens, completion_tokens, total_tokens } }
+    const usage = data && typeof data.usage === "object" ? data.usage : null;
+
     return {
       reply,
       provider: "DeepSeek",
       model: DEEPSEEK_MODEL,
+      usage: usage
+        ? {
+            prompt_tokens: Number(usage.prompt_tokens) || 0,
+            completion_tokens: Number(usage.completion_tokens) || 0,
+            total_tokens: Number(usage.total_tokens) || 0,
+          }
+        : null,
     };
   } catch (error) {
     if (error.name === "AbortError") {
@@ -1288,6 +1379,15 @@ function getFallbackIntro(reason) {
   }
   if (reason === "missing_api_key") {
     return "我先按本地知识模式陪你往下拆。";
+  }
+  if (reason === "daily_budget_exhausted") {
+    return "今天整站的 AI 对话额度已经用完了，我先用本地知识模式陪你聊。明天再试就会恢复。";
+  }
+  if (reason === "ip_daily_quota_exhausted") {
+    return "你这边的请求量今天已经达到上限。我先按本地知识模式继续陪你，明天再来 AI 模式会恢复。";
+  }
+  if (reason === "anon_daily_chat_exhausted") {
+    return "未登录用户每天有体验次数上限。我先用本地知识模式陪你；登录之后可以继续用 AI 模式深聊。";
   }
   return "现在对话通道有点挤，我先给你一个基于书里内容的快速回答。";
 }
@@ -1516,6 +1616,7 @@ function buildDeepHealth({ requestId }) {
       circuit_open: circuitOpen,
       consecutive_failures: circuitState.consecutiveFailures,
     },
+    cost: costControl.snapshot(),
     process: {
       pid: process.pid,
       heap_mb: memoryMb,
@@ -1545,6 +1646,7 @@ function cleanupExpiredEntries() {
   lastCleanupAt = now;
 
   cleanupExpiredCacheEntries(now);
+  costControl.cleanupExpired();
 
   for (const [key, value] of rateLimitStore.entries()) {
     if (
