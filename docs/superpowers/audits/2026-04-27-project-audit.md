@@ -35,14 +35,16 @@
 
 ### 推荐分波次执行
 
-| Wave | 主题 | 工时 | 解决什么 |
-|---|---|---|---|
-| **Wave 1** | 止血（cost guardrails + 文件清理） | 4-6 h | 钱不再烧 + 心智负担 -50% |
-| **Wave 2** | 文档重组 + 部署固化 | 4-6 h | 单一信源 + 救火 SOP |
-| **Wave 3** | server.js 拆解 | 1-2 d | 可维护性 |
-| **Wave 4** | 长期治理（CI、staging、监控告警） | 1-2 d | 防止回归 |
+| Wave | 主题 | 工时 | 解决什么 | 状态 |
+|---|---|---|---|---|
+| **Wave 1** | 止血（cost guardrails + .gitignore） | 4-6 h | 钱不再烧 + 心智负担 -50% | ✅ 完成 |
+| **Wave 2** | 文档重组 + 前后端分离 + 数据资产化 | 4-6 h | 单一信源 + 救火 SOP + R-23 静默 404 | ✅ 完成 |
+| **Wave 3** | CI 兜底 + 运维监控 + runbooks 全 + .env 加固 | ~9 h | 防回归 + 余额监控 + 5 份 runbook | ✅ 完成 |
+| **Wave 4** | server.js 拆解 + staging 环境 | 1-2 d | 长期可维护性 | ⬜ 待启动 |
 
-详见 §7 Remediation Roadmap。
+详见 §7 Remediation Roadmap 和 `docs/superpowers/plans/`：
+- `2026-04-27-phase-c-frontend-backend-split.md`（Wave 2 Phase C 详细计划）
+- `2026-04-27-wave-3-ops-and-ci.md`（Wave 3 详细计划）
 
 ---
 
@@ -966,28 +968,28 @@ scripts/cleanup-claimed-sessions.js  (~10 天前加)
 |---|---|---|---|---|---|---|
 | **R-01** | 🔴 P0 | 安全/成本 | 实施 cost guardrails（A/B/C/D/E） | 3-4 h | — | ✅ Wave 1 (`aa9a8d6` + 部署) |
 | **R-02** | 🔴 P0 | 安全/成本 | 恢复 DEEPSEEK_API_KEY（依赖 R-01 完成） | 5 min | R-01 | ✅ 已恢复（health 显示 `llm.status=ok`） |
-| **R-03** | 🟡 P1 | 安全 | `.env` 迁到 `/etc/book-of-elon/.env` + `chmod 600` | 30 min | — | ⬜ Wave 3 |
+| **R-03** | 🟡 P1 | 安全 | `.env` 加固：永远 600 + 不进 git + cron 自动校正 | 30 min | — | ✅ Wave 3。决策不迁 `/etc/`（收益<成本）；上 `scripts/ops/check-env-perms.sh` cron + `docs/runbooks/env-management.md` SOP |
 | **R-04** | 🟡 P1 | 文件/目录 | 数据 JSON 化：`book-source.js` / `card-data.js` 转 `web/*.json` | 45 min | — | ✅ Wave 2 Phase C-2 (`26b3ea0`)。`knowledge-base.js` 是逻辑库保持 .js |
-| **R-05** | 🟡 P1 | 文件/目录 | 重组 `scripts/` 为 `ops/` / `tools/` / `calibration/` | 1 h | — | 🟢 Wave 2 Phase B（ops/ + tools/ 完成；calibration/ 留 Wave 3） |
+| **R-05** | 🟡 P1 | 文件/目录 | 重组 `scripts/` 为 `ops/` / `tools/` / `calibration/` | 1 h | — | ✅ Wave 2 Phase B + Wave 3 R-24（calibration 进了 `tests/calibration/` 而非 `scripts/`，更贴定位） |
 | **R-06** | 🟡 P1 | 文件/目录 | 前后端物理分离（重定义为 web/ 隔离） | 45 min | — | ✅ Wave 2 Phase C-1 (`b8831f7`)。9 个前端文件搬到 `web/`；URL 不变 |
 | **R-07** | 🟡 P1 | 文件/目录 | 把 `reply-engine.js` `model-client.js` 移到 `services/` | 30 min | — | ❌ 重定义：这两个是浏览器端 `<script>` 文件，不是 Node 模块。已并入 R-06 搬到 `web/`。|
 | **R-08** | 🟡 P1 | 文件/目录 | 测试 smoke 移到 `tests/` | 1 h | R-05 | 🟢 Wave 2 Phase B（tests/{smoke,e2e,probe}/ 全部建立） |
 | **R-09** | 🟡 P1 | 文档 | 合并 3 份 DEPLOY 文档为 `docs/DEPLOYMENT.md` | 2 h | — | 🟢 Wave 2 Phase A |
 | **R-10** | 🟡 P1 | 文档 | 6 份 .md 移到 `docs/`（OBSERVABILITY、launch-plan、reply-strategy、prompt-ab、reply-calib-output 删除） | 30 min | — | 🟢 Wave 2 Phase A（移到 archive/quality/，未删） |
 | **R-11** | 🟡 P1 | 文档 | 写 `docs/ARCHITECTURE.md`（从 CLAUDE.md §3 抽出 + 加 mermaid） | 1 h | — | 🟢 Wave 2 Phase A |
-| **R-12** | 🟡 P1 | 文档 | 写 `docs/runbooks/` × 5 份 | 1.5 h | — | ⏳ 1/5 写完（incident-cost-spike，`0107de7`） |
+| **R-12** | 🟡 P1 | 文档 | 写 `docs/runbooks/` × 5 份 | 1.5 h | — | ✅ Wave 3。5/5 齐：cost-spike + deploy-failed + db-corruption + deepseek-down + static-404 + env-management(SOP) |
 | **R-13** | 🟡 P1 | 文档 | `README.md` 精简到 ~3 KB | 30 min | R-09, R-11 | 🟢 Wave 2 Phase A |
-| **R-14** | 🟡 P1 | 部署/运维 | 健康检查 cron + DeepSeek 余额监控 | 1.5 h | — | ⬜ Wave 3 |
+| **R-14** | 🟡 P1 | 部署/运维 | 健康检查 cron + DeepSeek 余额监控 | 1.5 h | — | ✅ Wave 3。`scripts/ops/health-check.sh`（每分钟 + 3 次失败自动 reload）+ `daily-report.sh`（09:00 + 余额 < 50 告警） |
 | **R-15** | 🟡 P1 | 部署/运维 | `.gitignore` 补强 | 5 min | — | ✅ Wave 1 (`d97db61`) |
-| **R-16** | 🟠 P2 | 部署/运维 | 决策 Docker 路径：保留+加 CI 或删除 | 1 h | — | ⬜ Wave 3 |
-| **R-17** | 🟠 P2 | 部署/运维 | git config + commit message convention（写到 CONTRIBUTING.md） | 30 min | — | ⬜ Wave 3 |
-| **R-18** | 🟠 P2 | 部署/运维 | 加 GitHub Actions CI（preflight + smoke） | 1 h | R-17 | ⬜ Wave 3 |
+| **R-16** | 🟠 P2 | 部署/运维 | 决策 Docker 路径：保留+加 CI 或删除 | 1 h | — | ✅ Wave 3。决策保留：CI `docker-build` job 每次 push 验证 Dockerfile 没漂移；Dockerfile 加注释标明决策 |
+| **R-17** | 🟠 P2 | 部署/运维 | git config + commit message convention（写到 CONTRIBUTING.md） | 30 min | — | ✅ Wave 3。`CONTRIBUTING.md` 落 conventional commits 简化版 + 文件结构红线 + review checklist + hot-fix 流程 |
+| **R-18** | 🟠 P2 | 部署/运维 | 加 GitHub Actions CI（preflight + smoke） | 1 h | R-17 | ✅ Wave 3。`.github/workflows/ci.yml` 4 个 job 并行：lint-preflight / unit-smoke / integration-smoke / docker-build |
 | **R-19** | 🟠 P2 | 部署/运维 | staging 环境（同机器子域名） | 4 h | R-18 | ⬜ Wave 4 |
 | **R-20** | 🟢 P3 | 代码/架构 | `server.js` 拆解为 `routes/` × 5 + `services/` × 3 + `middleware/` | 1-2 d | R-08（测试结构稳定后） | ⬜ Wave 4 |
-| **R-21** | 🟢 P3 | 部署/运维 | DR 演练（恢复一次备份） | 1 h | — | ⬜ Wave 3 |
+| **R-21** | 🟢 P3 | 部署/运维 | DR 演练（恢复一次备份） | 1 h | — | 🟢 Wave 3 服务器侧执行（演练记录写进 `incident-db-corruption.md` §8） |
 | **R-22** | 🟢 P3 | 安全 | 30 天后再跑 `/cso` 看回归 | 30 min | — | ⬜ 2026-05-27 |
 | **R-23** | 🔴 P0 | 安全/Bug | 修 `/book-source.js → 404` 静默 bug：白名单加 `/book-source.js` | 5 min | R-06 | ✅ Wave 2 Phase C-1 (`b8831f7`)。Phase C-2 后该 URL 已废弃为 404（数据走 `/book-source.json`）|
-| **R-24** | 🟡 P1 | 文件/目录 | 把 calibration tools (`reply-calibration.js` / `deepseek-eval.js`) 搬到 `tests/calibration/` 或 `scripts/tools/calibration/` | 30 min | R-04 | ⬜ Wave 3。Phase C-2 已让它们在新 JSON 数据下能跑（fetch stub），但仍在 root |
+| **R-24** | 🟡 P1 | 文件/目录 | 把 calibration tools (`reply-calibration.js` / `deepseek-eval.js`) 搬到 `tests/calibration/` 或 `scripts/tools/calibration/` | 30 min | R-04 | ✅ Wave 3。5 个文件（含 test-set.json + output md）git mv 到 `tests/calibration/`；`projectRoot` 回退 2 级；package.json scripts + .gitignore + .dockerignore 同步更新 |
 
 ### 7.2 推荐执行波次
 

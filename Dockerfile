@@ -1,6 +1,13 @@
 # ════════════════════════════════════════════════════════════════
 # Dockerfile — Book of Elon
 # ────────────────────────────────────────────────────────────────
+# 当前生产部署方式：pm2 直起 node（不走 docker）
+# 这份 Dockerfile 的作用（Wave 3 R-16 决策）：
+#   1. 未来切容器化（k8s / docker compose）的起点，不从零写
+#   2. dev 隔离环境：本地想跑一个干净的 sandbox 时 docker run 起来即可
+#   3. CI 每次 push 自动 docker build 验证它没漂移（.github/workflows/ci.yml
+#      docker-build job），防止"Dockerfile 早就坏了但没人发现"
+#
 # 安全约束（CSO #4 HIGH 修复）：
 #   1. 用 npm ci 锁版本，杜绝供应链漂移
 #   2. 创建非 root 用户跑 node，最小权限
