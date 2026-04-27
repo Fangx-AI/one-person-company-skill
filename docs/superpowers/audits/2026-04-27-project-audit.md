@@ -959,7 +959,7 @@ scripts/cleanup-claimed-sessions.js  (~10 天前加)
 
 ### 7.1 优先级一览
 
-> **进度跟踪**（更新于 2026-04-27 Wave 2 Phase A 完成）：
+> **进度跟踪**（更新于 2026-04-27 Wave 2 Phase C 完成）：
 > ✅ = 已完成并部署 / 验证；🟢 = 已完成代码改动待提交；⏳ = 进行中；⬜ = 未开始
 
 | 编号 | 优先级 | 维度 | 工作 | 工时 | 依赖 | 状态 |
@@ -967,10 +967,10 @@ scripts/cleanup-claimed-sessions.js  (~10 天前加)
 | **R-01** | 🔴 P0 | 安全/成本 | 实施 cost guardrails（A/B/C/D/E） | 3-4 h | — | ✅ Wave 1 (`aa9a8d6` + 部署) |
 | **R-02** | 🔴 P0 | 安全/成本 | 恢复 DEEPSEEK_API_KEY（依赖 R-01 完成） | 5 min | R-01 | ✅ 已恢复（health 显示 `llm.status=ok`） |
 | **R-03** | 🟡 P1 | 安全 | `.env` 迁到 `/etc/book-of-elon/.env` + `chmod 600` | 30 min | — | ⬜ Wave 3 |
-| **R-04** | 🟡 P1 | 文件/目录 | 删 working tree 里的 `output.md` | 5 min | — | ⬜ Wave 2 Phase B 顺手做 |
-| **R-05** | 🟡 P1 | 文件/目录 | 重组 `scripts/` 为 `ops/` / `tools/` / `calibration/` | 1 h | — | 🟢 Wave 2 Phase B（ops/ + tools/ 完成；calibration/ 留 Phase C） |
-| **R-06** | 🟡 P1 | 文件/目录 | `book-source.js` / `card-data.js` / `knowledge-base.js` 转 JSON 移到 `data/` | 45 min | — | ⬜ Wave 2 Phase C |
-| **R-07** | 🟡 P1 | 文件/目录 | 把 `reply-engine.js` `model-client.js` 移到 `services/` | 30 min | — | ⬜ Wave 2 Phase C |
+| **R-04** | 🟡 P1 | 文件/目录 | 数据 JSON 化：`book-source.js` / `card-data.js` 转 `web/*.json` | 45 min | — | ✅ Wave 2 Phase C-2 (`26b3ea0`)。`knowledge-base.js` 是逻辑库保持 .js |
+| **R-05** | 🟡 P1 | 文件/目录 | 重组 `scripts/` 为 `ops/` / `tools/` / `calibration/` | 1 h | — | 🟢 Wave 2 Phase B（ops/ + tools/ 完成；calibration/ 留 Wave 3） |
+| **R-06** | 🟡 P1 | 文件/目录 | 前后端物理分离（重定义为 web/ 隔离） | 45 min | — | ✅ Wave 2 Phase C-1 (`b8831f7`)。9 个前端文件搬到 `web/`；URL 不变 |
+| **R-07** | 🟡 P1 | 文件/目录 | 把 `reply-engine.js` `model-client.js` 移到 `services/` | 30 min | — | ❌ 重定义：这两个是浏览器端 `<script>` 文件，不是 Node 模块。已并入 R-06 搬到 `web/`。|
 | **R-08** | 🟡 P1 | 文件/目录 | 测试 smoke 移到 `tests/` | 1 h | R-05 | 🟢 Wave 2 Phase B（tests/{smoke,e2e,probe}/ 全部建立） |
 | **R-09** | 🟡 P1 | 文档 | 合并 3 份 DEPLOY 文档为 `docs/DEPLOYMENT.md` | 2 h | — | 🟢 Wave 2 Phase A |
 | **R-10** | 🟡 P1 | 文档 | 6 份 .md 移到 `docs/`（OBSERVABILITY、launch-plan、reply-strategy、prompt-ab、reply-calib-output 删除） | 30 min | — | 🟢 Wave 2 Phase A（移到 archive/quality/，未删） |
@@ -986,6 +986,8 @@ scripts/cleanup-claimed-sessions.js  (~10 天前加)
 | **R-20** | 🟢 P3 | 代码/架构 | `server.js` 拆解为 `routes/` × 5 + `services/` × 3 + `middleware/` | 1-2 d | R-08（测试结构稳定后） | ⬜ Wave 4 |
 | **R-21** | 🟢 P3 | 部署/运维 | DR 演练（恢复一次备份） | 1 h | — | ⬜ Wave 3 |
 | **R-22** | 🟢 P3 | 安全 | 30 天后再跑 `/cso` 看回归 | 30 min | — | ⬜ 2026-05-27 |
+| **R-23** | 🔴 P0 | 安全/Bug | 修 `/book-source.js → 404` 静默 bug：白名单加 `/book-source.js` | 5 min | R-06 | ✅ Wave 2 Phase C-1 (`b8831f7`)。Phase C-2 后该 URL 已废弃为 404（数据走 `/book-source.json`）|
+| **R-24** | 🟡 P1 | 文件/目录 | 把 calibration tools (`reply-calibration.js` / `deepseek-eval.js`) 搬到 `tests/calibration/` 或 `scripts/tools/calibration/` | 30 min | R-04 | ⬜ Wave 3。Phase C-2 已让它们在新 JSON 数据下能跑（fetch stub），但仍在 root |
 
 ### 7.2 推荐执行波次
 
@@ -1004,18 +1006,28 @@ R-03 .env 加固              30 min
 #### Wave 2 — 秩序重建（4-6 小时，建议本周）
 
 ```
-R-05 scripts/ 重组          1 h
-R-06 数据移 data/JSON       45 min
-R-07 reply 移 services/     30 min
-R-08 tests/ 重组            1 h
-R-10 .md 移 docs/           30 min
-R-09 合 DEPLOY 三份         2 h
-R-11 ARCHITECTURE.md        1 h
-R-12 runbooks × 5           1.5 h
-R-13 README 精简            30 min
+[Phase A — 文档]
+R-09 合 DEPLOY 三份         2 h     ✅ f819dee
+R-10 .md 移 docs/           30 min  ✅ f819dee
+R-11 ARCHITECTURE.md        1 h     ✅ f819dee
+R-13 README 精简            30 min  ✅ f819dee
+
+[Phase B — 脚本/测试]
+R-05 scripts/ 重组          1 h     ✅ e9551ba（calibration 留 Wave 3）
+R-08 tests/ 重组            1 h     ✅ e9551ba
+
+[Phase C — 前后端隔离 + 数据资产化]
+R-06 web/ 目录前后端分离    45 min  ✅ b8831f7（C-1）
+R-23 修 /book-source.js 404 5 min   ✅ b8831f7（C-1，新发现 bug）
+R-04 数据 .js → .json       1 h     ✅ 26b3ea0（C-2，async bootstrap）
+R-07 reply/model 移服务端  30 min  ❌ 重定义为 R-06（其实是浏览器端文件）
+
+[尾声]
+R-12 runbooks × 5           1.5 h   ⏳ 1/5（incident-cost-spike 已写）
+R-24 calibration 入 tests/  30 min  ⬜ Wave 3（新发现）
 ```
 
-**完成后**：根目录从 35 个文件减到 ~14 个；docs/ 从空变成结构化；scripts/ 分组；3 份 DEPLOY 合 1。心智负担骤降。
+**完成后**：根目录从 35 个文件减到 13 个；前后端物理隔离（`web/` vs `server.js`/`services/`/`db/`/`routes/`/`auth/`）；数据 vs 逻辑解耦（JSON 资产 + 函数库）；docs/ 从空变成结构化；scripts/ 分组；3 份 DEPLOY 合 1；修了一处生产 bug（R-23 让 361KB 知识源真正 work）。心智负担骤降。
 
 #### Wave 3 — 长期治理（半天，可选）
 

@@ -2,7 +2,7 @@
 
 - **作者**：Claude（superpowers framework）
 - **日期**：2026-04-27
-- **状态**：执行中
+- **状态**：✅ 已完成。C-1 = `b8831f7`（前后端隔离 + R-23 修 404 bug）；C-2 = `26b3ea0`（数据 JSON 化 + async bootstrap）。生产部署验证通过。
 - **覆盖审计项**：R-04 / R-06 / R-23（新发现）/ R-24（新发现）
 - **关联**：`docs/superpowers/audits/2026-04-27-project-audit.md`
 
