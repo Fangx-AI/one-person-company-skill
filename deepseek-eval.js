@@ -69,6 +69,13 @@ function bootstrapBrowserLikeRuntime() {
     llmEnabled: true,
     chatEndpoint: "http://localhost:3000/api/chat",
   };
+
+  // Phase C-2 (R-04)：参见 reply-calibration.js 的同名注释。
+  global.location = global.location || { hostname: "localhost", host: "localhost" };
+  if (typeof global.fetch !== "function" || !global.__calibrationFetchStubbed) {
+    global.fetch = () => Promise.reject(new Error("fetch disabled in Node calibration runtime"));
+    global.__calibrationFetchStubbed = true;
+  }
 }
 
 function runScript(filename) {
@@ -77,14 +84,45 @@ function runScript(filename) {
   vm.runInThisContext(code, { filename: fullPath });
 }
 
+function loadCardData() {
+  const data = JSON.parse(fs.readFileSync(path.join(webRoot, "cards.json"), "utf8"));
+  global.cards = data.cards;
+  global.featuredIds = data.featuredIds;
+  global.quickAskPrompts = data.quickAskPrompts;
+  global.featuredCardTags = data.featuredCardTags;
+  global.topicLibraryGroups = data.topicLibraryGroups;
+  const cardLibraryGroupById = Object.fromEntries(
+    data.topicLibraryGroups.flatMap((g) =>
+      g.cardIds.map((cardId) => [cardId, g.id])
+    )
+  );
+  data.cards.forEach((card) => {
+    card.frontend.library_group =
+      cardLibraryGroupById[card.id] || "direction-meaning";
+  });
+  global.idToCard = Object.fromEntries(data.cards.map((c) => [c.id, c]));
+}
+
+function loadBookSource() {
+  const data = JSON.parse(fs.readFileSync(path.join(webRoot, "book-source.json"), "utf8"));
+  global.window.BOOK_OF_ELON_SOURCE = data;
+}
+
 async function main() {
   bootstrapBrowserLikeRuntime();
-  runScript("book-source.js");
-  runScript("card-data.js");
   runScript("knowledge-base.js");
   runScript("model-client.js");
   runScript("reply-engine.js");
   runScript("app.js");
+  loadCardData();
+  loadBookSource();
+  if (typeof global.buildKnowledgeBase === "function") {
+    global.knowledgeBase = global.buildKnowledgeBase(global.cards, global.window.BOOK_OF_ELON_SOURCE);
+    global.window.BOOK_OF_ELON_KB = global.knowledgeBase;
+  }
+  if (typeof global.window.BOOK_OF_ELON_REGISTER_DEBUG_HOOK === "function") {
+    global.window.BOOK_OF_ELON_REGISTER_DEBUG_HOOK();
+  }
 
   const tests = JSON.parse(fs.readFileSync(path.join(projectRoot, "reply-test-set.json"), "utf8"));
   const requestedCaseIds = process.argv.slice(2);

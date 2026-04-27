@@ -1,22 +1,47 @@
-var knowledgeBase = buildKnowledgeBase(cards, null);
-window.BOOK_OF_ELON_KB = knowledgeBase;
+// ── async bootstrap (Phase C-2 / R-04) ──────────────────────────
+// 改造前：card-data.js / book-source.js 通过 <script defer> 同步加载，cards /
+// idToCard / featuredIds 等顶层 var 在解析完成时全局立刻可用。
+// 改造后：cards 和 book-source 改为 JSON 资产，bootstrap() 异步 fetch。
+// 渲染函数必须等 bootstrap 完成；bootstrap 之前 user 点击 chip 也无所谓
+// （wireEvents 还没绑，handler 不会触发）。
+//
+// 这些全局仍然用 var（即 window.X），因为 reply-engine.js / knowledge-base.js
+// 这些独立 <script> 模块以 global 形式访问 cards / idToCard，必须保持兼容。
+var cards = [];
+var featuredIds = [];
+var quickAskPrompts = [];
+var featuredCardTags = {};
+var topicLibraryGroups = [];
+var idToCard = {};
+var knowledgeBase = null;
 
-function loadBookSourceAsync() {
+// 数据版本号：cards.json / book-source.json 内容变更时改这里来 cache-bust。
+// 跟 index.html 里 <script src="./xxx.js?v=..."> 的版本号是同一类东西。
+const DATA_VERSION = "20260427-c2";
+
+async function loadBookSourceAsync() {
   if (window.BOOK_OF_ELON_SOURCE) {
     knowledgeBase = buildKnowledgeBase(cards, window.BOOK_OF_ELON_SOURCE);
     window.BOOK_OF_ELON_KB = knowledgeBase;
     return;
   }
 
-  var script = document.createElement("script");
-  script.src = "./book-source.js?v=20260414-perf2";
-  script.onload = function () {
-    if (window.BOOK_OF_ELON_SOURCE) {
-      knowledgeBase = buildKnowledgeBase(cards, window.BOOK_OF_ELON_SOURCE);
-      window.BOOK_OF_ELON_KB = knowledgeBase;
+  try {
+    const res = await fetch(`./book-source.json?v=${DATA_VERSION}`);
+    if (!res.ok) {
+      // 不致命：knowledgeBase 已基于 cards 构建过，RAG 仍 work（只是没有
+      // 全文 chunks）。生产 R-23 修好以前 /book-source.js 一直 404，这条
+      // fallback 路径就是当时跑了几周的 cards-only 模式。
+      console.warn("[bootstrap] book-source.json HTTP", res.status);
+      return;
     }
-  };
-  document.head.appendChild(script);
+    const bookSource = await res.json();
+    window.BOOK_OF_ELON_SOURCE = bookSource;
+    knowledgeBase = buildKnowledgeBase(cards, bookSource);
+    window.BOOK_OF_ELON_KB = knowledgeBase;
+  } catch (err) {
+    console.warn("[bootstrap] book-source.json fetch failed:", err);
+  }
 }
 
 const heroFloatingCards = document.getElementById("hero-floating-cards");
@@ -64,7 +89,49 @@ let lockedBodyScrollY = 0;
 let analyticsHeartbeatTimer = 0;
 let analyticsTrackingStarted = false;
 
-render();
+// ── 启动入口 (Phase C-2 / R-04) ─────────────────────────────────
+// fetch cards.json → 填全局 var → 派生 idToCard / library_group →
+// buildKnowledgeBase → render → setTimeout 异步 fetch book-source.json。
+// 失败路径：toast 提示 + 不渲染（用户看到的是 index.html 里 HTML 静态默认
+// 内容 + 静态 chip 列表，仍然能输入快速问题，只是 chip 点击不响应）。
+(async function bootstrap() {
+  try {
+    const res = await fetch(`./cards.json?v=${DATA_VERSION}`);
+    if (!res.ok) throw new Error(`cards.json HTTP ${res.status}`);
+    const data = await res.json();
+
+    cards = data.cards;
+    featuredIds = data.featuredIds;
+    quickAskPrompts = data.quickAskPrompts;
+    featuredCardTags = data.featuredCardTags;
+    topicLibraryGroups = data.topicLibraryGroups;
+
+    // 派生 cardLibraryGroupById 并把 library_group 注入每张 card。
+    // 原本是 card-data.js 末尾两段 mutation 做的事，现在 bootstrap 时即时算。
+    const cardLibraryGroupById = Object.fromEntries(
+      topicLibraryGroups.flatMap((group) =>
+        group.cardIds.map((cardId) => [cardId, group.id])
+      )
+    );
+    cards.forEach((card) => {
+      card.frontend.library_group =
+        cardLibraryGroupById[card.id] || "direction-meaning";
+    });
+    idToCard = Object.fromEntries(cards.map((card) => [card.id, card]));
+
+    knowledgeBase = buildKnowledgeBase(cards, null);
+    window.BOOK_OF_ELON_KB = knowledgeBase;
+
+    render();
+    registerDebugHook();
+    setTimeout(loadBookSourceAsync, 0);
+  } catch (err) {
+    console.error("[bootstrap] cards.json load failed:", err);
+    if (typeof window.toast === "function") {
+      window.toast("数据加载失败，请刷新页面或检查网络。", { variant: "warning" });
+    }
+  }
+})();
 
 function render() {
   renderHeroFloatingCards();
@@ -901,24 +968,43 @@ function sendAnalyticsEvent(type, options = {}) {
   }).catch(() => {});
 }
 
-if (location.hostname === "localhost" || location.hostname === "127.0.0.1") window.BOOK_OF_ELON_DEBUG = {
-  cards,
-  knowledgeBase,
-  runtimeConfig,
-  buildUserContext,
-  classifyIntent,
-  findRelevantCards,
-  searchKnowledgeBase,
-  buildModelPayload,
-  previewReply(userText, cardId = null) {
-    chatMessages = [];
-    const card = cardId ? idToCard[cardId] : null;
-    return {
-      userText,
-      cardId: card?.id || null,
-      cardTitle: card?.frontend.title_zh || null,
-      reply: generateReply(userText, card),
-      suggestedCards: findRelevantCards(userText).slice(0, 3).map((item) => item.frontend.title_zh),
-    };
-  },
-};
+// Phase C-2 (R-04)：debug hook 用 getter 包 cards / knowledgeBase，因为
+// 在 async bootstrap 完成前后这两个 var 会被 reassign（cards: [] → 真数据；
+// knowledgeBase: null → buildKnowledgeBase 结果）。getter 总是返回 module
+// scope 当前值，避免被首次调用时的快照锁死成空数组。
+//
+// 同时 typeof location 防御让 Node CLI 模拟器（reply-calibration / deepseek-eval）
+// 不会在没有 location 全局时 crash。
+function registerDebugHook() {
+  if (typeof location === "undefined") return;
+  if (location.hostname !== "localhost" && location.hostname !== "127.0.0.1") return;
+  window.BOOK_OF_ELON_DEBUG = {
+    get cards() { return cards; },
+    get idToCard() { return idToCard; },
+    get knowledgeBase() { return knowledgeBase; },
+    runtimeConfig,
+    buildUserContext,
+    classifyIntent,
+    findRelevantCards,
+    searchKnowledgeBase,
+    buildModelPayload,
+    previewReply(userText, cardId = null) {
+      chatMessages = [];
+      const card = cardId ? idToCard[cardId] : null;
+      return {
+        userText,
+        cardId: card?.id || null,
+        cardTitle: card?.frontend.title_zh || null,
+        reply: generateReply(userText, card),
+        suggestedCards: findRelevantCards(userText).slice(0, 3).map((item) => item.frontend.title_zh),
+      };
+    },
+  };
+}
+
+// Node CLI 模拟器（reply-calibration.js / deepseek-eval.js）在 fetch 失败后
+// 手动填 cards/knowledgeBase 并显式调用这个钩子来注册 BOOK_OF_ELON_DEBUG。
+// 浏览器走 bootstrap() 内部统一调用。
+if (typeof window !== "undefined") {
+  window.BOOK_OF_ELON_REGISTER_DEBUG_HOOK = registerDebugHook;
+}

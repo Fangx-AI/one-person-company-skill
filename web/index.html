@@ -203,13 +203,14 @@
     </section>
   </div>
 
-  <script defer src="./card-data.js?v=20260418-mem1"></script>
-  <script defer src="./knowledge-base.js?v=20260418-mem1"></script>
-  <script defer src="/config.js?v=20260418-mem1"></script>
-  <script defer src="./model-client.js?v=20260418-mem1"></script>
-  <script defer src="./reply-engine.js?v=20260418-mem1"></script>
-  <script defer src="./auth-ui.js?v=20260418-mem1"></script>
-  <script defer src="./app.js?v=20260418-mem1"></script>
+  <!-- Phase C-2: card-data.js + book-source.js 改为 cards.json + book-source.json
+       async fetch（见 app.js bootstrap）。knowledge-base.js 是逻辑库，保留 .js。 -->
+  <script defer src="./knowledge-base.js?v=20260427-c2"></script>
+  <script defer src="/config.js?v=20260427-c2"></script>
+  <script defer src="./model-client.js?v=20260427-c2"></script>
+  <script defer src="./reply-engine.js?v=20260427-c2"></script>
+  <script defer src="./auth-ui.js?v=20260427-c2"></script>
+  <script defer src="./app.js?v=20260427-c2"></script>
 </body>
 </html>
 

@@ -118,14 +118,15 @@ const STATIC_FILE_ALLOW = new Set([
   "/styles.css",
   "/app.js",
   "/auth-ui.js",
-  "/card-data.js",
   "/knowledge-base.js",
-  // R-23 修复（Phase C-1）：之前漏加 /book-source.js，导致 361KB 的 BOOK_OF_ELON_SOURCE
-  // 在生产环境一直 404，前端 loadBookSourceAsync 静默 fallback 到 cards-only 模式，
-  // 整本《埃隆之书》原文知识源失效。
-  "/book-source.js",
   "/model-client.js",
   "/reply-engine.js",
+  // Phase C-2 (R-04)：card-data.js 和 book-source.js 已经从内联 JS 数据
+  // 转为 JSON 资产；前端 app.js bootstrap 异步 fetch 这两个文件。
+  // 旧的 /card-data.js 和 /book-source.js URL 已废弃；如果有老缓存命中，
+  // 这里没列就 404，强制刷新拿新版（DATA_VERSION cache-bust）。
+  "/cards.json",
+  "/book-source.json",
 ]);
 
 const rateLimitStore = new Map();
