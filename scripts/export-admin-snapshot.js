@@ -27,16 +27,42 @@ const path = require("path");
 const os = require("os");
 const Database = require("better-sqlite3");
 
-const DB_PATH =
-  process.env.SQLITE_DB_PATH || path.join(__dirname, "..", "data", "site.db");
 const OUT_PATH = process.argv[2] || "/tmp/admin-snapshot.html";
 const MAX_MESSAGES = Number(process.env.SNAPSHOT_MAX_MESSAGES || 30000);
 const MAX_SESSIONS = Number(process.env.SNAPSHOT_MAX_SESSIONS || 10000);
 
-if (!fs.existsSync(DB_PATH)) {
-  console.error(`[snapshot] Database not found: ${DB_PATH}`);
+function resolveDbPath() {
+  const dataDir = path.join(__dirname, "..", "data");
+  const candidates = [
+    process.env.SQLITE_DB_PATH,
+    path.join(dataDir, "app.db"),
+    path.join(dataDir, "site.db"),
+    path.join(dataDir, "production.db"),
+  ].filter(Boolean);
+
+  for (const p of candidates) {
+    if (fs.existsSync(p)) return p;
+  }
+
+  if (fs.existsSync(dataDir)) {
+    const dbFiles = fs
+      .readdirSync(dataDir)
+      .filter((f) => f.endsWith(".db") && !f.includes("test"))
+      .map((f) => path.join(dataDir, f));
+    if (dbFiles.length) return dbFiles[0];
+  }
+
+  return null;
+}
+
+const DB_PATH = resolveDbPath();
+if (!DB_PATH) {
+  console.error("[snapshot] No SQLite database found.");
+  console.error("[snapshot] Tried: $SQLITE_DB_PATH, data/app.db, data/site.db, data/production.db");
+  console.error("[snapshot] Run from project root, or set SQLITE_DB_PATH explicitly.");
   process.exit(1);
 }
+console.log("[snapshot] Using database:", DB_PATH);
 
 const db = new Database(DB_PATH, { readonly: true, fileMustExist: true });
 const now = Date.now();
