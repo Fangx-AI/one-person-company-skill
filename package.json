@@ -13,7 +13,7 @@
     "preflight:degraded": "node preflight-check.js --allow-degraded",
     "preflight:prod": "node preflight-check.js --strict-production",
 
-    "smoke:chat": "node deepseek-smoke-test.js",
+    "smoke:chat": "node tests/calibration/deepseek-smoke-test.js",
     "smoke:auth": "node tests/smoke/auth.js",
     "smoke:db": "node tests/smoke/db.js",
     "smoke:persistence": "node tests/smoke/persistence.js",
@@ -29,8 +29,8 @@
     "static:smoke": "node tests/smoke/static-security.js",
     "prompt:smoke": "node tests/smoke/prompt-injection.js",
 
-    "test:reply": "node reply-calibration.js",
-    "test:deepseek": "node deepseek-eval.js",
+    "test:reply": "node tests/calibration/reply-calibration.js",
+    "test:deepseek": "node tests/calibration/deepseek-eval.js",
     "test:e2e": "node tests/e2e/full-flow.js",
     "test:integration": "node tests/e2e/integration-memory.js",
     "test:fact-extractor": "node tests/e2e/fact-extractor.js",

@@ -50,6 +50,7 @@ CHANGELOG.md
 docs/
 reply-calibration-output.md
 deepseek-eval-output.md
+tests/calibration/
 prompt-ab-output*
 *.md
 !**/*.md.example

@@ -2,9 +2,13 @@ const fs = require("fs");
 const path = require("path");
 const vm = require("vm");
 
-const projectRoot = __dirname;
+// Wave 3 R-24: calibration 工具搬到 tests/calibration/，回退 2 级才是 projectRoot。
+const projectRoot = path.join(__dirname, "..", "..");
 // Phase C-1: 前端文件搬到 web/，CLI 模拟浏览器运行时的 runScript 也跟着改路径。
 const webRoot = path.join(projectRoot, "web");
+// Wave 3 R-24: test set 和 output 也跟着搬到 tests/calibration/ 内部，
+// 不再写到 projectRoot —— 输出物自封闭，repo 根保持干净。
+const calibrationRoot = __dirname;
 
 function createElementStub(id = "") {
   return {
@@ -123,7 +127,7 @@ function main() {
     global.window.BOOK_OF_ELON_REGISTER_DEBUG_HOOK();
   }
 
-  const tests = JSON.parse(fs.readFileSync(path.join(projectRoot, "reply-test-set.json"), "utf8"));
+  const tests = JSON.parse(fs.readFileSync(path.join(calibrationRoot, "reply-test-set.json"), "utf8"));
   const results = tests.map((test, index) => {
     const preview = window.BOOK_OF_ELON_DEBUG.previewReply(test.user_message);
     return {
@@ -155,7 +159,7 @@ function main() {
     lines.push("");
   }
 
-  const outputPath = path.join(projectRoot, "reply-calibration-output.md");
+  const outputPath = path.join(calibrationRoot, "output-latest.md");
   fs.writeFileSync(outputPath, lines.join("\n"), "utf8");
   console.log(`WROTE ${outputPath}`);
   console.log(`CASES ${results.length}`);
