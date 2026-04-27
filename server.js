@@ -5,6 +5,10 @@ const crypto = require("crypto");
 const zlib = require("zlib");
 
 const projectRoot = __dirname;
+// Phase C-1: 前后端物理分离。后端代码留在 projectRoot（server.js / services/ /
+// routes/ / db/ / auth/），所有浏览器端文件归 webRoot = projectRoot/web。
+// 静态资源服务统一从 webRoot 解析路径，URL 不变（仍然是 /index.html /app.js 等）。
+const webRoot = path.join(projectRoot, "web");
 const env = loadEnvFile(path.join(projectRoot, ".env"));
 
 for (const [key, value] of Object.entries(env)) {
@@ -116,6 +120,10 @@ const STATIC_FILE_ALLOW = new Set([
   "/auth-ui.js",
   "/card-data.js",
   "/knowledge-base.js",
+  // R-23 修复（Phase C-1）：之前漏加 /book-source.js，导致 361KB 的 BOOK_OF_ELON_SOURCE
+  // 在生产环境一直 404，前端 loadBookSourceAsync 静默 fallback 到 cards-only 模式，
+  // 整本《埃隆之书》原文知识源失效。
+  "/book-source.js",
   "/model-client.js",
   "/reply-engine.js",
 ]);
@@ -993,9 +1001,12 @@ async function serveStaticFile(requestPath, response) {
   }
 
   const safePath = path.normalize(normalizedPath).replace(/^(\.\.[/\\])+/, "");
-  const filePath = path.join(projectRoot, safePath);
+  // Phase C-1: 静态资源根从 projectRoot 改为 webRoot（projectRoot/web）。
+  // 这样即便未来 normalize 漏个 case，攻击者也只能逃到 webRoot 之外（撞 webRoot
+  // 边界检查），永远进不到后端的 services/ / db/ / .env 等目录。
+  const filePath = path.join(webRoot, safePath);
 
-  if (!filePath.startsWith(projectRoot)) {
+  if (!filePath.startsWith(webRoot)) {
     return sendJson(response, 403, { error: "forbidden" });
   }
 

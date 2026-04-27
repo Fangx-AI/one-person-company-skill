@@ -3,6 +3,8 @@ const path = require("path");
 const vm = require("vm");
 
 const projectRoot = __dirname;
+// Phase C-1: 前端文件搬到 web/，CLI 模拟浏览器运行时的 runScript 也跟着改路径。
+const webRoot = path.join(projectRoot, "web");
 const defaultCaseIds = [
   "fear-start-project",
   "source-check",
@@ -70,7 +72,7 @@ function bootstrapBrowserLikeRuntime() {
 }
 
 function runScript(filename) {
-  const fullPath = path.join(projectRoot, filename);
+  const fullPath = path.join(webRoot, filename);
   const code = fs.readFileSync(fullPath, "utf8");
   vm.runInThisContext(code, { filename: fullPath });
 }

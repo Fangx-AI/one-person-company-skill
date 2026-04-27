@@ -60,6 +60,8 @@ function assert(cond, msg) {
     "/auth-ui.js",
     "/card-data.js",
     "/knowledge-base.js",
+    // R-23 修复：之前白名单漏了 book-source.js，导致 361KB 知识源 404 静默失效
+    "/book-source.js",
     "/model-client.js",
     "/reply-engine.js",
   ];
@@ -125,6 +127,11 @@ function assert(cond, msg) {
     "/data/../server.js",
     "/../etc/passwd",
     "/%2e%2e/%2e%2e/etc/passwd",
+
+    // Phase C-1：前后端分离后，web/ 是内部目录，URL 不暴露 /web/ 前缀
+    "/web/index.html",
+    "/web/app.js",
+    "/web/book-source.js",
   ];
   for (const p of deny) {
     const r = await request(p);

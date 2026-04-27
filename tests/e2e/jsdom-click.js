@@ -1,7 +1,9 @@
 const { JSDOM, VirtualConsole } = require("jsdom");
 
 (async () => {
-  const url = "http://127.0.0.1:3000/";
+  const url = process.env.SMOKE_BASE
+    ? process.env.SMOKE_BASE.replace(/\/?$/, "/")
+    : "http://127.0.0.1:3000/";
   const fetchRes = await fetch(url);
   const html = await fetchRes.text();
 
