@@ -1,5 +1,22 @@
 # CLAUDE.md — 给未来 AI agent 的驾驶员手册
 
+> ### 🚧 项目状态：maintenance (toy with paywall)
+>
+> **2026-04-27 起，本项目从「AI 创业教练 SaaS」正式降级为「maintenance 状态
+> 的个人玩具 + 付费墙」。**
+>
+> 接手前请先读 `docs/superpowers/decisions/2026-04-27-toy-mode-and-paywall.md`
+> 了解完整决策过程。要点：
+>
+> - **不再投资新功能**，只修破的东西 + 付费墙这一个例外
+> - **Wave 4 全部 CANCELLED**（R-19 staging / R-20 server.js 拆解 / R-22 二次 CSO）
+> - **存在硬性 Kill Switch**：付费墙上线后 6 个月 < 5 付费用户 → 关站流程
+> - **付费模型**：¥19.9 一次性终身 + 手机号登录后 7 天无限免费 +
+>   匿名访客永久免费（20 次/天硬限）
+>
+> 如果你（AI 或人）被要求"重新做大"或"加新特性"，**先阅读那份 decision doc
+> 再决定**。里面列了 owner 当时已经考虑过并明确否决的替代方案。
+
 这份文档是给**接手这个项目的 AI agent**看的（包括未来的 Claude / Cursor / Codex
 session）。读完这一份，你能在 15 分钟内理解：项目是什么、关键设计决策为什么这样、
 哪里有坑、改东西要先做什么。

@@ -1,5 +1,17 @@
 # Book of Elon · Comprehensive Project Audit
 
+> ### 🚧 2026-04-27 晚更新：项目已转入 toy mode
+>
+> 同日下午经 `/office-hours` 全流程，owner 将项目正式降级为「maintenance
+> 状态的玩具 + 付费墙」。详见：
+> - `docs/superpowers/decisions/2026-04-27-toy-mode-and-paywall.md`
+> - 本文档 §7 Remediation Roadmap 已同步更新：R-19 / R-20 / R-22 **CANCELLED**
+> - 新增 R-27 付费墙建设（拆分到独立 plan：
+>   `docs/superpowers/plans/2026-04-28-paywall-onboarding.md`）
+>
+> 下面的原始审计仍然有效（Wave 1-3 的 22 项全部实施或重新评估过），
+> 保留做历史记录。重点 diff：原来"Wave 4 待启动"那一段应该读作"Wave 4 已取消"。
+
 | | |
 |---|---|
 | **审计日期** | 2026-04-27 |
@@ -40,7 +52,8 @@
 | **Wave 1** | 止血（cost guardrails + .gitignore） | 4-6 h | 钱不再烧 + 心智负担 -50% | ✅ 完成 |
 | **Wave 2** | 文档重组 + 前后端分离 + 数据资产化 | 4-6 h | 单一信源 + 救火 SOP + R-23 静默 404 | ✅ 完成 |
 | **Wave 3** | CI 兜底 + 运维监控 + runbooks 全 + .env 加固 | ~9 h | 防回归 + 余额监控 + 5 份 runbook | ✅ 完成 |
-| **Wave 4** | server.js 拆解 + staging 环境 | 1-2 d | 长期可维护性 | ⬜ 待启动 |
+| **Wave 4** | server.js 拆解 + staging 环境 | 1-2 d | 长期可维护性 | ❌ CANCELLED（toy scope，2026-04-27 晚） |
+| **玩具付费墙** | R-27（拆独立 plan） | 2-3 晚 | 防刷 + demand 信号 + 自给自足 | ⬜ 规划中 |
 
 ### 还在挂着的事（Wave 3 收尾后）
 
@@ -992,10 +1005,11 @@ scripts/cleanup-claimed-sessions.js  (~10 天前加)
 | **R-16** | 🟠 P2 | 部署/运维 | 决策 Docker 路径：保留+加 CI 或删除 | 1 h | — | ✅ Wave 3。决策保留：CI `docker-build` job 每次 push 验证 Dockerfile 没漂移；Dockerfile 加注释标明决策 |
 | **R-17** | 🟠 P2 | 部署/运维 | git config + commit message convention（写到 CONTRIBUTING.md） | 30 min | — | ✅ Wave 3。`CONTRIBUTING.md` 落 conventional commits 简化版 + 文件结构红线 + review checklist + hot-fix 流程 |
 | **R-18** | 🟠 P2 | 部署/运维 | 加 GitHub Actions CI（preflight + smoke） | 1 h | R-17 | ✅ Wave 3。`.github/workflows/ci.yml` 4 个 job 并行：lint-preflight / unit-smoke / integration-smoke / docker-build |
-| **R-19** | 🟠 P2 | 部署/运维 | staging 环境（同机器子域名） | 4 h | R-18 | ⬜ Wave 4 |
-| **R-20** | 🟢 P3 | 代码/架构 | `server.js` 拆解为 `routes/` × 5 + `services/` × 3 + `middleware/` | 1-2 d | R-08（测试结构稳定后） | ⬜ Wave 4 |
+| **R-19** | 🟠 P2 | 部署/运维 | staging 环境（同机器子域名） | 4 h | R-18 | ❌ CANCELLED（2026-04-27 toy mode，see decision doc）|
+| **R-20** | 🟢 P3 | 代码/架构 | `server.js` 拆解为 `routes/` × 5 + `services/` × 3 + `middleware/` | 1-2 d | R-08（测试结构稳定后） | ❌ CANCELLED（2026-04-27 toy mode；骨架如果抽 `side-project-starter-kit` 模板时再拆）|
 | **R-21** | ✅ P3 | 部署/运维 | DR 演练（恢复一次备份） | 1 h | — | ✅ Wave 3 完成（2026-04-27 演练 PASS：`integrity_check=ok` + schema 与 prod sha256 一致；脚本固化到 `scripts/ops/dr-drill.js`，记录见 `incident-db-corruption.md` §8） |
-| **R-22** | 🟢 P3 | 安全 | 30 天后再跑 `/cso` 看回归 | 30 min | — | ⬜ 2026-05-27 |
+| **R-22** | 🟢 P3 | 安全 | 30 天后再跑 `/cso` 看回归 | 30 min | — | ❌ CANCELLED（2026-04-27 toy mode；下次大改=付费墙上线时再跑一次 CSO，由 plan doc 触发）|
+| **R-27** | 🟡 P1 | 商业/架构 | 玩具付费墙：¥19.9 一次性终身 + 登录后 7 天无限免费；见 plan doc `2026-04-28-paywall-onboarding.md`；Kill Switch：6 个月 < 5 付费用户 → 关站 | 2-3 晚 | — | ⬜ plan 编写中 |
 | **R-23** | 🔴 P0 | 安全/Bug | 修 `/book-source.js → 404` 静默 bug：白名单加 `/book-source.js` | 5 min | R-06 | ✅ Wave 2 Phase C-1 (`b8831f7`)。Phase C-2 后该 URL 已废弃为 404（数据走 `/book-source.json`）|
 | **R-24** | 🟡 P1 | 文件/目录 | 把 calibration tools (`reply-calibration.js` / `deepseek-eval.js`) 搬到 `tests/calibration/` 或 `scripts/tools/calibration/` | 30 min | R-04 | ✅ Wave 3。5 个文件（含 test-set.json + output md）git mv 到 `tests/calibration/`；`projectRoot` 回退 2 级；package.json scripts + .gitignore + .dockerignore 同步更新 |
 | **R-25** | 🔴 P0 | 安全/成本 | 修正 R-02 误判：`.env` 中 `DEEPSEEK_API_KEY` 实际仍是占位符 `disabled_due_to_abuse`；后果：站点 2+ 天对所有用户走 `[FALLBACK]`（通过 admin-report 实证）。需重新生成 key + 重启 + 验证 | 15 min | R-14 | ⏳ Wave 3 daily-report 跑通后发现；流程见 `docs/runbooks/env-management.md` § "key 轮换" |
