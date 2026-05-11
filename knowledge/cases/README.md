@@ -22,7 +22,22 @@ This directory stores structured case intelligence for the one-person-company pr
 
 ## Candidate Import Workflow
 
-Put new rows into `candidates/case-candidates.jsonl` first. Each row must be one JSON object with these fields:
+There are two ways to create candidates.
+
+### 1. Collect candidates from public URLs
+
+Use this for public product pages, founder pages, directories, and public articles where metadata is enough for a first-pass candidate.
+
+```bash
+npm run opc:collect:candidates:dry -- https://example.com/product
+npm run opc:collect:candidates -- https://example.com/product
+```
+
+The collector only reads HTML metadata such as title, meta description, Open Graph tags, and canonical URL. It does not copy article body text and it writes only low-confidence candidates with `route: ["candidate_requires_review"]`.
+
+### 2. Manually write candidate rows
+
+Put reviewed rows into `candidates/case-candidates.jsonl` first. Each row must be one JSON object with these fields:
 
 ```json
 {"id":"example_case","source_id":"src_public_product_pages","url":"https://example.com","title":"Example","language":"en","raw_signal":"Short public signal only.","name":"Example","founder_type":"solo_founder","geography":["global"],"target_user":["founders"],"product_form":["case_library"],"route":["case_intelligence_product"],"acquisition":["seo"],"delivery":["website"],"pricing":["subscription"],"summary":"Compact summary.","commercial_path":"How the case makes money.","risks":["case_facts_age_quickly"],"confidence":"medium"}
