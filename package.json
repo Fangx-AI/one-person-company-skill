@@ -48,7 +48,9 @@
 
     "opc:validate:cases": "node scripts/opc/validate-case-intelligence.js --target=v0.1",
     "opc:validate:cases:smoke": "node scripts/opc/validate-case-intelligence.js",
-    "opc:case:index": "node scripts/opc/build-case-index.js"
+    "opc:validate:cases:seed": "node scripts/opc/validate-case-intelligence.js --min-sources=30 --min-raw=30 --min-normalized=30 --min-gold=10",
+    "opc:case:index": "node scripts/opc/build-case-index.js",
+    "opc:idea:match": "node scripts/opc/match-product-idea.js"
   },
   "dependencies": {
     "better-sqlite3": "^12.9.0"

@@ -1,0 +1,138 @@
+#!/usr/bin/env node
+"use strict";
+
+const assert = require("assert");
+const fs = require("fs");
+const os = require("os");
+const path = require("path");
+
+const { matchProductIdea } = require("../../scripts/opc/match-product-idea");
+
+function writeJsonl(filePath, rows) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, rows.map((row) => JSON.stringify(row)).join("\n") + "\n", "utf8");
+}
+
+function createFixture() {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "opc-idea-match-"));
+  const base = path.join(root, "knowledge", "cases");
+
+  writeJsonl(path.join(base, "normalized", "normalized-cases.jsonl"), [
+    {
+      id: "case_xhs_content_tool",
+      raw_ids: ["raw_xhs_content_tool"],
+      name: "XHS Content Tool",
+      founder_type: "solo_founder",
+      geography: ["cn"],
+      target_user: ["creators", "xiaohongshu_sellers"],
+      product_form: ["ai_tool", "content_tool"],
+      route: ["xiaohongshu_to_paid_tool", "content_workflow_automation"],
+      acquisition: ["xiaohongshu", "public_posts", "community_feedback"],
+      delivery: ["web_app"],
+      pricing: ["subscription"],
+      evidence_urls: ["https://example.com/xhs"],
+      summary: "A tool for Xiaohongshu creators to plan titles and posts.",
+      commercial_path: "Validate with creators, sell a narrow paid workflow, then expand.",
+      risks: ["platform_algorithm_dependency", "ai_output_commodity"],
+      confidence: "medium",
+      date_checked: "2026-05-11",
+    },
+    {
+      id: "case_api_tool",
+      raw_ids: ["raw_api_tool"],
+      name: "API Tool",
+      founder_type: "solo_founder",
+      geography: ["global"],
+      target_user: ["developers"],
+      product_form: ["api_saas"],
+      route: ["developer_tool_to_b2b_saas"],
+      acquisition: ["content"],
+      delivery: ["api"],
+      pricing: ["subscription"],
+      evidence_urls: ["https://example.com/api"],
+      summary: "A developer API SaaS.",
+      commercial_path: "Ship API docs and sell to developers.",
+      risks: ["developer_tool_distribution_is_slow"],
+      confidence: "medium",
+      date_checked: "2026-05-11",
+    },
+    {
+      id: "case_daily_journal",
+      raw_ids: ["raw_daily_journal"],
+      name: "Daily Journal",
+      founder_type: "solo_founder",
+      geography: ["global"],
+      target_user: ["writers"],
+      product_form: ["habit_app"],
+      route: ["daily_writing_habit"],
+      acquisition: ["email"],
+      delivery: ["web_app"],
+      pricing: ["subscription"],
+      evidence_urls: ["https://example.com/daily"],
+      summary: "A daily writing app with email reminders.",
+      commercial_path: "Build a habit loop and charge for continuity.",
+      risks: ["consumer_churn"],
+      confidence: "high",
+      date_checked: "2026-05-11",
+    },
+  ]);
+
+  writeJsonl(path.join(base, "gold", "gold-cases.jsonl"), [
+    {
+      id: "gold_xhs_content_tool",
+      case_id: "case_xhs_content_tool",
+      score: 90,
+      why_gold: "Strong fit for domestic creator tools.",
+      reusable_lessons: ["Validate with platform-native content before building features."],
+      applicable_to: ["xiaohongshu_tool", "ai_content_tool"],
+      warning_flags: ["Do not confuse saves and comments with payment intent."],
+    },
+    {
+      id: "gold_daily_journal",
+      case_id: "case_daily_journal",
+      score: 95,
+      why_gold: "Strong habit-product benchmark, but irrelevant to Xiaohongshu AI content tooling.",
+      reusable_lessons: ["Habit loops matter."],
+      applicable_to: ["habit_app"],
+      warning_flags: ["Consumer churn is high."],
+    },
+  ]);
+
+  return root;
+}
+
+function testMatchesDomesticAiContentIdea() {
+  const result = matchProductIdea({
+    root: createFixture(),
+    idea:
+      "\u6211\u60f3\u505a\u4e00\u4e2a AI \u5c0f\u7ea2\u4e66\u9009\u9898\u52a9\u624b\uff0c\u5e2e\u535a\u4e3b\u751f\u6210\u6807\u9898\u548c\u7b14\u8bb0\u65b9\u5411",
+    limit: 3,
+  });
+
+  assert.strictEqual(result.similarCases[0].id, "case_xhs_content_tool");
+  assert(!result.similarCases.some((row) => row.id === "case_api_tool"));
+  assert(!result.similarCases.some((row) => row.id === "case_daily_journal"));
+  assert(result.extractedSignals.keywords.includes("xiaohongshu"));
+  assert(result.extractedSignals.keywords.includes("ai"));
+  assert(result.similarRoutes.some((route) => route.route === "xiaohongshu_to_paid_tool"));
+  assert(result.chinaRisks.some((risk) => risk.risk.includes("\u5e73\u53f0")));
+  assert(result.shortestValidationPath.length >= 3);
+}
+
+function testDoesNotTreatPaidAsAiSignal() {
+  const result = matchProductIdea({
+    root: createFixture(),
+    idea: "paid template for github developers",
+    limit: 3,
+  });
+
+  assert(!result.extractedSignals.keywords.includes("ai"));
+  assert(result.extractedSignals.keywords.includes("knowledge_product"));
+  assert(!result.similarCases.some((row) => row.id === "case_xhs_content_tool"));
+  assert(result.similarCases.some((row) => row.id === "case_api_tool"));
+  assert.strictEqual(result.chinaRisks.length, 0);
+}
+
+testMatchesDomesticAiContentIdea();
+testDoesNotTreatPaidAsAiSignal();
+console.log("product-idea-matcher tests passed");
