@@ -1,5 +1,7 @@
 # 一人公司作战库 Skill System Implementation Plan
 
+> Superseded by [2026-05-11-case-intelligence-first.md](./2026-05-11-case-intelligence-first.md). Kept only for historical skill-layer reference.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build the repo-local v0.1 “一人公司作战库” skill toolbox and knowledge base, with validation gates and a safe Book of Elon retirement inventory.

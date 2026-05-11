@@ -1,0 +1,290 @@
+{
+  "generated_at": "2026-05-11T08:35:17.642Z",
+  "route_count": 12,
+  "routes": {
+    "developer_tool_to_b2b_saas": [
+      {
+        "id": "case_bannerbear_api_tool",
+        "name": "Bannerbear",
+        "target_user": [
+          "developers",
+          "marketers",
+          "automation_builders"
+        ],
+        "product_form": [
+          "api_saas",
+          "image_generation_tool"
+        ],
+        "acquisition": [
+          "content",
+          "newsletter",
+          "marketing_site",
+          "customer_feedback"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "pivot_until_repeatable_use_case": [
+      {
+        "id": "case_bannerbear_api_tool",
+        "name": "Bannerbear",
+        "target_user": [
+          "developers",
+          "marketers",
+          "automation_builders"
+        ],
+        "product_form": [
+          "api_saas",
+          "image_generation_tool"
+        ],
+        "acquisition": [
+          "content",
+          "newsletter",
+          "marketing_site",
+          "customer_feedback"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "simple_tool_in_crowded_market": [
+      {
+        "id": "case_carrd_simple_builder",
+        "name": "Carrd",
+        "target_user": [
+          "creators",
+          "small_business_owners",
+          "makers"
+        ],
+        "product_form": [
+          "no_code_builder",
+          "website_tool"
+        ],
+        "acquisition": [
+          "word_of_mouth",
+          "product_led_growth",
+          "creator_community"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "feature_limitation_as_positioning": [
+      {
+        "id": "case_carrd_simple_builder",
+        "name": "Carrd",
+        "target_user": [
+          "creators",
+          "small_business_owners",
+          "makers"
+        ],
+        "product_form": [
+          "no_code_builder",
+          "website_tool"
+        ],
+        "acquisition": [
+          "word_of_mouth",
+          "product_led_growth",
+          "creator_community"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "freelance_to_product": [
+      {
+        "id": "case_inkdrop_subscription_notes",
+        "name": "Inkdrop",
+        "target_user": [
+          "developers",
+          "technical_note_takers"
+        ],
+        "product_form": [
+          "desktop_app",
+          "subscription_tool"
+        ],
+        "acquisition": [
+          "blog",
+          "developer_community",
+          "long_term_build_in_public"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "niche_subscription_app": [
+      {
+        "id": "case_inkdrop_subscription_notes",
+        "name": "Inkdrop",
+        "target_user": [
+          "developers",
+          "technical_note_takers"
+        ],
+        "product_form": [
+          "desktop_app",
+          "subscription_tool"
+        ],
+        "acquisition": [
+          "blog",
+          "developer_community",
+          "long_term_build_in_public"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "xiaohongshu_to_app_launch": [
+      {
+        "id": "case_sunally_xhs_launch",
+        "name": "Sun Ally",
+        "target_user": [
+          "health_conscious_consumers",
+          "outdoor_lifestyle_users"
+        ],
+        "product_form": [
+          "mobile_app",
+          "consumer_utility"
+        ],
+        "acquisition": [
+          "xiaohongshu",
+          "community_feedback",
+          "public_beta"
+        ],
+        "pricing": [
+          "unknown"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "interest_content_to_beta_users": [
+      {
+        "id": "case_sunally_xhs_launch",
+        "name": "Sun Ally",
+        "target_user": [
+          "health_conscious_consumers",
+          "outdoor_lifestyle_users"
+        ],
+        "product_form": [
+          "mobile_app",
+          "consumer_utility"
+        ],
+        "acquisition": [
+          "xiaohongshu",
+          "community_feedback",
+          "public_beta"
+        ],
+        "pricing": [
+          "unknown"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "existing_product_to_domestic_channel": [
+      {
+        "id": "case_midiplus_xhs_feedback",
+        "name": "谜底黑胶",
+        "target_user": [
+          "music_lovers",
+          "vinyl_and_album_collectors"
+        ],
+        "product_form": [
+          "mobile_app",
+          "media_tool"
+        ],
+        "acquisition": [
+          "xiaohongshu",
+          "creator_content",
+          "niche_community"
+        ],
+        "pricing": [
+          "unknown"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "xiaohongshu_feedback_loop": [
+      {
+        "id": "case_midiplus_xhs_feedback",
+        "name": "谜底黑胶",
+        "target_user": [
+          "music_lovers",
+          "vinyl_and_album_collectors"
+        ],
+        "product_form": [
+          "mobile_app",
+          "media_tool"
+        ],
+        "acquisition": [
+          "xiaohongshu",
+          "creator_content",
+          "niche_community"
+        ],
+        "pricing": [
+          "unknown"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "domestic_channel_intelligence": [
+      {
+        "id": "case_xhs_indie_ecosystem",
+        "name": "小红书独立开发者生态",
+        "target_user": [
+          "indie_developers",
+          "consumer_app_builders",
+          "ai_tool_builders"
+        ],
+        "product_form": [
+          "channel_signal"
+        ],
+        "acquisition": [
+          "xiaohongshu",
+          "public_posts",
+          "comments"
+        ],
+        "pricing": [
+          "not_applicable"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "xiaohongshu_as_validation_surface": [
+      {
+        "id": "case_xhs_indie_ecosystem",
+        "name": "小红书独立开发者生态",
+        "target_user": [
+          "indie_developers",
+          "consumer_app_builders",
+          "ai_tool_builders"
+        ],
+        "product_form": [
+          "channel_signal"
+        ],
+        "acquisition": [
+          "xiaohongshu",
+          "public_posts",
+          "comments"
+        ],
+        "pricing": [
+          "not_applicable"
+        ],
+        "confidence": "medium"
+      }
+    ]
+  }
+}

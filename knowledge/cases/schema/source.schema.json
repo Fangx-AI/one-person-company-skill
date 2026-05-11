@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "OPC Case Source",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "url",
+    "platform",
+    "language",
+    "priority",
+    "access",
+    "collection_method",
+    "allowed_use",
+    "risk_level",
+    "notes"
+  ],
+  "properties": {
+    "id": { "type": "string", "pattern": "^src_[a-z0-9_]+$" },
+    "name": { "type": "string", "minLength": 1 },
+    "url": { "type": "string", "format": "uri" },
+    "platform": { "type": "string", "minLength": 1 },
+    "language": { "type": "string", "minLength": 2 },
+    "priority": { "type": "integer", "minimum": 1, "maximum": 5 },
+    "access": { "type": "string", "minLength": 1 },
+    "collection_method": { "type": "string", "minLength": 1 },
+    "allowed_use": { "type": "string", "minLength": 1 },
+    "risk_level": { "enum": ["low", "medium", "high"] },
+    "notes": { "type": "string", "minLength": 1 }
+  },
+  "additionalProperties": false
+}

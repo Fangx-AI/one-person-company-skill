@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "OPC Gold Case",
+  "type": "object",
+  "required": [
+    "id",
+    "case_id",
+    "score",
+    "why_gold",
+    "reusable_lessons",
+    "applicable_to",
+    "warning_flags"
+  ],
+  "properties": {
+    "id": { "type": "string", "pattern": "^gold_[a-z0-9_]+$" },
+    "case_id": { "type": "string", "pattern": "^case_[a-z0-9_]+$" },
+    "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "why_gold": { "type": "string", "minLength": 1 },
+    "reusable_lessons": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "applicable_to": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+    "warning_flags": { "type": "array", "items": { "type": "string" }, "minItems": 1 }
+  },
+  "additionalProperties": false
+}

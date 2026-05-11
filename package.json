@@ -44,7 +44,11 @@
     "db:backup": "node scripts/ops/backup-db.js",
     "db:migrate": "node scripts/ops/migrate.js",
     "db:migrate:apply": "node scripts/ops/migrate.js --apply",
-    "db:dr-drill": "node scripts/ops/dr-drill.js"
+    "db:dr-drill": "node scripts/ops/dr-drill.js",
+
+    "opc:validate:cases": "node scripts/opc/validate-case-intelligence.js --target=v0.1",
+    "opc:validate:cases:smoke": "node scripts/opc/validate-case-intelligence.js",
+    "opc:case:index": "node scripts/opc/build-case-index.js"
   },
   "dependencies": {
     "better-sqlite3": "^12.9.0"

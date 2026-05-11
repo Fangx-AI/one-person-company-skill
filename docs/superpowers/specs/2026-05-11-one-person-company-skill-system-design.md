@@ -121,6 +121,29 @@
 
 参考 `dbskill` 的启发，本产品不应是单一 prompt，而应是多 skill 工具箱 + 知识库。
 
+### 3.0 情报库优先
+
+本产品的第一资产不是 skill，而是 **案例情报库**。
+
+skill 只负责入口和诊断，真正的价值来自把用户的产品思路对上大量相似案例，然后直接输出：
+
+- 相似产品
+- 相似路径
+- 商业断点
+- 国内迁移风险
+- 下一步路线
+
+因此，v0.1 的底座应优先建设情报库，而不是先追求 skill 数量。
+
+情报库的最小结构分六层：
+
+- `raw_sources`：原始来源索引
+- `raw_cases`：原始案例记录
+- `normalized_cases`：清洗后的统一案例
+- `case_routes`：获客、转化、交付、复购路径
+- `case_atoms`：可复用判断卡片
+- `gold_cases`：高质量精拆案例
+
 ### 3.1 v0.1 最小工具箱
 
 第一版只做 5 个核心 skill，不一次性铺太大。
@@ -166,6 +189,11 @@
 - 案例和坑位会越来越多，必须能按主题、阶段、路线检索。
 - 想做到“专业”，就必须把知识沉淀成资产，而不是把希望押在模型聪明上。
 
+在这个产品里，资产分两类：
+
+- **情报资产**：案例、产品、路径、价格、获客方式、失败信号。
+- **方法资产**：判断公式、诊断框架、表达协议、质量 rubric。
+
 一个具体例子：
 
 用户问：“我做官网是不是要先备案？”
@@ -183,7 +211,7 @@
 
 这就是知识库的价值：不是让答案更长，而是让答案更准、更稳、更像懂国内实战的人。
 
-### 4.2 总目录
+### 4.2 情报库的数据层
 
 ```text
 one-person-company/
@@ -212,6 +240,12 @@ skills/
   opc-china-reality/
 
 knowledge/
+  cases/
+    source-map.jsonl
+    raw/
+    normalized/
+    gold/
+    indexes/
   atoms/
     atoms.jsonl
   packs/
@@ -225,7 +259,16 @@ knowledge/
     quality-rubric.md
 ```
 
-### 4.3 知识原子格式
+### 4.3 情报库使用规则
+
+情报库不是“全网链接堆砌”，而是要把公开信息压成可检索结构：
+
+1. 原始记录先保留来源、上下文和抓取时间。
+2. 清洗层把产品、用户、获客、转化、交付、复购、风险统一字段化。
+3. gold case 负责直接回答相似产品、相似路径和商业断点。
+4. `atoms.jsonl` 负责沉淀可复用判断，不代替案例层。
+
+### 4.4 知识原子格式
 
 模仿 dbskill 的原子库思想，但字段服务于“一人公司”。
 
@@ -260,7 +303,7 @@ knowledge/
 | `risk` | policy / platform / cost / legal / execution / delivery |
 | `confidence` | high / medium / low |
 
-### 4.4 可信度规则
+### 4.5 可信度规则
 
 - 官方规则类内容必须有官方来源或注明需复查。
 - 案例类内容必须区分“公开事实”和“推断”。
@@ -353,6 +396,15 @@ knowledge/
 - 国内一人公司方法论与实践：EasyChen、一人公司方法论、独立开发者、知识付费、私域、内容 IP、AI 工具案例
 - dbskill / dontbesilent 作为结构参考：原子库、多 skill 路由、诊断与内容工具箱
 - 失败案例：做完产品没人买、内容涨粉不变现、低价课交付拖死、工具订阅无人续费、私域被封、备案/支付卡住
+
+对用户输入的产品思路，系统优先匹配这几类案例维度：
+
+- 产品形态相似
+- 用户群体相似
+- 获客路径相似
+- 交付结构相似
+- 收费模型相似
+- 失败方式相似
 
 每个案例必须按统一模板拆：
 
@@ -458,6 +510,15 @@ knowledge/
 - 坚持下去
 
 这些词不是不能用，而是不能作为结论。
+
+### 7.4 产品思路输入协议
+
+当用户直接输入一个产品思路时，回答必须优先输出四件事：
+
+1. **相似产品**：至少 3 个。
+2. **相似路径**：至少 2 条。
+3. **商业断点**：一句话指出主问题。
+4. **下一步路线**：给出最短验证路径。
 
 ---
 
@@ -574,6 +635,7 @@ knowledge/
 
 ### 必做
 
+- 案例情报库最小版本：1000 条 raw source / raw case、300 条 normalized case、50 条 gold case
 - `opc` 主入口设计
 - `opc-diagnosis` 商业诊断设计
 - `opc-content` 自媒体/内容商业诊断设计
@@ -659,22 +721,24 @@ knowledge/
 v0.1 成功不是“能回答”，而是：
 
 1. 对 20 个压力测试问题，平均评分 >= 8/10。
-2. 每个回答都能指出商业断点，而不是泛泛建议。
+2. 每个回答都能先给相似产品和相似路径，而不是泛泛建议。
 3. 遇到国内现实问题，能给出权衡，而不是单一路径。
 4. 回答能引用案例结构或来源，不靠空口权威。
-5. 用户读完能感觉“这不是普通大模型会说的话”。
+5. 情报库覆盖至少 1000 条原始线索、300 条清洗案例、50 条 gold case。
+6. 用户读完能感觉“这不是普通大模型会说的话”。
 
 ---
 
 ## 14. 下一步实施路线
 
 1. Owner 审阅本蓝图，确认产品方向。
-2. 写 `opc` / `opc-diagnosis` / `opc-content` / `opc-china-reality` 的详细 skill spec。
-3. 建立第一版知识库目录和 50-100 条原子。
-4. 用 20 个压力测试问题做 baseline：普通模型回答 vs skill 回答。
-5. 根据评分迭代 skill。
-6. 做 Book of Elon 本地资产清单，标记保留、归档、删除三类。
-7. 等 skill 通过压力测试后，再决定是否把旧网站代码改造成这个 skill 的前端体验，或直接废弃旧前端。
+2. 先建立案例情报库最小版本：source map、抓取器、清洗器、gold case 模板。
+3. 再写 `opc` / `opc-diagnosis` / `opc-content` / `opc-china-reality` 的详细 skill spec。
+4. 建立第一版知识库目录和 50-100 条原子。
+5. 用 20 个压力测试问题做 baseline：普通模型回答 vs skill 回答。
+6. 根据评分迭代 skill 和案例检索。
+7. 做 Book of Elon 本地资产清单，标记保留、归档、删除三类。
+8. 等 skill 通过压力测试后，再决定是否把旧网站代码改造成这个 skill 的前端体验，或直接废弃旧前端。
 
 ---
 
@@ -689,7 +753,7 @@ v0.1 成功不是“能回答”，而是：
 待确认：
 
 1. 产品名称暂定 **一人公司作战库**；后续如果出现更强名字，再整体替换。
-2. 知识库采用 `atoms.jsonl + packs/*.md`：本蓝图已解释其价值，仍需 owner 确认是否接受。
+2. 情报库优先的六层结构（raw sources / raw cases / normalized cases / case routes / case atoms / gold cases）是否作为正式底座。
 3. 新 skill 是放在本仓库内作为产品资产，还是安装到本机 Codex skills 目录用于直接调用；建议先放本仓库，等稳定后再安装。
 
 ---
@@ -699,5 +763,10 @@ v0.1 成功不是“能回答”，而是：
 - dbskill: https://github.com/dontbesilent2025/dbskill
 - 一人公司方法论: https://github.com/easychen/one-person-businesses-methodology
 - Awesome Indie Hackers: https://github.com/johackim/awesome-indiehackers
+- Qiit 一人公司案例库: https://qiit.com/cases
+- 1 Person Business: https://1person.biz/
+- OPCBASE 案例: https://opcbase.net/articles/cases
+- OPC圈: https://www.opcquan.com/
+- Starter Story solopreneurs report: https://www.starterstory.com/stories/starter-story-solopreneurs-report
 - 腾讯云 ICP 备案云资源说明: https://cloud.tencent.cn/document/product/243/18908
 - 阿里云 ICP 备案服务器信息确认: https://www.alibabacloud.com/help/zh/icp-filing/basic-icp-service/user-guide/icp-filing-server-access-information-check
