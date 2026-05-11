@@ -48,7 +48,7 @@
 
     "opc:validate:cases": "node scripts/opc/validate-case-intelligence.js --target=v0.1",
     "opc:validate:cases:smoke": "node scripts/opc/validate-case-intelligence.js",
-    "opc:validate:cases:seed": "node scripts/opc/validate-case-intelligence.js --min-sources=30 --min-raw=30 --min-normalized=30 --min-gold=10",
+    "opc:validate:cases:seed": "node scripts/opc/validate-case-intelligence.js --min-sources=30 --min-raw=100 --min-normalized=100 --min-gold=30",
     "opc:case:index": "node scripts/opc/build-case-index.js",
     "opc:idea:match": "node scripts/opc/match-product-idea.js",
     "opc:case:context:test": "node tests/opc/case-context.test.js && node tests/opc/case-context-server-boundary.test.js"

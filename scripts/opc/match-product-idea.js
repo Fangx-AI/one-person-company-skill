@@ -9,6 +9,21 @@ const signalDictionary = [
   { pattern: /\bAI\b|\u4eba\u5de5\u667a\u80fd|\u5927\u6a21\u578b|\bLLM\b/i, keyword: "ai" },
   {
     pattern:
+      /headshot|profile\s*picture|avatar|photo|image|\u804c\u4e1a\u7167|\u8bc1\u4ef6\u7167|\u5934\u50cf|\u7167\u7247|\u56fe\u7247|\u4fee\u56fe|\u6444\u5f71/i,
+    keyword: "visual_ai",
+  },
+  {
+    pattern: /headshot|\u804c\u4e1a\u7167|\u8bc1\u4ef6\u7167|\u5546\u52a1\u7167|\u5de5\u4f5c\u7167/i,
+    keyword: "headshot",
+  },
+  {
+    pattern:
+      /\u6848\u4f8b|case|\u60c5\u62a5|\u6570\u636e\u5e93|\u8d44\u6599\u5e93|\u5546\u4e1a\u8def\u7ebf|\u5546\u4e1a\u8def\u5f84|\u8def\u7ebf\u89c4\u5212|\u4e00\u4eba\u516c\u53f8|\u521b\u4e1a\u6848\u4f8b|founder\s*story/i,
+    keyword: "case_intelligence",
+  },
+  { pattern: /notion/i, keyword: "notion" },
+  {
+    pattern:
       /\u9009\u9898|\u6807\u9898|\u7b14\u8bb0|\u5185\u5bb9|\u516c\u4f17\u53f7|\u81ea\u5a92\u4f53|\u535a\u4e3b|creator|\u77ed\u89c6\u9891|\u89c6\u9891|\u64ad\u5ba2/i,
     keyword: "content",
   },
@@ -45,6 +60,46 @@ const keywordAliases = {
     "voice_to_text",
     "manual_workflow_to_automation",
     "ai_output_commodity",
+  ],
+  visual_ai: [
+    "ai_image_tool",
+    "ai_image_service",
+    "ai_avatar_tool",
+    "ai_photo_pack",
+    "professional_photo_tool",
+    "visual_workflow_automation",
+    "ai_outcome_product",
+    "clear_willingness_to_pay",
+    "professionals",
+    "photo",
+    "image",
+    "avatar",
+    "headshot",
+  ],
+  headshot: [
+    "headshot",
+    "professional_photo_tool",
+    "ai_outcome_product",
+    "clear_willingness_to_pay",
+  ],
+  case_intelligence: [
+    "case_library",
+    "founder_story_library",
+    "case_intelligence_product",
+    "content_database_to_paid_research",
+    "founder_intelligence",
+    "business_idea_researchers",
+    "paid_research",
+    "research_archive",
+    "founder stories",
+  ],
+  notion: [
+    "notion",
+    "notion_tool",
+    "notion_site_builder",
+    "notion_to_website_workflow",
+    "notion_community",
+    "platform_layer_on_existing_tool",
   ],
   xiaohongshu: [
     "xiaohongshu",
@@ -116,6 +171,22 @@ const keywordAliases = {
   china: ["cn", "xiaohongshu", "wechat", "domestic_channel_intelligence"],
 };
 
+const keywordWeights = {
+  ai: 7,
+  content: 7,
+  saas: 6,
+  automation: 7,
+  freelancer_ops: 10,
+  developer: 10,
+  knowledge_product: 10,
+  china: 10,
+  xiaohongshu: 18,
+  visual_ai: 14,
+  headshot: 18,
+  case_intelligence: 18,
+  notion: 18,
+};
+
 function readJsonl(filePath) {
   if (!fs.existsSync(filePath)) return [];
   return fs
@@ -167,7 +238,7 @@ function scoreCase(row, signals) {
     const matched = aliases.filter((alias) => haystack.includes(alias.toLowerCase()));
     if (matched.length > 0) {
       const cappedMatchCount = Math.min(matched.length, 4);
-      baseScore += 10 + cappedMatchCount * 2;
+      baseScore += (keywordWeights[keyword] || 10) + cappedMatchCount * 2;
       reasons.push(`${keyword}: ${matched.slice(0, 3).join(", ")}`);
     }
   }

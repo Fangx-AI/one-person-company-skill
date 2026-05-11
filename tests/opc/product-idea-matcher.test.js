@@ -75,6 +75,63 @@ function createFixture() {
       confidence: "high",
       date_checked: "2026-05-11",
     },
+    {
+      id: "case_ai_headshot",
+      raw_ids: ["raw_ai_headshot"],
+      name: "AI Headshot Tool",
+      founder_type: "solo_founder",
+      geography: ["global"],
+      target_user: ["professionals", "small_teams"],
+      product_form: ["ai_image_service", "professional_photo_tool"],
+      route: ["ai_outcome_product", "clear_willingness_to_pay"],
+      acquisition: ["seo"],
+      delivery: ["web_app"],
+      pricing: ["one_time_purchase"],
+      evidence_urls: ["https://example.com/headshot"],
+      summary: "A professional AI headshot product for individuals and teams.",
+      commercial_path: "Sell finished professional photos against the offline alternative cost.",
+      risks: ["output_quality_variance"],
+      confidence: "medium",
+      date_checked: "2026-05-11",
+    },
+    {
+      id: "case_case_library",
+      raw_ids: ["raw_case_library"],
+      name: "Founder Case Library",
+      founder_type: "solo_founder",
+      geography: ["global"],
+      target_user: ["founders", "business_idea_researchers"],
+      product_form: ["case_library", "paid_research"],
+      route: ["case_intelligence_product", "content_database_to_paid_research"],
+      acquisition: ["seo", "newsletter"],
+      delivery: ["website"],
+      pricing: ["subscription"],
+      evidence_urls: ["https://example.com/cases"],
+      summary: "A structured case library for founders evaluating product ideas.",
+      commercial_path: "Normalize many founder stories into searchable commercial patterns.",
+      risks: ["case_facts_age_quickly"],
+      confidence: "medium",
+      date_checked: "2026-05-11",
+    },
+    {
+      id: "case_notion_site",
+      raw_ids: ["raw_notion_site"],
+      name: "Notion Site Builder",
+      founder_type: "solo_founder",
+      geography: ["global"],
+      target_user: ["notion_users", "creators"],
+      product_form: ["notion_site_builder", "no_code_tool"],
+      route: ["notion_to_website_workflow", "platform_layer_on_existing_tool"],
+      acquisition: ["notion_community", "templates"],
+      delivery: ["web_app"],
+      pricing: ["subscription"],
+      evidence_urls: ["https://example.com/notion"],
+      summary: "A tool that turns Notion pages into creator websites.",
+      commercial_path: "Sell the missing publishing layer to users already maintaining content in Notion.",
+      risks: ["platform_dependency"],
+      confidence: "medium",
+      date_checked: "2026-05-11",
+    },
   ]);
 
   writeJsonl(path.join(base, "gold", "gold-cases.jsonl"), [
@@ -133,6 +190,46 @@ function testDoesNotTreatPaidAsAiSignal() {
   assert.strictEqual(result.chinaRisks.length, 0);
 }
 
+function testMatchesAiHeadshotOutcomeProduct() {
+  const result = matchProductIdea({
+    root: createFixture(),
+    idea: "AI headshot product for professionals and small teams",
+    limit: 3,
+  });
+
+  assert(result.extractedSignals.keywords.includes("visual_ai"));
+  assert(result.similarCases.some((row) => row.id === "case_ai_headshot"));
+  assert(result.similarCases.find((row) => row.id === "case_ai_headshot").score >= result.similarCases[0].score - 5);
+}
+
+function testMatchesCaseIntelligenceIdea() {
+  const result = matchProductIdea({
+    root: createFixture(),
+    idea:
+      "\u6211\u60f3\u505a\u4e00\u4e2a\u4e00\u4eba\u516c\u53f8\u6848\u4f8b\u68c0\u7d22\u548c\u5546\u4e1a\u8def\u7ebf\u89c4\u5212\u5de5\u5177",
+    limit: 3,
+  });
+
+  assert(result.extractedSignals.keywords.includes("case_intelligence"));
+  assert(result.similarCases.some((row) => row.id === "case_case_library"));
+  assert(result.similarCases.find((row) => row.id === "case_case_library").score >= result.similarCases[0].score - 5);
+}
+
+function testMatchesNotionSiteBuilder() {
+  const result = matchProductIdea({
+    root: createFixture(),
+    idea: "Notion \u5efa\u7ad9\u5de5\u5177 for creators",
+    limit: 3,
+  });
+
+  assert(result.extractedSignals.keywords.includes("notion"));
+  assert(result.similarCases.some((row) => row.id === "case_notion_site"));
+  assert(result.similarCases.find((row) => row.id === "case_notion_site").score >= result.similarCases[0].score - 5);
+}
+
 testMatchesDomesticAiContentIdea();
 testDoesNotTreatPaidAsAiSignal();
+testMatchesAiHeadshotOutcomeProduct();
+testMatchesCaseIntelligenceIdea();
+testMatchesNotionSiteBuilder();
 console.log("product-idea-matcher tests passed");

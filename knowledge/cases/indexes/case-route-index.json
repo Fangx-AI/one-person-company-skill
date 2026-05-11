@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-05-11T10:05:40.587Z",
-  "route_count": 56,
+  "generated_at": "2026-05-11T13:29:39.720Z",
+  "route_count": 189,
   "routes": {
     "developer_tool_to_b2b_saas": [
       {
@@ -96,6 +96,28 @@
         ],
         "pricing": [
           "freemium",
+          "subscription"
+        ],
+        "confidence": "medium"
+      },
+      {
+        "id": "case_umso_landing_pages",
+        "name": "Umso",
+        "target_user": [
+          "startup_founders",
+          "saas_builders",
+          "marketers"
+        ],
+        "product_form": [
+          "landing_page_builder",
+          "no_code_tool"
+        ],
+        "acquisition": [
+          "seo",
+          "templates",
+          "product_hunt"
+        ],
+        "pricing": [
           "subscription"
         ],
         "confidence": "medium"
@@ -636,6 +658,28 @@
           "content",
           "open_source",
           "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      },
+      {
+        "id": "case_simpleanalytics_privacy",
+        "name": "Simple Analytics",
+        "target_user": [
+          "website_operators",
+          "privacy_first_teams",
+          "small_businesses"
+        ],
+        "product_form": [
+          "analytics_saas",
+          "privacy_tool"
+        ],
+        "acquisition": [
+          "content",
+          "seo",
+          "values_based_word_of_mouth"
         ],
         "pricing": [
           "subscription"
@@ -1453,6 +1497,3404 @@
           "content",
           "reddit",
           "founder_community"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "public_data_to_paid_community": [
+      {
+        "id": "case_nomadlist_remote_lifestyle",
+        "name": "Nomad List",
+        "target_user": [
+          "remote_workers",
+          "digital_nomads",
+          "founders"
+        ],
+        "product_form": [
+          "community",
+          "data_product",
+          "membership"
+        ],
+        "acquisition": [
+          "seo",
+          "community",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "membership",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "niche_identity_business": [
+      {
+        "id": "case_nomadlist_remote_lifestyle",
+        "name": "Nomad List",
+        "target_user": [
+          "remote_workers",
+          "digital_nomads",
+          "founders"
+        ],
+        "product_form": [
+          "community",
+          "data_product",
+          "membership"
+        ],
+        "acquisition": [
+          "seo",
+          "community",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "membership",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "niche_job_board": [
+      {
+        "id": "case_remoteok_job_board",
+        "name": "Remote OK",
+        "target_user": [
+          "remote_workers",
+          "hiring_teams",
+          "startup_operators"
+        ],
+        "product_form": [
+          "job_board",
+          "media_marketplace"
+        ],
+        "acquisition": [
+          "seo",
+          "social",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "job_posting",
+          "featured_listing"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "seo_demand_capture": [
+      {
+        "id": "case_remoteok_job_board",
+        "name": "Remote OK",
+        "target_user": [
+          "remote_workers",
+          "hiring_teams",
+          "startup_operators"
+        ],
+        "product_form": [
+          "job_board",
+          "media_marketplace"
+        ],
+        "acquisition": [
+          "seo",
+          "social",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "job_posting",
+          "featured_listing"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "ai_wrapper_to_outcome_product": [
+      {
+        "id": "case_photoai_ai_photos",
+        "name": "Photo AI",
+        "target_user": [
+          "creators",
+          "ecommerce_sellers",
+          "professionals"
+        ],
+        "product_form": [
+          "ai_image_tool",
+          "prosumer_tool"
+        ],
+        "acquisition": [
+          "seo",
+          "social",
+          "creator_audience"
+        ],
+        "pricing": [
+          "credit_pack",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "visual_workflow_automation": [
+      {
+        "id": "case_photoai_ai_photos",
+        "name": "Photo AI",
+        "target_user": [
+          "creators",
+          "ecommerce_sellers",
+          "professionals"
+        ],
+        "product_form": [
+          "ai_image_tool",
+          "prosumer_tool"
+        ],
+        "acquisition": [
+          "seo",
+          "social",
+          "creator_audience"
+        ],
+        "pricing": [
+          "credit_pack",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "before_after_ai_utility": [
+      {
+        "id": "case_interiorai_design_ai",
+        "name": "Interior AI",
+        "target_user": [
+          "homeowners",
+          "interior_designers",
+          "real_estate_marketers"
+        ],
+        "product_form": [
+          "ai_image_tool",
+          "design_preview_tool"
+        ],
+        "acquisition": [
+          "seo",
+          "social_visual_sharing",
+          "press"
+        ],
+        "pricing": [
+          "credit_pack",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "vertical_ai_tool": [
+      {
+        "id": "case_interiorai_design_ai",
+        "name": "Interior AI",
+        "target_user": [
+          "homeowners",
+          "interior_designers",
+          "real_estate_marketers"
+        ],
+        "product_form": [
+          "ai_image_tool",
+          "design_preview_tool"
+        ],
+        "acquisition": [
+          "seo",
+          "social_visual_sharing",
+          "press"
+        ],
+        "pricing": [
+          "credit_pack",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "fast_ai_trend_launch": [
+      {
+        "id": "case_avatarai_photo_pack",
+        "name": "Avatar AI",
+        "target_user": [
+          "creators",
+          "social_media_users",
+          "professionals"
+        ],
+        "product_form": [
+          "ai_image_pack",
+          "consumer_ai_tool"
+        ],
+        "acquisition": [
+          "social",
+          "press",
+          "founder_audience"
+        ],
+        "pricing": [
+          "one_time_pack"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "paid_digital_pack": [
+      {
+        "id": "case_avatarai_photo_pack",
+        "name": "Avatar AI",
+        "target_user": [
+          "creators",
+          "social_media_users",
+          "professionals"
+        ],
+        "product_form": [
+          "ai_image_pack",
+          "consumer_ai_tool"
+        ],
+        "acquisition": [
+          "social",
+          "press",
+          "founder_audience"
+        ],
+        "pricing": [
+          "one_time_pack"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "ux_layer_on_model_api": [
+      {
+        "id": "case_typingmind_ai_chat_client",
+        "name": "TypingMind",
+        "target_user": [
+          "ai_power_users",
+          "founders",
+          "knowledge_workers"
+        ],
+        "product_form": [
+          "ai_client",
+          "productivity_tool"
+        ],
+        "acquisition": [
+          "founder_audience",
+          "product_hunt",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "one_time_license",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "prosumer_ai_tool": [
+      {
+        "id": "case_typingmind_ai_chat_client",
+        "name": "TypingMind",
+        "target_user": [
+          "ai_power_users",
+          "founders",
+          "knowledge_workers"
+        ],
+        "product_form": [
+          "ai_client",
+          "productivity_tool"
+        ],
+        "acquisition": [
+          "founder_audience",
+          "product_hunt",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "one_time_license",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "platform_workflow_tool": [
+      {
+        "id": "case_blackmagic_twitter_tool",
+        "name": "Black Magic",
+        "target_user": [
+          "creators",
+          "twitter_power_users",
+          "indie_founders"
+        ],
+        "product_form": [
+          "social_media_tool",
+          "analytics_saas"
+        ],
+        "acquisition": [
+          "twitter",
+          "build_in_public",
+          "creator_word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      },
+      {
+        "id": "case_hypefury_social_tool",
+        "name": "Hypefury",
+        "target_user": [
+          "creators",
+          "founders",
+          "newsletter_writers"
+        ],
+        "product_form": [
+          "social_media_tool",
+          "creator_saas"
+        ],
+        "acquisition": [
+          "twitter",
+          "creator_referrals",
+          "content"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "creator_growth_saas": [
+      {
+        "id": "case_blackmagic_twitter_tool",
+        "name": "Black Magic",
+        "target_user": [
+          "creators",
+          "twitter_power_users",
+          "indie_founders"
+        ],
+        "product_form": [
+          "social_media_tool",
+          "analytics_saas"
+        ],
+        "acquisition": [
+          "twitter",
+          "build_in_public",
+          "creator_word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "tiny_daily_workflow_tool": [
+      {
+        "id": "case_devutils_mac_tool",
+        "name": "DevUtils",
+        "target_user": [
+          "developers",
+          "mac_power_users"
+        ],
+        "product_form": [
+          "desktop_app",
+          "developer_utility"
+        ],
+        "acquisition": [
+          "developer_community",
+          "product_hunt",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "one_time_license",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "native_app_for_developers": [
+      {
+        "id": "case_devutils_mac_tool",
+        "name": "DevUtils",
+        "target_user": [
+          "developers",
+          "mac_power_users"
+        ],
+        "product_form": [
+          "desktop_app",
+          "developer_utility"
+        ],
+        "acquisition": [
+          "developer_community",
+          "product_hunt",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "one_time_license",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "polished_micro_utility": [
+      {
+        "id": "case_xnapper_screenshot_tool",
+        "name": "Xnapper",
+        "target_user": [
+          "creators",
+          "founders",
+          "developers"
+        ],
+        "product_form": [
+          "desktop_app",
+          "creator_tool"
+        ],
+        "acquisition": [
+          "twitter",
+          "creator_word_of_mouth",
+          "product_hunt"
+        ],
+        "pricing": [
+          "one_time_license",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "creator_workflow_tool": [
+      {
+        "id": "case_xnapper_screenshot_tool",
+        "name": "Xnapper",
+        "target_user": [
+          "creators",
+          "founders",
+          "developers"
+        ],
+        "product_form": [
+          "desktop_app",
+          "creator_tool"
+        ],
+        "acquisition": [
+          "twitter",
+          "creator_word_of_mouth",
+          "product_hunt"
+        ],
+        "pricing": [
+          "one_time_license",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "trust_workflow_saas": [
+      {
+        "id": "case_testimonialto_social_proof",
+        "name": "Testimonial.to",
+        "target_user": [
+          "saas_founders",
+          "course_creators",
+          "service_businesses"
+        ],
+        "product_form": [
+          "b2b_saas",
+          "social_proof_tool"
+        ],
+        "acquisition": [
+          "seo",
+          "word_of_mouth",
+          "customer_badges"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription"
+        ],
+        "confidence": "medium"
+      },
+      {
+        "id": "case_senja_testimonials",
+        "name": "Senja",
+        "target_user": [
+          "creators",
+          "saas_founders",
+          "course_sellers"
+        ],
+        "product_form": [
+          "testimonial_tool",
+          "social_proof_saas"
+        ],
+        "acquisition": [
+          "seo",
+          "social",
+          "customer_badges"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "simple_b2b_painkiller": [
+      {
+        "id": "case_testimonialto_social_proof",
+        "name": "Testimonial.to",
+        "target_user": [
+          "saas_founders",
+          "course_creators",
+          "service_businesses"
+        ],
+        "product_form": [
+          "b2b_saas",
+          "social_proof_tool"
+        ],
+        "acquisition": [
+          "seo",
+          "word_of_mouth",
+          "customer_badges"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "ai_wrapper_to_specific_file_workflow": [
+      {
+        "id": "case_pdfai_chat_pdf",
+        "name": "PDF.ai",
+        "target_user": [
+          "students",
+          "researchers",
+          "professionals"
+        ],
+        "product_form": [
+          "ai_document_tool",
+          "knowledge_tool"
+        ],
+        "acquisition": [
+          "seo",
+          "paid_search",
+          "product_hunt"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "seo_ai_utility": [
+      {
+        "id": "case_pdfai_chat_pdf",
+        "name": "PDF.ai",
+        "target_user": [
+          "students",
+          "researchers",
+          "professionals"
+        ],
+        "product_form": [
+          "ai_document_tool",
+          "knowledge_tool"
+        ],
+        "acquisition": [
+          "seo",
+          "paid_search",
+          "product_hunt"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "platform_layer_on_existing_tool": [
+      {
+        "id": "case_feather_notion_blog",
+        "name": "Feather",
+        "target_user": [
+          "founders",
+          "marketers",
+          "creators"
+        ],
+        "product_form": [
+          "notion_tool",
+          "cms_tool"
+        ],
+        "acquisition": [
+          "seo",
+          "creator_audience",
+          "templates"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      },
+      {
+        "id": "case_bullet_notion_site",
+        "name": "Bullet.so",
+        "target_user": [
+          "notion_users",
+          "creators",
+          "small_businesses"
+        ],
+        "product_form": [
+          "notion_site_builder",
+          "no_code_tool"
+        ],
+        "acquisition": [
+          "notion_community",
+          "seo",
+          "templates"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "content_workflow_saas": [
+      {
+        "id": "case_feather_notion_blog",
+        "name": "Feather",
+        "target_user": [
+          "founders",
+          "marketers",
+          "creators"
+        ],
+        "product_form": [
+          "notion_tool",
+          "cms_tool"
+        ],
+        "acquisition": [
+          "seo",
+          "creator_audience",
+          "templates"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "simple_developer_observability": [
+      {
+        "id": "case_logsnag_event_tracking",
+        "name": "LogSnag",
+        "target_user": [
+          "indie_founders",
+          "developers",
+          "saas_operators"
+        ],
+        "product_form": [
+          "developer_tool",
+          "monitoring_saas"
+        ],
+        "acquisition": [
+          "developer_community",
+          "product_hunt",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "maker_tool": [
+      {
+        "id": "case_logsnag_event_tracking",
+        "name": "LogSnag",
+        "target_user": [
+          "indie_founders",
+          "developers",
+          "saas_operators"
+        ],
+        "product_form": [
+          "developer_tool",
+          "monitoring_saas"
+        ],
+        "acquisition": [
+          "developer_community",
+          "product_hunt",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "crowded_market_with_better_workflow": [
+      {
+        "id": "case_savvycal_scheduling",
+        "name": "SavvyCal",
+        "target_user": [
+          "consultants",
+          "founders",
+          "sales_teams"
+        ],
+        "product_form": [
+          "scheduling_saas",
+          "productivity_tool"
+        ],
+        "acquisition": [
+          "founder_audience",
+          "content",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "trust_led_bootstrapping": [
+      {
+        "id": "case_savvycal_scheduling",
+        "name": "SavvyCal",
+        "target_user": [
+          "consultants",
+          "founders",
+          "sales_teams"
+        ],
+        "product_form": [
+          "scheduling_saas",
+          "productivity_tool"
+        ],
+        "acquisition": [
+          "founder_audience",
+          "content",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "creator_infrastructure_saas": [
+      {
+        "id": "case_transistor_podcast_hosting",
+        "name": "Transistor",
+        "target_user": [
+          "podcasters",
+          "creators",
+          "companies"
+        ],
+        "product_form": [
+          "creator_infrastructure",
+          "hosting_saas"
+        ],
+        "acquisition": [
+          "podcast_audience",
+          "content",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "content_led_bootstrap": [
+      {
+        "id": "case_transistor_podcast_hosting",
+        "name": "Transistor",
+        "target_user": [
+          "podcasters",
+          "creators",
+          "companies"
+        ],
+        "product_form": [
+          "creator_infrastructure",
+          "hosting_saas"
+        ],
+        "acquisition": [
+          "podcast_audience",
+          "content",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "simple_tool_against_incumbent": [
+      {
+        "id": "case_simpleanalytics_privacy",
+        "name": "Simple Analytics",
+        "target_user": [
+          "website_operators",
+          "privacy_first_teams",
+          "small_businesses"
+        ],
+        "product_form": [
+          "analytics_saas",
+          "privacy_tool"
+        ],
+        "acquisition": [
+          "content",
+          "seo",
+          "values_based_word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "privacy_first_saas": [
+      {
+        "id": "case_fathom_privacy_analytics",
+        "name": "Fathom Analytics",
+        "target_user": [
+          "website_operators",
+          "agencies",
+          "privacy_conscious_teams"
+        ],
+        "product_form": [
+          "analytics_saas",
+          "privacy_tool"
+        ],
+        "acquisition": [
+          "content",
+          "affiliate",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "simple_tool_against_free_incumbent": [
+      {
+        "id": "case_fathom_privacy_analytics",
+        "name": "Fathom Analytics",
+        "target_user": [
+          "website_operators",
+          "agencies",
+          "privacy_conscious_teams"
+        ],
+        "product_form": [
+          "analytics_saas",
+          "privacy_tool"
+        ],
+        "acquisition": [
+          "content",
+          "affiliate",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "developer_tool_in_crowded_market": [
+      {
+        "id": "case_panelbear_analytics",
+        "name": "Panelbear",
+        "target_user": [
+          "developers",
+          "indie_founders",
+          "small_teams"
+        ],
+        "product_form": [
+          "analytics_saas",
+          "monitoring_tool"
+        ],
+        "acquisition": [
+          "developer_community",
+          "product_hunt",
+          "content"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription"
+        ],
+        "confidence": "low"
+      }
+    ],
+    "small_tool_distribution_lesson": [
+      {
+        "id": "case_panelbear_analytics",
+        "name": "Panelbear",
+        "target_user": [
+          "developers",
+          "indie_founders",
+          "small_teams"
+        ],
+        "product_form": [
+          "analytics_saas",
+          "monitoring_tool"
+        ],
+        "acquisition": [
+          "developer_community",
+          "product_hunt",
+          "content"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription"
+        ],
+        "confidence": "low"
+      }
+    ],
+    "narrow_b2b_widget": [
+      {
+        "id": "case_storemapper_locator_saas",
+        "name": "Storemapper",
+        "target_user": [
+          "retail_brands",
+          "shopify_merchants",
+          "small_businesses"
+        ],
+        "product_form": [
+          "b2b_saas",
+          "map_widget"
+        ],
+        "acquisition": [
+          "seo",
+          "app_marketplace",
+          "content"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "merchant_workflow_saas": [
+      {
+        "id": "case_storemapper_locator_saas",
+        "name": "Storemapper",
+        "target_user": [
+          "retail_brands",
+          "shopify_merchants",
+          "small_businesses"
+        ],
+        "product_form": [
+          "b2b_saas",
+          "map_widget"
+        ],
+        "acquisition": [
+          "seo",
+          "app_marketplace",
+          "content"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "service_to_recurring_revenue": [
+      {
+        "id": "case_wpcurve_productized_wp",
+        "name": "WP Curve",
+        "target_user": [
+          "wordpress_site_owners",
+          "small_businesses",
+          "agencies"
+        ],
+        "product_form": [
+          "productized_service",
+          "maintenance_subscription"
+        ],
+        "acquisition": [
+          "content",
+          "partnerships",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "scope_limited_operations": [
+      {
+        "id": "case_wpcurve_productized_wp",
+        "name": "WP Curve",
+        "target_user": [
+          "wordpress_site_owners",
+          "small_businesses",
+          "agencies"
+        ],
+        "product_form": [
+          "productized_service",
+          "maintenance_subscription"
+        ],
+        "acquisition": [
+          "content",
+          "partnerships",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "expertise_to_premium_digital_product": [
+      {
+        "id": "case_refactoringui_knowledge_product",
+        "name": "Refactoring UI",
+        "target_user": [
+          "developers",
+          "founders",
+          "design_learners"
+        ],
+        "product_form": [
+          "knowledge_product",
+          "digital_asset_bundle"
+        ],
+        "acquisition": [
+          "twitter",
+          "newsletter",
+          "founder_audience"
+        ],
+        "pricing": [
+          "one_time_purchase"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "audience_trust_launch": [
+      {
+        "id": "case_refactoringui_knowledge_product",
+        "name": "Refactoring UI",
+        "target_user": [
+          "developers",
+          "founders",
+          "design_learners"
+        ],
+        "product_form": [
+          "knowledge_product",
+          "digital_asset_bundle"
+        ],
+        "acquisition": [
+          "twitter",
+          "newsletter",
+          "founder_audience"
+        ],
+        "pricing": [
+          "one_time_purchase"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "niche_developer_education": [
+      {
+        "id": "case_laracasts_developer_education",
+        "name": "Laracasts",
+        "target_user": [
+          "developers",
+          "laravel_users",
+          "php_teams"
+        ],
+        "product_form": [
+          "education_subscription",
+          "community"
+        ],
+        "acquisition": [
+          "developer_community",
+          "seo",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "authority_subscription": [
+      {
+        "id": "case_laracasts_developer_education",
+        "name": "Laracasts",
+        "target_user": [
+          "developers",
+          "laravel_users",
+          "php_teams"
+        ],
+        "product_form": [
+          "education_subscription",
+          "community"
+        ],
+        "acquisition": [
+          "developer_community",
+          "seo",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "database_as_moat": [
+      {
+        "id": "case_builtwith_data_saas",
+        "name": "BuiltWith",
+        "target_user": [
+          "sales_teams",
+          "marketers",
+          "researchers"
+        ],
+        "product_form": [
+          "data_saas",
+          "lead_database"
+        ],
+        "acquisition": [
+          "seo",
+          "direct_sales",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "b2b_research_tool": [
+      {
+        "id": "case_builtwith_data_saas",
+        "name": "BuiltWith",
+        "target_user": [
+          "sales_teams",
+          "marketers",
+          "researchers"
+        ],
+        "product_form": [
+          "data_saas",
+          "lead_database"
+        ],
+        "acquisition": [
+          "seo",
+          "direct_sales",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "content_database_to_paid_research": [
+      {
+        "id": "case_starterstory_media_business",
+        "name": "Starter Story",
+        "target_user": [
+          "founders",
+          "operators",
+          "business_idea_researchers"
+        ],
+        "product_form": [
+          "case_library",
+          "media_business",
+          "subscription_research"
+        ],
+        "acquisition": [
+          "seo",
+          "newsletter",
+          "founder_community"
+        ],
+        "pricing": [
+          "subscription",
+          "sponsorship"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "case_intelligence_product": [
+      {
+        "id": "case_starterstory_media_business",
+        "name": "Starter Story",
+        "target_user": [
+          "founders",
+          "operators",
+          "business_idea_researchers"
+        ],
+        "product_form": [
+          "case_library",
+          "media_business",
+          "subscription_research"
+        ],
+        "acquisition": [
+          "seo",
+          "newsletter",
+          "founder_community"
+        ],
+        "pricing": [
+          "subscription",
+          "sponsorship"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "curated_research_product": [
+      {
+        "id": "case_trendsvc_newsletter",
+        "name": "Trends.vc",
+        "target_user": [
+          "founders",
+          "investors",
+          "marketers"
+        ],
+        "product_form": [
+          "newsletter",
+          "research_report",
+          "community"
+        ],
+        "acquisition": [
+          "newsletter_referrals",
+          "twitter",
+          "community"
+        ],
+        "pricing": [
+          "subscription",
+          "membership"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "trend_intelligence_subscription": [
+      {
+        "id": "case_trendsvc_newsletter",
+        "name": "Trends.vc",
+        "target_user": [
+          "founders",
+          "investors",
+          "marketers"
+        ],
+        "product_form": [
+          "newsletter",
+          "research_report",
+          "community"
+        ],
+        "acquisition": [
+          "newsletter_referrals",
+          "twitter",
+          "community"
+        ],
+        "pricing": [
+          "subscription",
+          "membership"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "community_media_flywheel": [
+      {
+        "id": "case_indiehackers_community_media",
+        "name": "Indie Hackers",
+        "target_user": [
+          "indie_founders",
+          "bootstrappers",
+          "makers"
+        ],
+        "product_form": [
+          "community",
+          "media_site",
+          "founder_story_library"
+        ],
+        "acquisition": [
+          "community",
+          "seo",
+          "podcast"
+        ],
+        "pricing": [
+          "sponsorship",
+          "strategic_acquisition"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "founder_story_supply": [
+      {
+        "id": "case_indiehackers_community_media",
+        "name": "Indie Hackers",
+        "target_user": [
+          "indie_founders",
+          "bootstrappers",
+          "makers"
+        ],
+        "product_form": [
+          "community",
+          "media_site",
+          "founder_story_library"
+        ],
+        "acquisition": [
+          "community",
+          "seo",
+          "podcast"
+        ],
+        "pricing": [
+          "sponsorship",
+          "strategic_acquisition"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "distinct_content_format_to_products": [
+      {
+        "id": "case_visualizevalue_visual_products",
+        "name": "Visualize Value",
+        "target_user": [
+          "creators",
+          "founders",
+          "knowledge_workers"
+        ],
+        "product_form": [
+          "knowledge_product",
+          "course",
+          "membership"
+        ],
+        "acquisition": [
+          "twitter",
+          "visual_sharing",
+          "newsletter"
+        ],
+        "pricing": [
+          "one_time_purchase",
+          "membership"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "creator_brand_business": [
+      {
+        "id": "case_visualizevalue_visual_products",
+        "name": "Visualize Value",
+        "target_user": [
+          "creators",
+          "founders",
+          "knowledge_workers"
+        ],
+        "product_form": [
+          "knowledge_product",
+          "course",
+          "membership"
+        ],
+        "acquisition": [
+          "twitter",
+          "visual_sharing",
+          "newsletter"
+        ],
+        "pricing": [
+          "one_time_purchase",
+          "membership"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "solo_operator_audience_funnel": [
+      {
+        "id": "case_justinwelsh_creator_business",
+        "name": "Justin Welsh creator business",
+        "target_user": [
+          "solo_founders",
+          "creators",
+          "consultants"
+        ],
+        "product_form": [
+          "newsletter",
+          "course",
+          "digital_template"
+        ],
+        "acquisition": [
+          "linkedin",
+          "twitter",
+          "newsletter"
+        ],
+        "pricing": [
+          "one_time_purchase",
+          "sponsorship"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "expertise_to_digital_products": [
+      {
+        "id": "case_justinwelsh_creator_business",
+        "name": "Justin Welsh creator business",
+        "target_user": [
+          "solo_founders",
+          "creators",
+          "consultants"
+        ],
+        "product_form": [
+          "newsletter",
+          "course",
+          "digital_template"
+        ],
+        "acquisition": [
+          "linkedin",
+          "twitter",
+          "newsletter"
+        ],
+        "pricing": [
+          "one_time_purchase",
+          "sponsorship"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "philosophy_to_paid_community": [
+      {
+        "id": "case_smallbets_community",
+        "name": "Small Bets",
+        "target_user": [
+          "indie_founders",
+          "creators",
+          "career_switchers"
+        ],
+        "product_form": [
+          "community",
+          "course",
+          "workshop"
+        ],
+        "acquisition": [
+          "twitter",
+          "newsletter",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "membership"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "experimentation_framework": [
+      {
+        "id": "case_smallbets_community",
+        "name": "Small Bets",
+        "target_user": [
+          "indie_founders",
+          "creators",
+          "career_switchers"
+        ],
+        "product_form": [
+          "community",
+          "course",
+          "workshop"
+        ],
+        "acquisition": [
+          "twitter",
+          "newsletter",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "membership"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "experience_to_authority_media": [
+      {
+        "id": "case_arvidkahl_bootstrapped_content",
+        "name": "The Bootstrapped Founder",
+        "target_user": [
+          "bootstrapped_founders",
+          "indie_makers",
+          "saas_operators"
+        ],
+        "product_form": [
+          "newsletter",
+          "book",
+          "podcast"
+        ],
+        "acquisition": [
+          "twitter",
+          "newsletter",
+          "podcast"
+        ],
+        "pricing": [
+          "book_sales",
+          "sponsorship",
+          "community"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "founder_education_business": [
+      {
+        "id": "case_arvidkahl_bootstrapped_content",
+        "name": "The Bootstrapped Founder",
+        "target_user": [
+          "bootstrapped_founders",
+          "indie_makers",
+          "saas_operators"
+        ],
+        "product_form": [
+          "newsletter",
+          "book",
+          "podcast"
+        ],
+        "acquisition": [
+          "twitter",
+          "newsletter",
+          "podcast"
+        ],
+        "pricing": [
+          "book_sales",
+          "sponsorship",
+          "community"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "operator_network_to_subscription_media": [
+      {
+        "id": "case_lenny_newsletter",
+        "name": "Lenny's Newsletter",
+        "target_user": [
+          "product_managers",
+          "startup_operators",
+          "growth_teams"
+        ],
+        "product_form": [
+          "paid_newsletter",
+          "community",
+          "research_archive"
+        ],
+        "acquisition": [
+          "newsletter_referrals",
+          "podcast",
+          "operator_network"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "premium_professional_content": [
+      {
+        "id": "case_lenny_newsletter",
+        "name": "Lenny's Newsletter",
+        "target_user": [
+          "product_managers",
+          "startup_operators",
+          "growth_teams"
+        ],
+        "product_form": [
+          "paid_newsletter",
+          "community",
+          "research_archive"
+        ],
+        "acquisition": [
+          "newsletter_referrals",
+          "podcast",
+          "operator_network"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "niche_saas_for_creators": [
+      {
+        "id": "case_convertkit_creator_email",
+        "name": "Kit / ConvertKit",
+        "target_user": [
+          "creators",
+          "newsletter_writers",
+          "digital_product_sellers"
+        ],
+        "product_form": [
+          "email_saas",
+          "creator_infrastructure"
+        ],
+        "acquisition": [
+          "founder_audience",
+          "content",
+          "creator_partnerships"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "audience_led_bootstrapping": [
+      {
+        "id": "case_convertkit_creator_email",
+        "name": "Kit / ConvertKit",
+        "target_user": [
+          "creators",
+          "newsletter_writers",
+          "digital_product_sellers"
+        ],
+        "product_form": [
+          "email_saas",
+          "creator_infrastructure"
+        ],
+        "acquisition": [
+          "founder_audience",
+          "content",
+          "creator_partnerships"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "simple_checkout_for_creators": [
+      {
+        "id": "case_gumroad_creator_platform",
+        "name": "Gumroad",
+        "target_user": [
+          "creators",
+          "indie_makers",
+          "digital_product_sellers"
+        ],
+        "product_form": [
+          "creator_commerce",
+          "marketplace_tool"
+        ],
+        "acquisition": [
+          "creator_word_of_mouth",
+          "marketplace",
+          "social"
+        ],
+        "pricing": [
+          "take_rate"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "take_rate_platform": [
+      {
+        "id": "case_gumroad_creator_platform",
+        "name": "Gumroad",
+        "target_user": [
+          "creators",
+          "indie_makers",
+          "digital_product_sellers"
+        ],
+        "product_form": [
+          "creator_commerce",
+          "marketplace_tool"
+        ],
+        "acquisition": [
+          "creator_word_of_mouth",
+          "marketplace",
+          "social"
+        ],
+        "pricing": [
+          "take_rate"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "ai_outcome_product": [
+      {
+        "id": "case_headshotpro_ai_photos",
+        "name": "HeadshotPro",
+        "target_user": [
+          "professionals",
+          "teams",
+          "job_seekers"
+        ],
+        "product_form": [
+          "ai_image_service",
+          "professional_photo_tool"
+        ],
+        "acquisition": [
+          "seo",
+          "paid_search",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "one_time_purchase",
+          "team_package"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "clear_willingness_to_pay": [
+      {
+        "id": "case_headshotpro_ai_photos",
+        "name": "HeadshotPro",
+        "target_user": [
+          "professionals",
+          "teams",
+          "job_seekers"
+        ],
+        "product_form": [
+          "ai_image_service",
+          "professional_photo_tool"
+        ],
+        "acquisition": [
+          "seo",
+          "paid_search",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "one_time_purchase",
+          "team_package"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "ai_photo_pack": [
+      {
+        "id": "case_profilepictureai_avatar",
+        "name": "ProfilePicture.AI",
+        "target_user": [
+          "creators",
+          "professionals",
+          "social_media_users"
+        ],
+        "product_form": [
+          "ai_avatar_tool",
+          "consumer_ai_product"
+        ],
+        "acquisition": [
+          "social",
+          "seo",
+          "product_hunt"
+        ],
+        "pricing": [
+          "one_time_pack"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "trend_timing_launch": [
+      {
+        "id": "case_profilepictureai_avatar",
+        "name": "ProfilePicture.AI",
+        "target_user": [
+          "creators",
+          "professionals",
+          "social_media_users"
+        ],
+        "product_form": [
+          "ai_avatar_tool",
+          "consumer_ai_product"
+        ],
+        "acquisition": [
+          "social",
+          "seo",
+          "product_hunt"
+        ],
+        "pricing": [
+          "one_time_pack"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "vertical_ai_support_tool": [
+      {
+        "id": "case_sitegpt_ai_support",
+        "name": "SiteGPT",
+        "target_user": [
+          "saas_founders",
+          "support_teams",
+          "website_owners"
+        ],
+        "product_form": [
+          "ai_support_chatbot",
+          "b2b_saas"
+        ],
+        "acquisition": [
+          "seo",
+          "product_hunt",
+          "founder_community"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "website_content_to_chatbot": [
+      {
+        "id": "case_sitegpt_ai_support",
+        "name": "SiteGPT",
+        "target_user": [
+          "saas_founders",
+          "support_teams",
+          "website_owners"
+        ],
+        "product_form": [
+          "ai_support_chatbot",
+          "b2b_saas"
+        ],
+        "acquisition": [
+          "seo",
+          "product_hunt",
+          "founder_community"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "niche_ai_content_generator": [
+      {
+        "id": "case_supermeme_ai_memes",
+        "name": "Supermeme.ai",
+        "target_user": [
+          "marketers",
+          "creators",
+          "social_media_managers"
+        ],
+        "product_form": [
+          "ai_content_tool",
+          "marketing_tool"
+        ],
+        "acquisition": [
+          "seo",
+          "social_sharing",
+          "product_hunt"
+        ],
+        "pricing": [
+          "subscription",
+          "credit_pack"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "workflow_specific_ai": [
+      {
+        "id": "case_supermeme_ai_memes",
+        "name": "Supermeme.ai",
+        "target_user": [
+          "marketers",
+          "creators",
+          "social_media_managers"
+        ],
+        "product_form": [
+          "ai_content_tool",
+          "marketing_tool"
+        ],
+        "acquisition": [
+          "seo",
+          "social_sharing",
+          "product_hunt"
+        ],
+        "pricing": [
+          "subscription",
+          "credit_pack"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "local_first_product": [
+      {
+        "id": "case_obsidian_knowledge_tool",
+        "name": "Obsidian",
+        "target_user": [
+          "knowledge_workers",
+          "writers",
+          "developers"
+        ],
+        "product_form": [
+          "desktop_app",
+          "knowledge_tool",
+          "plugin_ecosystem"
+        ],
+        "acquisition": [
+          "community",
+          "plugins",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription",
+          "commercial_license"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "community_ecosystem_moat": [
+      {
+        "id": "case_obsidian_knowledge_tool",
+        "name": "Obsidian",
+        "target_user": [
+          "knowledge_workers",
+          "writers",
+          "developers"
+        ],
+        "product_form": [
+          "desktop_app",
+          "knowledge_tool",
+          "plugin_ecosystem"
+        ],
+        "acquisition": [
+          "community",
+          "plugins",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription",
+          "commercial_license"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "creator_site_builder": [
+      {
+        "id": "case_typedream_site_builder",
+        "name": "Typedream",
+        "target_user": [
+          "creators",
+          "startups",
+          "makers"
+        ],
+        "product_form": [
+          "no_code_builder",
+          "website_tool"
+        ],
+        "acquisition": [
+          "creator_community",
+          "templates",
+          "product_hunt"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "template_led_growth": [
+      {
+        "id": "case_typedream_site_builder",
+        "name": "Typedream",
+        "target_user": [
+          "creators",
+          "startups",
+          "makers"
+        ],
+        "product_form": [
+          "no_code_builder",
+          "website_tool"
+        ],
+        "acquisition": [
+          "creator_community",
+          "templates",
+          "product_hunt"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "startup_landing_page_utility": [
+      {
+        "id": "case_umso_landing_pages",
+        "name": "Umso",
+        "target_user": [
+          "startup_founders",
+          "saas_builders",
+          "marketers"
+        ],
+        "product_form": [
+          "landing_page_builder",
+          "no_code_tool"
+        ],
+        "acquisition": [
+          "seo",
+          "templates",
+          "product_hunt"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "seo_template_acquisition": [
+      {
+        "id": "case_unicornplatform_landing_pages",
+        "name": "Unicorn Platform",
+        "target_user": [
+          "startup_founders",
+          "saas_marketers",
+          "makers"
+        ],
+        "product_form": [
+          "landing_page_builder",
+          "template_tool"
+        ],
+        "acquisition": [
+          "seo",
+          "templates",
+          "product_hunt"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "startup_site_builder": [
+      {
+        "id": "case_unicornplatform_landing_pages",
+        "name": "Unicorn Platform",
+        "target_user": [
+          "startup_founders",
+          "saas_marketers",
+          "makers"
+        ],
+        "product_form": [
+          "landing_page_builder",
+          "template_tool"
+        ],
+        "acquisition": [
+          "seo",
+          "templates",
+          "product_hunt"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "product_feedback_workflow": [
+      {
+        "id": "case_canny_feedback_saas",
+        "name": "Canny",
+        "target_user": [
+          "product_teams",
+          "saas_founders",
+          "customer_success_teams"
+        ],
+        "product_form": [
+          "b2b_saas",
+          "feedback_tool"
+        ],
+        "acquisition": [
+          "customer_badges",
+          "seo",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "public_board_as_distribution": [
+      {
+        "id": "case_canny_feedback_saas",
+        "name": "Canny",
+        "target_user": [
+          "product_teams",
+          "saas_founders",
+          "customer_success_teams"
+        ],
+        "product_form": [
+          "b2b_saas",
+          "feedback_tool"
+        ],
+        "acquisition": [
+          "customer_badges",
+          "seo",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "saas_specific_marketing_tool": [
+      {
+        "id": "case_userlist_email_automation",
+        "name": "Userlist",
+        "target_user": [
+          "saas_founders",
+          "product_marketers",
+          "customer_success_teams"
+        ],
+        "product_form": [
+          "email_automation_saas",
+          "customer_messaging"
+        ],
+        "acquisition": [
+          "content",
+          "podcast",
+          "founder_network"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "b2b_lifecycle_automation": [
+      {
+        "id": "case_userlist_email_automation",
+        "name": "Userlist",
+        "target_user": [
+          "saas_founders",
+          "product_marketers",
+          "customer_success_teams"
+        ],
+        "product_form": [
+          "email_automation_saas",
+          "customer_messaging"
+        ],
+        "acquisition": [
+          "content",
+          "podcast",
+          "founder_network"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "speed_to_publish": [
+      {
+        "id": "case_bullet_notion_site",
+        "name": "Bullet.so",
+        "target_user": [
+          "notion_users",
+          "creators",
+          "small_businesses"
+        ],
+        "product_form": [
+          "notion_site_builder",
+          "no_code_tool"
+        ],
+        "acquisition": [
+          "notion_community",
+          "seo",
+          "templates"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "notion_to_website_workflow": [
+      {
+        "id": "case_potion_notion_site",
+        "name": "Potion",
+        "target_user": [
+          "notion_users",
+          "creators",
+          "founders"
+        ],
+        "product_form": [
+          "notion_site_builder",
+          "no_code_tool"
+        ],
+        "acquisition": [
+          "notion_community",
+          "templates",
+          "product_hunt"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "creator_site_tool": [
+      {
+        "id": "case_potion_notion_site",
+        "name": "Potion",
+        "target_user": [
+          "notion_users",
+          "creators",
+          "founders"
+        ],
+        "product_form": [
+          "notion_site_builder",
+          "no_code_tool"
+        ],
+        "acquisition": [
+          "notion_community",
+          "templates",
+          "product_hunt"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "paid_boilerplate_for_specific_stack": [
+      {
+        "id": "case_saaspegasus_boilerplate",
+        "name": "SaaS Pegasus",
+        "target_user": [
+          "django_developers",
+          "saas_founders",
+          "technical_bootstrappers"
+        ],
+        "product_form": [
+          "developer_template",
+          "boilerplate"
+        ],
+        "acquisition": [
+          "seo",
+          "developer_content",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "one_time_purchase",
+          "license"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "time_saving_developer_product": [
+      {
+        "id": "case_saaspegasus_boilerplate",
+        "name": "SaaS Pegasus",
+        "target_user": [
+          "django_developers",
+          "saas_founders",
+          "technical_bootstrappers"
+        ],
+        "product_form": [
+          "developer_template",
+          "boilerplate"
+        ],
+        "acquisition": [
+          "seo",
+          "developer_content",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "one_time_purchase",
+          "license"
+        ],
+        "confidence": "medium"
+      },
+      {
+        "id": "case_saasykit_boilerplate",
+        "name": "SaaSykit",
+        "target_user": [
+          "laravel_developers",
+          "saas_founders"
+        ],
+        "product_form": [
+          "developer_template",
+          "boilerplate"
+        ],
+        "acquisition": [
+          "seo",
+          "laravel_community",
+          "developer_content"
+        ],
+        "pricing": [
+          "one_time_purchase",
+          "license"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "painful_infrastructure_as_api": [
+      {
+        "id": "case_scrapingbee_api_saas",
+        "name": "ScrapingBee",
+        "target_user": [
+          "developers",
+          "data_teams",
+          "growth_teams"
+        ],
+        "product_form": [
+          "api_saas",
+          "developer_infrastructure"
+        ],
+        "acquisition": [
+          "seo",
+          "developer_content",
+          "documentation"
+        ],
+        "pricing": [
+          "usage_based",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "developer_tool_b2b": [
+      {
+        "id": "case_scrapingbee_api_saas",
+        "name": "ScrapingBee",
+        "target_user": [
+          "developers",
+          "data_teams",
+          "growth_teams"
+        ],
+        "product_form": [
+          "api_saas",
+          "developer_infrastructure"
+        ],
+        "acquisition": [
+          "seo",
+          "developer_content",
+          "documentation"
+        ],
+        "pricing": [
+          "usage_based",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "daily_curation_media": [
+      {
+        "id": "case_tldr_newsletter",
+        "name": "TLDR Newsletter",
+        "target_user": [
+          "developers",
+          "tech_workers",
+          "startup_operators"
+        ],
+        "product_form": [
+          "newsletter",
+          "media_network"
+        ],
+        "acquisition": [
+          "referrals",
+          "cross_promotion",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "sponsorship",
+          "ads"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "sponsorship_newsletter": [
+      {
+        "id": "case_tldr_newsletter",
+        "name": "TLDR Newsletter",
+        "target_user": [
+          "developers",
+          "tech_workers",
+          "startup_operators"
+        ],
+        "product_form": [
+          "newsletter",
+          "media_network"
+        ],
+        "acquisition": [
+          "referrals",
+          "cross_promotion",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "sponsorship",
+          "ads"
+        ],
+        "confidence": "medium"
+      },
+      {
+        "id": "case_dense_discovery_newsletter",
+        "name": "Dense Discovery",
+        "target_user": [
+          "designers",
+          "knowledge_workers",
+          "curious_professionals"
+        ],
+        "product_form": [
+          "newsletter",
+          "curation_media"
+        ],
+        "acquisition": [
+          "word_of_mouth",
+          "newsletter_referrals",
+          "curation_quality"
+        ],
+        "pricing": [
+          "sponsorship",
+          "membership"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "deep_research_media": [
+      {
+        "id": "case_generalist_newsletter",
+        "name": "The Generalist",
+        "target_user": [
+          "investors",
+          "founders",
+          "tech_operators"
+        ],
+        "product_form": [
+          "newsletter",
+          "research_media"
+        ],
+        "acquisition": [
+          "newsletter",
+          "twitter",
+          "operator_network"
+        ],
+        "pricing": [
+          "subscription",
+          "sponsorship"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "premium_analysis_product": [
+      {
+        "id": "case_generalist_newsletter",
+        "name": "The Generalist",
+        "target_user": [
+          "investors",
+          "founders",
+          "tech_operators"
+        ],
+        "product_form": [
+          "newsletter",
+          "research_media"
+        ],
+        "acquisition": [
+          "newsletter",
+          "twitter",
+          "operator_network"
+        ],
+        "pricing": [
+          "subscription",
+          "sponsorship"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "expert_analysis_subscription": [
+      {
+        "id": "case_stratechery_paid_newsletter",
+        "name": "Stratechery",
+        "target_user": [
+          "tech_executives",
+          "investors",
+          "operators"
+        ],
+        "product_form": [
+          "paid_newsletter",
+          "analysis_business"
+        ],
+        "acquisition": [
+          "word_of_mouth",
+          "free_articles",
+          "podcast"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "one_person_media_business": [
+      {
+        "id": "case_stratechery_paid_newsletter",
+        "name": "Stratechery",
+        "target_user": [
+          "tech_executives",
+          "investors",
+          "operators"
+        ],
+        "product_form": [
+          "paid_newsletter",
+          "analysis_business"
+        ],
+        "acquisition": [
+          "word_of_mouth",
+          "free_articles",
+          "podcast"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "practitioner_credibility_media": [
+      {
+        "id": "case_pragmatic_engineer_newsletter",
+        "name": "The Pragmatic Engineer",
+        "target_user": [
+          "software_engineers",
+          "engineering_managers",
+          "tech_leaders"
+        ],
+        "product_form": [
+          "paid_newsletter",
+          "community",
+          "job_board"
+        ],
+        "acquisition": [
+          "newsletter_referrals",
+          "twitter",
+          "industry_network"
+        ],
+        "pricing": [
+          "subscription",
+          "sponsorship"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "professional_subscription": [
+      {
+        "id": "case_pragmatic_engineer_newsletter",
+        "name": "The Pragmatic Engineer",
+        "target_user": [
+          "software_engineers",
+          "engineering_managers",
+          "tech_leaders"
+        ],
+        "product_form": [
+          "paid_newsletter",
+          "community",
+          "job_board"
+        ],
+        "acquisition": [
+          "newsletter_referrals",
+          "twitter",
+          "industry_network"
+        ],
+        "pricing": [
+          "subscription",
+          "sponsorship"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "taste_led_curation": [
+      {
+        "id": "case_dense_discovery_newsletter",
+        "name": "Dense Discovery",
+        "target_user": [
+          "designers",
+          "knowledge_workers",
+          "curious_professionals"
+        ],
+        "product_form": [
+          "newsletter",
+          "curation_media"
+        ],
+        "acquisition": [
+          "word_of_mouth",
+          "newsletter_referrals",
+          "curation_quality"
+        ],
+        "pricing": [
+          "sponsorship",
+          "membership"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "niche_expertise_subscription": [
+      {
+        "id": "case_sinocism_paid_newsletter",
+        "name": "Sinocism",
+        "target_user": [
+          "policy_professionals",
+          "investors",
+          "china_watchers"
+        ],
+        "product_form": [
+          "paid_newsletter",
+          "expert_analysis"
+        ],
+        "acquisition": [
+          "professional_network",
+          "word_of_mouth",
+          "free_briefing"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "professional_information_product": [
+      {
+        "id": "case_sinocism_paid_newsletter",
+        "name": "Sinocism",
+        "target_user": [
+          "policy_professionals",
+          "investors",
+          "china_watchers"
+        ],
+        "product_form": [
+          "paid_newsletter",
+          "expert_analysis"
+        ],
+        "acquisition": [
+          "professional_network",
+          "word_of_mouth",
+          "free_briefing"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "paid_boilerplate_with_launch_assets": [
+      {
+        "id": "case_shipixen_boilerplate",
+        "name": "Shipixen",
+        "target_user": [
+          "developers",
+          "indie_founders",
+          "saas_builders"
+        ],
+        "product_form": [
+          "developer_template",
+          "boilerplate",
+          "starter_kit"
+        ],
+        "acquisition": [
+          "twitter",
+          "seo",
+          "developer_community"
+        ],
+        "pricing": [
+          "one_time_purchase"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "speed_to_market_product": [
+      {
+        "id": "case_shipixen_boilerplate",
+        "name": "Shipixen",
+        "target_user": [
+          "developers",
+          "indie_founders",
+          "saas_builders"
+        ],
+        "product_form": [
+          "developer_template",
+          "boilerplate",
+          "starter_kit"
+        ],
+        "acquisition": [
+          "twitter",
+          "seo",
+          "developer_community"
+        ],
+        "pricing": [
+          "one_time_purchase"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "framework_specific_boilerplate": [
+      {
+        "id": "case_saasykit_boilerplate",
+        "name": "SaaSykit",
+        "target_user": [
+          "laravel_developers",
+          "saas_founders"
+        ],
+        "product_form": [
+          "developer_template",
+          "boilerplate"
+        ],
+        "acquisition": [
+          "seo",
+          "laravel_community",
+          "developer_content"
+        ],
+        "pricing": [
+          "one_time_purchase",
+          "license"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "creator_workflow_saas": [
+      {
+        "id": "case_feedhive_social_tool",
+        "name": "FeedHive",
+        "target_user": [
+          "creators",
+          "social_media_managers",
+          "small_businesses"
+        ],
+        "product_form": [
+          "social_media_tool",
+          "creator_saas"
+        ],
+        "acquisition": [
+          "social",
+          "templates",
+          "content"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "ai_assisted_social_planning": [
+      {
+        "id": "case_feedhive_social_tool",
+        "name": "FeedHive",
+        "target_user": [
+          "creators",
+          "social_media_managers",
+          "small_businesses"
+        ],
+        "product_form": [
+          "social_media_tool",
+          "creator_saas"
+        ],
+        "acquisition": [
+          "social",
+          "templates",
+          "content"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "audience_growth_tool": [
+      {
+        "id": "case_hypefury_social_tool",
+        "name": "Hypefury",
+        "target_user": [
+          "creators",
+          "founders",
+          "newsletter_writers"
+        ],
+        "product_form": [
+          "social_media_tool",
+          "creator_saas"
+        ],
+        "acquisition": [
+          "twitter",
+          "creator_referrals",
+          "content"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "writing_workflow_for_platform": [
+      {
+        "id": "case_typefully_twitter_tool",
+        "name": "Typefully",
+        "target_user": [
+          "creators",
+          "founders",
+          "social_writers"
+        ],
+        "product_form": [
+          "writing_tool",
+          "social_media_saas"
+        ],
+        "acquisition": [
+          "twitter",
+          "product_led_sharing",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "prosumer_creator_tool": [
+      {
+        "id": "case_typefully_twitter_tool",
+        "name": "Typefully",
+        "target_user": [
+          "creators",
+          "founders",
+          "social_writers"
+        ],
+        "product_form": [
+          "writing_tool",
+          "social_media_saas"
+        ],
+        "acquisition": [
+          "twitter",
+          "product_led_sharing",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "device_specific_utility": [
+      {
+        "id": "case_ktool_read_it_later",
+        "name": "KTool",
+        "target_user": [
+          "kindle_users",
+          "newsletter_readers",
+          "knowledge_workers"
+        ],
+        "product_form": [
+          "personal_productivity_tool",
+          "read_it_later"
+        ],
+        "acquisition": [
+          "twitter",
+          "maker_community",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription",
+          "one_time_purchase"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "niche_workflow_tool": [
+      {
+        "id": "case_ktool_read_it_later",
+        "name": "KTool",
+        "target_user": [
+          "kindle_users",
+          "newsletter_readers",
+          "knowledge_workers"
+        ],
+        "product_form": [
+          "personal_productivity_tool",
+          "read_it_later"
+        ],
+        "acquisition": [
+          "twitter",
+          "maker_community",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription",
+          "one_time_purchase"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "information_aggregation_tool": [
+      {
+        "id": "case_mailbrew_email_digest",
+        "name": "Mailbrew",
+        "target_user": [
+          "knowledge_workers",
+          "newsletter_readers",
+          "social_media_users"
+        ],
+        "product_form": [
+          "personal_productivity_tool",
+          "email_digest"
+        ],
+        "acquisition": [
+          "product_hunt",
+          "twitter",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "personal_workflow_subscription": [
+      {
+        "id": "case_mailbrew_email_digest",
+        "name": "Mailbrew",
+        "target_user": [
+          "knowledge_workers",
+          "newsletter_readers",
+          "social_media_users"
+        ],
+        "product_form": [
+          "personal_productivity_tool",
+          "email_digest"
+        ],
+        "acquisition": [
+          "product_hunt",
+          "twitter",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "clear_pain_consumer_utility": [
+      {
+        "id": "case_leave_me_alone_email_unsubscribe",
+        "name": "Leave Me Alone",
+        "target_user": [
+          "email_users",
+          "privacy_conscious_consumers",
+          "knowledge_workers"
+        ],
+        "product_form": [
+          "privacy_tool",
+          "email_utility"
+        ],
+        "acquisition": [
+          "seo",
+          "press",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "credit_pack",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "trust_based_product": [
+      {
+        "id": "case_leave_me_alone_email_unsubscribe",
+        "name": "Leave Me Alone",
+        "target_user": [
+          "email_users",
+          "privacy_conscious_consumers",
+          "knowledge_workers"
+        ],
+        "product_form": [
+          "privacy_tool",
+          "email_utility"
+        ],
+        "acquisition": [
+          "seo",
+          "press",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "credit_pack",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "polished_horizontal_tool": [
+      {
+        "id": "case_paperform_forms",
+        "name": "Paperform",
+        "target_user": [
+          "small_businesses",
+          "creators",
+          "operations_teams"
+        ],
+        "product_form": [
+          "form_builder",
+          "workflow_saas"
+        ],
+        "acquisition": [
+          "seo",
+          "templates",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "template_led_saas": [
+      {
+        "id": "case_paperform_forms",
+        "name": "Paperform",
+        "target_user": [
+          "small_businesses",
+          "creators",
+          "operations_teams"
+        ],
+        "product_form": [
+          "form_builder",
+          "workflow_saas"
+        ],
+        "acquisition": [
+          "seo",
+          "templates",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "creator_b2b_tool": [
+      {
+        "id": "case_senja_testimonials",
+        "name": "Senja",
+        "target_user": [
+          "creators",
+          "saas_founders",
+          "course_sellers"
+        ],
+        "product_form": [
+          "testimonial_tool",
+          "social_proof_saas"
+        ],
+        "acquisition": [
+          "seo",
+          "social",
+          "customer_badges"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "minimalist_publishing_saas": [
+      {
+        "id": "case_writeas_publishing",
+        "name": "Write.as",
+        "target_user": [
+          "writers",
+          "privacy_conscious_creators",
+          "bloggers"
+        ],
+        "product_form": [
+          "publishing_tool",
+          "hosted_blog"
+        ],
+        "acquisition": [
+          "indie_web_community",
+          "seo",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "privacy_positioning": [
+      {
+        "id": "case_writeas_publishing",
+        "name": "Write.as",
+        "target_user": [
+          "writers",
+          "privacy_conscious_creators",
+          "bloggers"
+        ],
+        "product_form": [
+          "publishing_tool",
+          "hosted_blog"
+        ],
+        "acquisition": [
+          "indie_web_community",
+          "seo",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "minimalist_tool_against_bloat": [
+      {
+        "id": "case_bearblog_publishing",
+        "name": "Bear Blog",
+        "target_user": [
+          "bloggers",
+          "developers",
+          "minimalist_writers"
+        ],
+        "product_form": [
+          "blogging_tool",
+          "hosted_publishing"
+        ],
+        "acquisition": [
+          "indie_web_community",
+          "word_of_mouth",
+          "seo"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "indie_web_product": [
+      {
+        "id": "case_bearblog_publishing",
+        "name": "Bear Blog",
+        "target_user": [
+          "bloggers",
+          "developers",
+          "minimalist_writers"
+        ],
+        "product_form": [
+          "blogging_tool",
+          "hosted_publishing"
+        ],
+        "acquisition": [
+          "indie_web_community",
+          "word_of_mouth",
+          "seo"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "independent_web_subscription": [
+      {
+        "id": "case_microblog_publishing",
+        "name": "Micro.blog",
+        "target_user": [
+          "indie_web_users",
+          "bloggers",
+          "creators"
+        ],
+        "product_form": [
+          "publishing_platform",
+          "social_network"
+        ],
+        "acquisition": [
+          "indie_web_community",
+          "podcast",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "publishing_plus_community": [
+      {
+        "id": "case_microblog_publishing",
+        "name": "Micro.blog",
+        "target_user": [
+          "indie_web_users",
+          "bloggers",
+          "creators"
+        ],
+        "product_form": [
+          "publishing_platform",
+          "social_network"
+        ],
+        "acquisition": [
+          "indie_web_community",
+          "podcast",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "spreadsheet_as_cms": [
+      {
+        "id": "case_sheet2site_nocode_site",
+        "name": "Sheet2Site",
+        "target_user": [
+          "no_code_builders",
+          "small_businesses",
+          "directory_operators"
+        ],
+        "product_form": [
+          "spreadsheet_to_site_tool",
+          "no_code_builder"
+        ],
+        "acquisition": [
+          "product_hunt",
+          "maker_community",
+          "seo"
+        ],
+        "pricing": [
+          "subscription",
+          "one_time_purchase"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "no_code_publishing": [
+      {
+        "id": "case_sheet2site_nocode_site",
+        "name": "Sheet2Site",
+        "target_user": [
+          "no_code_builders",
+          "small_businesses",
+          "directory_operators"
+        ],
+        "product_form": [
+          "spreadsheet_to_site_tool",
+          "no_code_builder"
+        ],
+        "acquisition": [
+          "product_hunt",
+          "maker_community",
+          "seo"
+        ],
+        "pricing": [
+          "subscription",
+          "one_time_purchase"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "spreadsheet_as_backend": [
+      {
+        "id": "case_sheetbest_sheets_api",
+        "name": "Sheet.best",
+        "target_user": [
+          "developers",
+          "no_code_builders",
+          "operators"
+        ],
+        "product_form": [
+          "spreadsheet_api",
+          "developer_tool"
+        ],
+        "acquisition": [
+          "seo",
+          "developer_content",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "low_code_api_tool": [
+      {
+        "id": "case_sheetbest_sheets_api",
+        "name": "Sheet.best",
+        "target_user": [
+          "developers",
+          "no_code_builders",
+          "operators"
+        ],
+        "product_form": [
+          "spreadsheet_api",
+          "developer_tool"
+        ],
+        "acquisition": [
+          "seo",
+          "developer_content",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "freemium",
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "template_led_site_builder": [
+      {
+        "id": "case_dorik_site_builder",
+        "name": "Dorik",
+        "target_user": [
+          "creators",
+          "small_businesses",
+          "startup_founders"
+        ],
+        "product_form": [
+          "website_builder",
+          "no_code_tool"
+        ],
+        "acquisition": [
+          "seo",
+          "templates",
+          "product_hunt"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "small_business_web_tool": [
+      {
+        "id": "case_dorik_site_builder",
+        "name": "Dorik",
+        "target_user": [
+          "creators",
+          "small_businesses",
+          "startup_founders"
+        ],
+        "product_form": [
+          "website_builder",
+          "no_code_tool"
+        ],
+        "acquisition": [
+          "seo",
+          "templates",
+          "product_hunt"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "founder_led_b2b_saas": [
+      {
+        "id": "case_bento_email_marketing",
+        "name": "Bento",
+        "target_user": [
+          "small_businesses",
+          "ecommerce_operators",
+          "marketers"
+        ],
+        "product_form": [
+          "email_marketing_saas",
+          "automation_tool"
+        ],
+        "acquisition": [
+          "founder_audience",
+          "content",
+          "word_of_mouth"
+        ],
+        "pricing": [
+          "subscription"
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "support_differentiated_tool": [
+      {
+        "id": "case_bento_email_marketing",
+        "name": "Bento",
+        "target_user": [
+          "small_businesses",
+          "ecommerce_operators",
+          "marketers"
+        ],
+        "product_form": [
+          "email_marketing_saas",
+          "automation_tool"
+        ],
+        "acquisition": [
+          "founder_audience",
+          "content",
+          "word_of_mouth"
         ],
         "pricing": [
           "subscription"
