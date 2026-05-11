@@ -1,8 +1,8 @@
-# 一人公司内参 Skill System Implementation Plan
+# 一人公司作战库 Skill System Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Build the repo-local v0.1 “一人公司内参” skill toolbox and knowledge base, with validation gates and a safe Book of Elon retirement inventory.
+**Goal:** Build the repo-local v0.1 “一人公司作战库” skill toolbox and knowledge base, with validation gates and a safe Book of Elon retirement inventory.
 
 **Architecture:** Create five Codex-style skills under `skills/`, all reading a shared `knowledge/` directory made of method packs and JSONL knowledge atoms. Add deterministic Node.js validation so the skill assets can be checked without calling an LLM. Do not delete Book of Elon code in this plan; only create a local retirement inventory and preserve server safety rules.
 
@@ -420,7 +420,7 @@ Expected: directories exist.
 Content:
 
 ```markdown
-# 一人公司内参 Knowledge Base
+# 一人公司作战库 Knowledge Base
 
 This directory is the shared knowledge layer for the `opc` skill toolbox.
 
@@ -448,7 +448,7 @@ Content:
 
 ## Core Position
 
-一人公司内参 sells judgment quality, not generic startup advice.
+一人公司作战库 sells judgment quality, not generic startup advice.
 
 The user is usually not lacking motivation. The user is usually missing one of these:
 
@@ -1183,7 +1183,7 @@ Content:
 ```markdown
 ---
 name: opc
-description: Main router for 一人公司内参, a Chinese one-person company business judgment toolbox. Use when the user asks about solo company direction, business viability, self-media monetization, AI product ideas, offer design, domestic China startup pitfalls, ICP/hosting/payment/entity/platform tradeoffs, or asks to diagnose a one-person business project.
+description: Main router for 一人公司作战库, a Chinese one-person company business judgment toolbox. Use when the user asks about solo company direction, business viability, self-media monetization, AI product ideas, offer design, domestic China startup pitfalls, ICP/hosting/payment/entity/platform tradeoffs, or asks to diagnose a one-person business project.
 ---
 
 # OPC Router
@@ -1546,7 +1546,7 @@ Scope: local repository only. This document does not authorize any server deleti
 
 ## Decision
 
-Original Book of Elon product is abandoned as the main direction. The new direction is 一人公司内参.
+Original Book of Elon product is abandoned as the main direction. The new direction is 一人公司作战库.
 
 ## Preserve For Learning
 
