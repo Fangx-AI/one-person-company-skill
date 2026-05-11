@@ -26,6 +26,7 @@ const dbFacts = require("./db/facts");
 const factExtractor = require("./services/fact-extractor");
 const systemPromptService = require("./services/system-prompt");
 const costControl = require("./services/cost-control");
+const opcCaseContext = require("./services/opc-case-context");
 const { getDb: getDatabase } = require("./db/database");
 getDatabase();
 
@@ -427,6 +428,24 @@ function attachUserMemoryToBody(request, body) {
   }
 }
 
+function attachOpcCaseContextToBody(body) {
+  try {
+    const generated = opcCaseContext.buildCaseContextForMessages({
+      messages: body.messages,
+    });
+    if (!generated) return;
+    if (!isPlainObject(body.context)) body.context = {};
+    body.context.opcCaseContext = {
+      kind: generated.kind,
+      text: safeSlice(generated.text, 1800),
+    };
+  } catch (err) {
+    logEvent("warning", "attach_opc_case_context_failed", {
+      details: safeSlice(err?.message || String(err), 240),
+    });
+  }
+}
+
 function scheduleFactExtraction({
   userId,
   sessionId,
@@ -658,6 +677,7 @@ async function handleChatRequest(request, response) {
 
   const body = validation.payload;
   attachUserMemoryToBody(request, body);
+  attachOpcCaseContextToBody(body);
   const cachePolicy = getCachePolicy(body);
   response.__meta.cacheEligible = cachePolicy.eligible;
   response.__meta.cacheReason = cachePolicy.reason;
@@ -1009,6 +1029,10 @@ function buildContextBlock(context) {
       "回答规则",
       ...context.productRules.map((item, index) => `${index + 1}. ${item}`),
     ].join("\n"));
+  }
+
+  if (context.opcCaseContext && context.opcCaseContext.text) {
+    sections.push(context.opcCaseContext.text);
   }
 
   return sections.join("\n\n");
