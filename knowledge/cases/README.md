@@ -1,28 +1,54 @@
-# 一人公司作战库 - 情报库
+# One-Person Company Case Intelligence Library
 
-这个目录保存的是一人公司案例情报，不是文章摘录仓库。
+This directory stores structured case intelligence for the one-person-company product. It is not an article archive and must not contain copied long-form content.
 
-## 分层
+## Layers
 
-- `source-map.jsonl`: 数据源目录，每一条代表一个可持续抓取或人工补充的来源
-- `raw/raw-cases.jsonl`: 原始线索，只保存标题、URL、短信号、时间、语言、来源引用
-- `normalized/normalized-cases.jsonl`: 标准化案例，把原始线索整理成可比对的商业结构
-- `gold/gold-cases.jsonl`: 高价值样本，保留可复用的商业路径和风险提示
-- `schema/*.json`: 每层数据的字段约束
+- `source-map.jsonl`: source registry. Each row represents one sustainable source bucket for manual review or future scraping.
+- `candidates/case-candidates.jsonl`: staging area for new case candidates before they enter the formal library.
+- `raw/raw-cases.jsonl`: raw evidence pointers. Store title, URL, short signal, capture date, language, and rights note.
+- `normalized/normalized-cases.jsonl`: comparable business cases derived from raw evidence.
+- `gold/gold-cases.jsonl`: high-value benchmark cases with reusable lessons and warning flags.
+- `indexes/case-route-index.json`: generated route index. Rebuild it with `npm run opc:case:index`.
+- `schema/*.json`: field contracts for each layer.
 
-## 规则
+## Rules
 
-- 只保存公开可访问来源的元数据、短摘要、结构化事实和我们的判断
-- 不存长篇转载，不存大段正文，不把原文复制进库
-- 每条 normalized case 必须能回溯到 raw case
-- 每条 gold case 必须能回溯到 normalized case
-- 评价一个案例时，优先写清楚：产品形态、获客路径、交付方式、定价方式、商业断点、国内可迁移风险
+- Store public metadata, short summaries, structured facts, and our own commercial judgment.
+- Do not store copied articles, long excerpts, or large chunks of original source text.
+- Every normalized case must trace back to at least one raw case.
+- Every gold case must trace back to one normalized case.
+- A useful case should make these clear: product form, target user, acquisition path, delivery method, pricing model, commercial bottleneck, and China-specific transfer risk when relevant.
 
-## 目标
+## Candidate Import Workflow
 
-v0.1 目标是把案例情报库变成 skill 的底座：
+Put new rows into `candidates/case-candidates.jsonl` first. Each row must be one JSON object with these fields:
 
-- 1000 条 raw source / raw case
-- 300 条 normalized case
-- 50 条 gold case
+```json
+{"id":"example_case","source_id":"src_public_product_pages","url":"https://example.com","title":"Example","language":"en","raw_signal":"Short public signal only.","name":"Example","founder_type":"solo_founder","geography":["global"],"target_user":["founders"],"product_form":["case_library"],"route":["case_intelligence_product"],"acquisition":["seo"],"delivery":["website"],"pricing":["subscription"],"summary":"Compact summary.","commercial_path":"How the case makes money.","risks":["case_facts_age_quickly"],"confidence":"medium"}
+```
 
+Then run:
+
+```bash
+npm run opc:import:cases:dry
+npm run opc:import:cases
+npm run opc:validate:cases:seed
+npm run opc:case:index
+```
+
+The importer writes `raw_<id>` and `case_<id>`, rejects duplicate evidence URLs, and skips invalid rows only when called with `--allow-skip`.
+
+## Current Targets
+
+The current seed gate is:
+
+- 100 raw cases
+- 100 normalized cases
+- 30 gold cases
+
+The v0.1 target remains:
+
+- 1000 raw cases
+- 300 normalized cases
+- 50 gold cases
