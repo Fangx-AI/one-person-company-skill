@@ -75,12 +75,44 @@ function testSkillDefaultsToMainlandChinaContext() {
 function testReferencesExistAndAreLinked() {
   [
     "business-judgment.md",
+    "business-model-delivery.md",
     "china-reality.md",
     "case-intelligence.md",
   ].forEach((file) => {
     assert(skill.includes(`references/${file}`), `SKILL.md should link ${file}`);
     const text = fs.readFileSync(path.join(root, "skills", "one-person-company", "references", file), "utf8");
     assert(text.length > 500, `${file} should contain substantive guidance`);
+  });
+}
+
+function testBusinessModelDeliveryReferenceIsHardNosed() {
+  assert(
+    skill.includes("references/business-model-delivery.md"),
+    "SKILL.md should link the business model and delivery reference"
+  );
+
+  const delivery = fs.readFileSync(
+    path.join(root, "skills", "one-person-company", "references", "business-model-delivery.md"),
+    "utf8"
+  );
+  [
+    "收费",
+    "支付",
+    "交付",
+    "毛利",
+    "复购",
+    "售后",
+    "停损",
+    "服务",
+    "模板",
+    "工具",
+    "咨询",
+    "社群",
+    "数据",
+    "自动化",
+    "先收钱",
+  ].forEach((marker) => {
+    assert(delivery.includes(marker), `business model reference should include ${marker}`);
   });
 }
 
@@ -98,6 +130,7 @@ testFrontmatterIsDiscoverable();
 testSkillDefinesThreeCoreEntrypoints();
 testSkillDefaultsToMainlandChinaContext();
 testReferencesExistAndAreLinked();
+testBusinessModelDeliveryReferenceIsHardNosed();
 testAgentMetadataExists();
 
 console.log("skill surface tests passed");

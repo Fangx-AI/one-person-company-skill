@@ -15,7 +15,7 @@ Use this skill to answer three core requests:
 
 1. `/产品判断`: decide whether an idea can become a business.
 2. `/相似案例`: compare the idea against real one-person-company cases and adjacent products.
-3. `/定价获客`: design pricing, first-customer acquisition, and stop-loss signals.
+3. `/定价获客`: design pricing, payment, delivery, first-customer acquisition, and stop-loss signals.
 
 ## Answer Contract
 
@@ -35,15 +35,17 @@ If the idea is commercially weak, say so directly. Do not soften a failed busine
 1. Restate the business in one sentence: user, painful workflow, paid outcome.
 2. Judge commercial viability: chargeability, acquisition, delivery, defensibility, solo-founder fit.
 3. Pull case intelligence from `knowledge/cases/` or run `node scripts/opc/match-product-idea.js "<idea>"`.
-4. Compare against market patterns in `knowledge/market-patterns/`.
-5. Give the lowest-friction next action that can test payment intent.
-6. Define stop-loss ("停损"): what result means the founder should pause, pivot, or kill the idea.
+4. Pick the business model and delivery path: service, template, tool, consulting, community, data, or automation.
+5. Compare against market patterns in `knowledge/market-patterns/`.
+6. Give the lowest-friction next action that can test payment intent, preferably by asking for money before building more.
+7. Define stop-loss ("停损"): what result means the founder should pause, pivot, or kill the idea.
 
 ## Reference Loading
 
 Load only what the request needs:
 
 - Product judgment: `references/business-judgment.md`
+- Business model, payment, and delivery: `references/business-model-delivery.md`
 - Domestic execution reality: `references/china-reality.md`
 - Similar-case retrieval: `references/case-intelligence.md`
 
