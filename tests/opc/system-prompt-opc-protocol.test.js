@@ -36,6 +36,21 @@ function testV2BlocksGenericStartupAdviceAsFinalAnswers() {
   });
 }
 
+function testProductJudgmentRequiresMarketAndPaymentMechanism() {
+  const v2 = systemPrompt.getSystemPrompt("v2");
+
+  [
+    "竞品或替代方案",
+    "付费机制",
+    "工作流场景",
+    "用户为什么现在付钱",
+    "不要因为它看起来像小工具",
+    "转换工具",
+  ].forEach((marker) => {
+    assert(v2.includes(marker), `expected V2 system prompt to require product judgment marker ${marker}`);
+  });
+}
+
 function testFallbackKeepsBusinessProtocol() {
   const fallback = systemPrompt.getSystemPrompt("unknown-version");
 
@@ -45,6 +60,7 @@ function testFallbackKeepsBusinessProtocol() {
 
 testV2ContainsOnePersonCompanyAnswerProtocol();
 testV2BlocksGenericStartupAdviceAsFinalAnswers();
+testProductJudgmentRequiresMarketAndPaymentMechanism();
 testFallbackKeepsBusinessProtocol();
 
 console.log("system prompt OPC protocol tests passed");

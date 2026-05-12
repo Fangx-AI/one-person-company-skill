@@ -9,11 +9,11 @@ const { validateAnswerQualityEvals } = require("../../scripts/opc/validate-answe
 
 function testAnswerQualityEvalsAreUsable() {
   const root = path.resolve(__dirname, "..", "..");
-  const result = validateAnswerQualityEvals({ root, minScenarios: 12, minGoldAnswers: 4 });
+  const result = validateAnswerQualityEvals({ root, minScenarios: 13, minGoldAnswers: 5 });
 
   assert.deepStrictEqual(result.errors, []);
-  assert(result.counts.scenarios >= 12);
-  assert(result.counts.goldAnswers >= 4);
+  assert(result.counts.scenarios >= 13);
+  assert(result.counts.goldAnswers >= 5);
   assert(result.counts.rubricItems >= 7);
 }
 

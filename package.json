@@ -55,10 +55,11 @@
     "opc:import:cases:dry": "node scripts/opc/import-case-candidates.js --dry-run",
     "opc:case:index": "node scripts/opc/build-case-index.js",
     "opc:idea:match": "node scripts/opc/match-product-idea.js",
-    "opc:eval:answers": "node scripts/opc/validate-answer-quality-evals.js --min-scenarios=12 --min-gold-answers=4",
+    "opc:eval:answers": "node scripts/opc/validate-answer-quality-evals.js --min-scenarios=13 --min-gold-answers=5",
     "opc:prompt:test": "node tests/opc/system-prompt-opc-protocol.test.js",
     "opc:frontend:test": "node tests/opc/frontend-positioning.test.js",
     "opc:slash:test": "node tests/opc/slash-command-dom.test.js",
+    "opc:market:test": "node tests/opc/market-patterns.test.js",
     "opc:case:context:test": "node tests/opc/case-context.test.js && node tests/opc/case-context-server-boundary.test.js"
   },
   "dependencies": {

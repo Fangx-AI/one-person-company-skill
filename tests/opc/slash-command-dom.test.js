@@ -68,4 +68,9 @@ window.__slashTest.applySlashCommand("china", "chat");
 assert(chatInput.value.includes("/国内坑位"));
 assert(chatInput.value.includes("备案"));
 
+window.__slashTest.applySlashCommand("judge", "quick");
+assert(quickInput.value.includes("竞品或替代方案"));
+assert(quickInput.value.includes("付费机制"));
+assert(quickInput.value.includes("具体工作流"));
+
 console.log("slash command DOM tests passed");
