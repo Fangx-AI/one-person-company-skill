@@ -1,53 +1,18 @@
 {
-  "name": "book-of-elon-chat",
-  "version": "1.0.0",
-  "private": true,
+  "name": "one-person-company-skill",
+  "version": "0.1.0",
+  "private": false,
+  "description": "一人公司Skill：面向独立创业者的产品判断、相似案例、定价获客与商业化可行性分析。",
+  "license": "MIT",
+  "type": "commonjs",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
-    "start": "node server.js",
-    "start:monitor": "node monitor-server.js",
-    "dev": "node server.js",
-    "preflight": "node preflight-check.js",
-    "preflight:degraded": "node preflight-check.js --allow-degraded",
-    "preflight:prod": "node preflight-check.js --strict-production",
-
-    "smoke:chat": "node tests/calibration/deepseek-smoke-test.js",
-    "smoke:auth": "node tests/smoke/auth.js",
-    "smoke:db": "node tests/smoke/db.js",
-    "smoke:persistence": "node tests/smoke/persistence.js",
-    "smoke:northstar": "node tests/smoke/northstar.js",
-    "smoke:cost": "node tests/smoke/cost-control.js",
-    "smoke:static": "node tests/smoke/static-security.js",
-    "smoke:prompt": "node tests/smoke/prompt-injection.js",
-
-    "auth:smoke": "node tests/smoke/auth.js",
-    "persist:smoke": "node tests/smoke/persistence.js",
-    "northstar:smoke": "node tests/smoke/northstar.js",
-    "cost:smoke": "node tests/smoke/cost-control.js",
-    "static:smoke": "node tests/smoke/static-security.js",
-    "prompt:smoke": "node tests/smoke/prompt-injection.js",
-
-    "test:reply": "node tests/calibration/reply-calibration.js",
-    "test:deepseek": "node tests/calibration/deepseek-eval.js",
-    "test:e2e": "node tests/e2e/full-flow.js",
-    "test:integration": "node tests/e2e/integration-memory.js",
-    "test:fact-extractor": "node tests/e2e/fact-extractor.js",
-
-    "probe:live-chat": "node tests/probe/live-chat.js",
-    "probe:prompt-injection": "node tests/probe/prompt-injection-live.js",
-    "probe:min": "node tests/probe/min.js",
-
-    "db:init": "node scripts/ops/init-db.js",
-    "db:smoke": "node tests/smoke/db.js",
-    "db:backup": "node scripts/ops/backup-db.js",
-    "db:migrate": "node scripts/ops/migrate.js",
-    "db:migrate:apply": "node scripts/ops/migrate.js --apply",
-    "db:dr-drill": "node scripts/ops/dr-drill.js",
-
-    "opc:validate:cases": "node scripts/opc/validate-case-intelligence.js --target=v0.1",
-    "opc:validate:cases:smoke": "node scripts/opc/validate-case-intelligence.js",
+    "test": "npm run opc:repo:test && npm run opc:skill:test && npm run opc:validate:cases:seed && npm run opc:eval:answers && npm run opc:idea:test && npm run opc:market:test && npm run opc:case-importer:test && npm run opc:case-collector:test",
+    "opc:repo:test": "node tests/opc/repository-boundary.test.js",
+    "opc:skill:test": "node tests/opc/skill-surface.test.js",
+    "opc:validate:cases": "node scripts/opc/validate-case-intelligence.js",
     "opc:validate:cases:seed": "node scripts/opc/validate-case-intelligence.js --min-sources=30 --min-raw=100 --min-normalized=100 --min-gold=30",
     "opc:collect:candidates": "node scripts/opc/collect-case-candidates.js",
     "opc:collect:candidates:dry": "node scripts/opc/collect-case-candidates.js --dry-run",
@@ -55,14 +20,12 @@
     "opc:import:cases:dry": "node scripts/opc/import-case-candidates.js --dry-run",
     "opc:case:index": "node scripts/opc/build-case-index.js",
     "opc:idea:match": "node scripts/opc/match-product-idea.js",
-    "opc:eval:answers": "node scripts/opc/validate-answer-quality-evals.js --min-scenarios=13 --min-gold-answers=5",
-    "opc:prompt:test": "node tests/opc/system-prompt-opc-protocol.test.js",
-    "opc:frontend:test": "node tests/opc/frontend-positioning.test.js",
-    "opc:slash:test": "node tests/opc/slash-command-dom.test.js",
+    "opc:idea:test": "node tests/opc/product-idea-matcher.test.js",
     "opc:market:test": "node tests/opc/market-patterns.test.js",
-    "opc:case:context:test": "node tests/opc/case-context.test.js && node tests/opc/case-context-server-boundary.test.js"
-  },
-  "dependencies": {
-    "better-sqlite3": "^12.9.0"
+    "opc:case-importer:test": "node tests/opc/case-importer.test.js",
+    "opc:case-collector:test": "node tests/opc/case-candidate-url-collector.test.js",
+    "opc:eval:answers": "node scripts/opc/validate-answer-quality-evals.js --min-scenarios=13 --min-gold-answers=5",
+    "opc:eval:test": "node tests/opc/answer-quality-evals.test.js",
+    "opc:case-validator:test": "node tests/opc/case-intelligence-validator.test.js"
   }
 }

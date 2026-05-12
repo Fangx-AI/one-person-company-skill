@@ -1,122 +1,150 @@
-# Book of Elon
+# 一人公司Skill
 
-中文互动 AI 教练站点。线上：[bookofelon.cn](https://bookofelon.cn)
+面向一人公司创业者的商业判断 skill。商业化可行性是第一准则：先判断能不能收费、能不能低成本触达、能不能持续交付，再谈功能、技术和愿景。
 
-| 入口 | 看什么 |
-|---|---|
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | 系统拓扑 / 数据流 / 关键决策（**改东西前必读**） |
-| [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) | 部署 / 烟测 / 回滚 / 备份 / 监控（**单一信源**） |
-| [`docs/runbooks/`](docs/runbooks/) | 救火手册（cost spike / pm2 errored / 等） |
-| [`docs/security/audits/`](docs/security/audits/) | CSO 安全审计 |
-| [`docs/superpowers/audits/`](docs/superpowers/audits/) | 项目整体审计与改造路线 |
-| [`CLAUDE.md`](CLAUDE.md) | 给未来 AI agent 的驾驶员手册 |
+这个仓库不是一个网站项目，而是一个可放进 AI agent / Codex / 类 ChatGPT skill 系统里的专业能力包。它专注三件事：
 
----
+- **产品判断**：一个想法能不能变成生意，卡点在哪里。
+- **相似案例**：用一人公司案例和替代方案校准判断，不空口给建议。
+- **定价获客**：第一批用户从哪里来，怎么定价，什么时候停损。
 
-## 一句话定位
+## 为什么存在
 
-- 前端：静态 HTML + CSS + 原生 JS（极简 Perplexity 风格）
-- 后端：Node.js 单进程（`server.js`），SQLite (`better-sqlite3`)，PM2 + Nginx
-- 模型：DeepSeek 代理（`prompts/system-prompt-v2.md` 风格），失败自动本地降级
-- 账号：手机号 + 阿里云短信 OTP，无密码，HMAC-SHA256 无状态 cookie
-- 记忆：登录用户的"北极星目标 + 关键 facts"会被注入下一次对话的 system prompt
-- 成本守门：三道闸（全站日 token / 单 IP / 匿名 session）+ 输入长度收紧
+通用大模型很容易给出正确但无用的创业建议：做 MVP、找痛点、持续输出、打造个人品牌。对一人公司来说，这些话没有信息增量。
 
----
+一人公司Skill 的目标是把回答压到商业本质：
 
-## 60 秒本地启动
+- 谁现在会付钱？
+- 他现在怎么解决？
+- 市面上谁已经收到了钱？
+- 一个人能不能交付？
+- 国内执行有什么坑？
+- 今天做什么能验证支付意愿？
+
+## 仓库结构
+
+```text
+skills/
+  one-person-company/
+    SKILL.md                         # skill 入口
+    references/
+      business-judgment.md           # 产品判断和商业可行性
+      case-intelligence.md           # 案例检索和对照方法
+      china-reality.md               # 国内执行现实
+
+knowledge/
+  cases/                             # 一人公司案例情报库
+  evals/answer-quality/              # 回答质量评估集
+  market-patterns/                   # 细分市场模式
+
+scripts/opc/                         # 案例校验、导入、检索工具
+tests/opc/                           # 仓库边界和知识库质量测试
+```
+
+## 使用方式
+
+把 `skills/one-person-company` 安装或复制到你的 agent skills 目录，然后这样提问：
+
+```text
+/产品判断
+idea: 我想做一个 markdown 转 html 的产品
+target_user: 写技术文档、博客、产品说明的人
+workflow: 现在需要把 markdown 转成可发布的网页或邮件格式
+paid_trigger: 用户为什么现在愿意付钱还不确定
+```
+
+```text
+/相似案例
+idea: 我想做一个面向小红书商家的 AI 选题工具
+target_user: 小红书商家、代运营、个人博主
+use_case: 每周找选题、写标题、判断爆款角度
+market_hint: 不知道
+```
+
+```text
+/定价获客
+idea: 我想做一个一人公司案例检索库
+target_user: 独立开发者、自由职业者、小团队创业者
+paid_trigger: 做产品前想减少误判
+acquisition_channel: GitHub、公众号、即刻、微信群
+```
+
+## 案例情报库
+
+当前仓库内置：
+
+- 100 条标准化一人公司/小团队产品案例
+- 30 条高价值 gold cases
+- 13 个回答质量评估场景
+- 5 条金标回答样本
+
+案例不是用来装饰回答的。每个案例都要拆成：
+
+- 目标用户
+- 付费机制
+- 获客路径
+- 交付方式
+- 可复制部分
+- 不可复制风险
+
+## 本地工具
+
+安装依赖：
 
 ```bash
-# 1. Node ≥ 20
-node -v
-
-# 2. 装依赖（注意：用 npm ci，better-sqlite3 是 native 模块）
-npm ci
-
-# 3. 配置环境变量
-cp .env.example .env
-# 至少改：DEEPSEEK_API_KEY / USER_SESSION_SECRET / SESSION_TOKEN_SECRET
-# 生成 secret：node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-
-# 4. 初始化数据库（首次必须）
-npm run db:init
-
-# 5. 启动
-npm run dev
-
-# 浏览器：http://localhost:3000
+npm install
 ```
 
-> 本地 SMS 默认走 mock：验证码会出现在 HTTP 响应的 `devCode` 字段，方便登录调试。
-> 生产**必须**配 `SMS_PROVIDER=aliyun` 全套，否则 `preflight:prod` 会拒启动。
-
-完整环境变量列表见 [`.env.example`](.env.example)；
-完整部署流程见 [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)。
-
----
-
-## 常用脚本
-
-| 命令 | 用途 |
-|---|---|
-| `npm run dev` | 本地启动 |
-| `npm run preflight:prod` | 生产环境完整性自检（部署前） |
-| `npm run smoke:chat` | `/api/chat` 走通烟测 |
-| `npm run cost:smoke` | 三道闸成本守门冒烟（30 个断言） |
-| `npm run prompt:smoke` | system prompt 注入防护 |
-| `npm run static:smoke` | 静态文件白名单生效 |
-| `npm run auth:smoke` | 登录全流程（**仅 mock 模式**） |
-| `npm run persist:smoke` | 聊天原子落库 + claim |
-| `npm run northstar:smoke` | 北极星目标读写 + dashboard |
-| `npm run test:e2e` | 30 个断言端到端（大改之后跑） |
-| `npm run db:backup` | 手动备份一次（gzip + 轮转） |
-| `npm run db:migrate` | 迁移 dry-run |
-
-完整脚本说明见 `package.json` + [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) §4（Smoke tests）。
-
----
-
-## 健康检查
+校验仓库：
 
 ```bash
-curl -s http://127.0.0.1:3000/api/health | python3 -m json.tool
+npm test
 ```
 
-返回里关键字段：
-
-```json
-{
-  "status": "ok",
-  "db":   { "status": "ok", "counts": {...} },
-  "llm":  { "status": "ok", "circuit_open": false },
-  "cost": { "global": { "tokens_used": ..., "tokens_budget": 2000000 } }
-}
-```
-
-详细告警建议见 [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) §7（Monitoring）。
-
----
-
-## 生产部署 30 秒摘要
+匹配相似案例：
 
 ```bash
-ssh root@bookofelon.cn
-cd /root/skill_The_book_of_Elon
-bash scripts/ops/deploy.sh
+node scripts/opc/match-product-idea.js "我想做一个 AI 小红书选题助手"
 ```
 
-完整流程（首次装机 / 例行发布 / 回滚 / 备份）见 [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)。
-救火（钱被烧 / DB 报错 / PM2 errored）见 [`docs/runbooks/`](docs/runbooks/)。
+校验案例库：
 
----
+```bash
+npm run opc:validate:cases:seed
+```
 
-## 状态徽章
+校验回答质量评估集：
 
-- Node.js `>=20`（生产跑 22.x）
-- DB：SQLite WAL，单机
-- 进程：PM2 单实例（`book-of-elon` + `book-of-elon-monitor`）
-- 反代：Nginx + Let's Encrypt
-- 监控：`/api/health` + 独立监控页（`monitor-server.js`，仅 127.0.0.1:3201）
-- 备份：cron 每 4h 一次，gzip + 轮转
+```bash
+npm run opc:eval:answers
+```
 
-更详细的当前架构姿态见 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)。
+## 回答标准
+
+好回答应该：
+
+- 简洁，但不是空泛。
+- 直接，但不是情绪化。
+- 反驳用户时给出商业理由。
+- 用案例、竞品、替代方案或渠道事实提供信息增量。
+- 说清楚国内现实约束，例如备案、支付、平台分发、微信生态、交付信任和合规摩擦。
+- 明确今天能做的验证动作，以及停损线。
+
+坏回答通常长这样：
+
+- 建议用户先做 MVP，但没有说卖给谁。
+- 建议持续输出，但没有渠道、内容角度和成交路径。
+- 说市场很大，但没有现有付费机制。
+- 只分析功能，不分析获客和交付成本。
+
+## 设计原则
+
+1. 商业化可行性优先于产品完整度。
+2. 真实案例优先于抽象建议。
+3. 国内执行现实优先于教科书路径。
+4. 一人公司适配度优先于大公司打法。
+5. 停损标准优先于长期幻想。
+
+## 状态
+
+这是一个早期 skill 仓库，核心方向已经确定：把一人公司创业判断做成高信任度、强信息增量、可检索案例支撑的 AI skill。
