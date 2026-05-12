@@ -51,6 +51,21 @@ function testProductJudgmentRequiresMarketAndPaymentMechanism() {
   });
 }
 
+function testCommercialViabilityIsFirstPrinciple() {
+  const v2 = systemPrompt.getSystemPrompt("v2");
+
+  [
+    "商业化可行性是第一准则",
+    "信息增量",
+    "能不能收费",
+    "能不能低成本触达",
+    "能不能持续交付",
+    "商业上不成立",
+  ].forEach((marker) => {
+    assert(v2.includes(marker), `expected V2 system prompt to include commercial viability marker ${marker}`);
+  });
+}
+
 function testFallbackKeepsBusinessProtocol() {
   const fallback = systemPrompt.getSystemPrompt("unknown-version");
 
@@ -61,6 +76,7 @@ function testFallbackKeepsBusinessProtocol() {
 testV2ContainsOnePersonCompanyAnswerProtocol();
 testV2BlocksGenericStartupAdviceAsFinalAnswers();
 testProductJudgmentRequiresMarketAndPaymentMechanism();
+testCommercialViabilityIsFirstPrinciple();
 testFallbackKeepsBusinessProtocol();
 
 console.log("system prompt OPC protocol tests passed");

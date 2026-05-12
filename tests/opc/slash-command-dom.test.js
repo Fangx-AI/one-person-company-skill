@@ -70,6 +70,8 @@ assert(quickInput.value.includes("竞品或替代方案"));
 assert(quickInput.value.includes("付费机制"));
 assert(quickInput.value.includes("具体工作流"));
 assert(quickInput.value.includes("target_user"));
+assert(quickInput.value.includes("商业化可行性"));
+assert(quickInput.value.includes("信息增量"));
 
 const chatInput = window.document.getElementById("chat-input");
 const chatMenu = window.document.getElementById("chat-slash-menu");
@@ -81,5 +83,6 @@ window.__slashTest.applySlashCommand("pricing", "chat");
 assert(chatInput.value.includes("/定价获客"));
 assert(chatInput.value.includes("paid_trigger"));
 assert(chatInput.value.includes("acquisition_channel"));
+assert(chatInput.value.includes("能不能收费"));
 
 console.log("slash command DOM tests passed");
