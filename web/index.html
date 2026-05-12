@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Book of Elon | 互动思想卡片</title>
+  <title>一人公司作战库 | 产品思路与商业路径判断</title>
   <meta
     name="description"
-    content="把 The Book of Elon 拆成可点击的思想卡片，用中文快速理解，再把它带回你的现实问题。"
+    content="面向国内一人公司创业者，把产品思路、相似案例、商业路径和现实坑位压缩成可执行判断。"
   >
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,8 +24,8 @@
 
     <header class="site-header" id="site-header">
       <a class="site-header__brand" href="#top">
-        <span class="site-header__brand-mark">BoE</span>
-        <span class="site-header__brand-text">The Book of Elon</span>
+        <span class="site-header__brand-mark">OPC</span>
+        <span class="site-header__brand-text">一人公司作战库</span>
       </a>
       <nav class="site-header__nav" id="site-header-nav">
         <button class="site-header__login-btn" id="login-btn" type="button">登录</button>
@@ -35,16 +35,16 @@
     <main class="home-min" id="top">
       <section class="hero-min">
         <div class="hero-min__inner">
-          <h1 class="hero-min__title">把你正在搞的事，<br>讲给它听。</h1>
-          <p class="hero-min__sub">它会用《埃隆之书》里的方式回应你。</p>
+          <h1 class="hero-min__title">输入你的产品思路，<br>先判断能不能变成生意。</h1>
+          <p class="hero-min__sub">它会对照相似案例、商业路径和现实坑位，给你一个短判断。</p>
 
           <div class="hero-min__composer">
             <textarea
               id="quick-ask-input"
               class="hero-min__input"
               rows="1"
-              placeholder="比如：我做的事好像没人在乎，是不是该放弃？"
-              aria-label="问点什么"
+              placeholder="比如：我想做一个 AI 小红书选题助手，怎么商业化？"
+              aria-label="输入产品思路或创业问题"
             ></textarea>
             <button id="quick-ask-submit" class="hero-min__submit" type="button" aria-label="开始对话">
               <span aria-hidden="true">↗</span>
@@ -52,12 +52,12 @@
           </div>
 
           <div class="hero-min__chips" id="quick-chip-row" data-preserve-children="true">
-            <button type="button" class="chip-min" data-quick-ask="我做的事好像没什么人在乎，是不是该放弃？">没人在乎</button>
-            <button type="button" class="chip-min" data-quick-ask="我有想做的事，但一直拖着不开始。">一直拖着</button>
-            <button type="button" class="chip-min" data-quick-ask="家里人不支持我做这件事。">家里人不支持</button>
-            <button type="button" class="chip-min" data-quick-ask="我害怕失败，怎么行动？">害怕失败</button>
-            <button type="button" class="chip-min" data-quick-ask="我该追赚钱，还是追我想做成的事？">钱 vs 理想</button>
-            <button type="button" class="chip-min" data-quick-ask="我没自信，总觉得自己还不够。">没自信</button>
+            <button type="button" class="chip-min" data-quick-ask="我想做一个 AI 小红书选题助手，怎么商业化？">AI 小红书工具</button>
+            <button type="button" class="chip-min" data-quick-ask="我想做一个面向一人公司的 Notion 模板，应该怎么定价和获客？">Notion 模板</button>
+            <button type="button" class="chip-min" data-quick-ask="我有一个知识付费产品想法，但不知道先做课程还是咨询。">课程还是咨询</button>
+            <button type="button" class="chip-min" data-quick-ask="我想做一个网站工具，国内备案和香港服务器应该怎么取舍？">备案和服务器</button>
+            <button type="button" class="chip-min" data-quick-ask="我会写代码但不会销售，一人公司第一单怎么拿？">第一单</button>
+            <button type="button" class="chip-min" data-quick-ask="我想做自媒体带产品，但不知道从公众号、知乎、小红书还是即刻开始。">内容渠道</button>
           </div>
 
           <div class="hero-min__resume hidden" id="resume-conversation-block">
@@ -73,11 +73,9 @@
       </section>
 
       <footer class="footer-min">
-        <a class="footer-min__link" href="https://wwaly.lanzn.com/iMoWJ3lmlvcb" target="_blank" rel="noopener noreferrer">
-          下载《埃隆之书》中文版 PDF
-        </a>
+        <span class="footer-min__link">100 个案例样本已接入回答</span>
         <span class="footer-min__sep" aria-hidden="true">·</span>
-        <button type="button" class="footer-min__link footer-min__as-button" id="random-card-btn">想不出来？随机给我一张主题卡</button>
+        <button type="button" class="footer-min__link footer-min__as-button" id="random-card-btn">随机看一个案例视角</button>
         <span class="footer-min__sep" aria-hidden="true">·</span>
         <button type="button" class="footer-min__link footer-min__as-button" id="ask-direct-btn">直接开始一段空白对话</button>
       </footer>
@@ -92,7 +90,7 @@
         <span aria-hidden="true">←</span>
         <span>新对话</span>
       </button>
-      <span class="conversation__brand">THE BOOK OF ELON</span>
+      <span class="conversation__brand">一人公司作战库</span>
       <span class="conversation__topbar-spacer" aria-hidden="true"></span>
     </div>
 
@@ -213,4 +211,3 @@
   <script defer src="./app.js?v=20260427-c2"></script>
 </body>
 </html>
-

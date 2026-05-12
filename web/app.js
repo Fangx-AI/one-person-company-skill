@@ -52,6 +52,14 @@ const randomCardBtn = document.getElementById("random-card-btn");
 const askDirectBtn = document.getElementById("ask-direct-btn");
 const quickAskInput = document.getElementById("quick-ask-input");
 const quickAskSubmit = document.getElementById("quick-ask-submit");
+const OPC_RANDOM_CASE_PROMPTS = [
+  "我想做一个 AI 小红书选题助手，帮一人公司老板生成标题和笔记方向，怎么商业化？",
+  "我想做一个面向一人公司的 Notion 模板，应该怎么定价和获客？",
+  "我想把咨询经验做成知识付费产品，先做课程、训练营还是一对一？",
+  "我想做一个网站工具，国内备案和香港服务器应该怎么取舍？",
+  "我会写代码但不会销售，一人公司第一单怎么拿？",
+  "我想从公众号、知乎、小红书、即刻里选一个渠道启动，应该怎么判断？",
+];
 const resumeConversationBlock = document.getElementById("resume-conversation-block");
 const resumeConversationBadge = document.getElementById("resume-conversation-badge");
 const resumeConversationTitle = document.getElementById("resume-conversation-title");
@@ -325,8 +333,8 @@ function wireEvents() {
   });
 
   randomCardBtn.addEventListener("click", () => {
-    const pick = cards[Math.floor(Math.random() * cards.length)];
-    openCard(pick.id);
+    const pick = OPC_RANDOM_CASE_PROMPTS[Math.floor(Math.random() * OPC_RANDOM_CASE_PROMPTS.length)];
+    openGenericCoach(pick);
   });
 
   askDirectBtn.addEventListener("click", () => openGenericCoach(""));
