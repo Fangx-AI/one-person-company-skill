@@ -52,6 +52,7 @@ const randomCardBtn = document.getElementById("random-card-btn");
 const askDirectBtn = document.getElementById("ask-direct-btn");
 const quickAskInput = document.getElementById("quick-ask-input");
 const quickAskSubmit = document.getElementById("quick-ask-submit");
+const quickSlashMenu = document.getElementById("quick-slash-menu");
 const OPC_RANDOM_CASE_PROMPTS = [
   "我想做一个 AI 小红书选题助手，帮一人公司老板生成标题和笔记方向，怎么商业化？",
   "我想做一个面向一人公司的 Notion 模板，应该怎么定价和获客？",
@@ -80,6 +81,45 @@ const chatSystemNote = document.getElementById("chat-system-note");
 const chatForm = document.getElementById("chat-form");
 const chatInput = document.getElementById("chat-input");
 const chatSubmitBtn = document.getElementById("chat-submit-btn");
+const chatSlashMenu = document.getElementById("chat-slash-menu");
+const OPC_SLASH_COMMANDS = [
+  {
+    id: "judge",
+    label: "产品判断",
+    hint: "先判断能不能变成生意",
+    prompt: "/产品判断 我想做一个 [产品/服务]，目标用户是 [人群]。请判断它能不能变成一人公司生意，并指出最大卡点。",
+  },
+  {
+    id: "cases",
+    label: "相似案例",
+    hint: "找类似案例、路径和风险",
+    prompt: "/相似案例 我想做一个 [产品/服务]。请找类似案例、可能路径、商业化方式和主要风险。",
+  },
+  {
+    id: "route",
+    label: "路线规划",
+    hint: "给 7 天和 30 天实践路线",
+    prompt: "/路线规划 我想做一个 [产品/服务]。请给我 7 天验证路线和 30 天商业化路线，每一步都要能产生真实信号。",
+  },
+  {
+    id: "china",
+    label: "国内坑位",
+    hint: "备案、支付、平台、主体、服务器",
+    prompt: "/国内坑位 我想做一个 [产品/服务]，主要面向国内用户。请检查备案、支付、平台规则、服务器、主体和内容风险。",
+  },
+  {
+    id: "pricing",
+    label: "定价获客",
+    hint: "定价、第一批用户、第一单",
+    prompt: "/定价获客 我想做一个 [产品/服务]，目标用户是 [人群]。请给定价、第一批用户来源和第一单验证动作。",
+  },
+  {
+    id: "stop",
+    label: "停损复盘",
+    hint: "判断继续、降级还是换方向",
+    prompt: "/停损复盘 我已经做了 [进展]，目前信号是 [数据/反馈]。请判断我该继续、降级还是换方向，并给停损条件。",
+  },
+];
 
 const CHAT_SESSION_STORAGE_KEY = "book-of-elon-chat-session-v1";
 const CHAT_SESSION_VERSION = 1;
@@ -314,6 +354,12 @@ function renderResumeEntry() {
 
 function wireEvents() {
   document.body.addEventListener("click", (event) => {
+    const slashCommandTrigger = event.target.closest("[data-slash-command-id]");
+    if (slashCommandTrigger) {
+      applySlashCommand(slashCommandTrigger.dataset.slashCommandId, slashCommandTrigger.dataset.slashTarget);
+      return;
+    }
+
     const topicGroupToggle = event.target.closest("[data-topic-group-toggle]");
     if (topicGroupToggle) {
       toggleTopicGroup(topicGroupToggle.dataset.topicGroupToggle);
@@ -341,13 +387,26 @@ function wireEvents() {
 
   quickAskSubmit.addEventListener("click", () => {
     const message = quickAskInput.value.trim();
+    if (message === "/") {
+      updateSlashMenuForInput(quickAskInput, quickSlashMenu);
+      return;
+    }
     openGenericCoach(message);
   });
 
   quickAskInput.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      hideSlashMenus();
+      return;
+    }
+
     if (event.key === "Enter" && !event.shiftKey && !event.isComposing) {
       event.preventDefault();
       const message = quickAskInput.value.trim();
+      if (message === "/") {
+        updateSlashMenuForInput(quickAskInput, quickSlashMenu);
+        return;
+      }
       openGenericCoach(message);
     }
   });
@@ -361,12 +420,25 @@ function wireEvents() {
     quickAskInput.addEventListener("input", autoGrow);
     autoGrow();
   }
+  quickAskInput.addEventListener("input", () => updateSlashMenuForInput(quickAskInput, quickSlashMenu));
+  quickAskInput.addEventListener("focus", () => updateSlashMenuForInput(quickAskInput, quickSlashMenu));
 
   chatForm.addEventListener("submit", (event) => {
     event.preventDefault();
     const value = chatInput.value.trim();
     if (!value) return;
+    if (value === "/") {
+      updateSlashMenuForInput(chatInput, chatSlashMenu);
+      return;
+    }
     pushUserMessage(value);
+  });
+  chatInput.addEventListener("input", () => updateSlashMenuForInput(chatInput, chatSlashMenu));
+  chatInput.addEventListener("focus", () => updateSlashMenuForInput(chatInput, chatSlashMenu));
+  chatInput.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      hideSlashMenus();
+    }
   });
 
   if (resumeConversationBtn) {
@@ -400,6 +472,63 @@ function openCard(cardId) {
   renderMessages();
   showDetail();
   persistChatSession();
+}
+
+function renderSlashMenu(menu, targetName) {
+  if (!menu) return;
+
+  menu.innerHTML = OPC_SLASH_COMMANDS.map(
+    (command) => `
+      <button
+        class="slash-command-menu__item"
+        type="button"
+        role="option"
+        data-slash-command-id="${command.id}"
+        data-slash-target="${targetName}"
+      >
+        <span class="slash-command-menu__label">/${command.label}</span>
+        <span class="slash-command-menu__hint">${command.hint}</span>
+      </button>`
+  ).join("");
+}
+
+function updateSlashMenuForInput(input, menu) {
+  if (!input || !menu) return;
+
+  const shouldShow = input.value.trim() === "/";
+  if (shouldShow) {
+    hideSlashMenus(menu);
+    renderSlashMenu(menu, input === chatInput ? "chat" : "quick");
+    menu.classList.remove("hidden");
+    return;
+  }
+
+  menu.classList.add("hidden");
+}
+
+function hideSlashMenus(exceptMenu) {
+  [quickSlashMenu, chatSlashMenu].forEach((menu) => {
+    if (menu && menu !== exceptMenu) {
+      menu.classList.add("hidden");
+    }
+  });
+}
+
+function applySlashCommand(commandId, targetName) {
+  const command = OPC_SLASH_COMMANDS.find((item) => item.id === commandId);
+  if (!command) return;
+
+  const input = targetName === "chat" ? chatInput : quickAskInput;
+  if (!input) return;
+
+  input.value = command.prompt;
+  hideSlashMenus();
+  input.focus();
+
+  if (input === quickAskInput && input.tagName === "TEXTAREA") {
+    input.style.height = "auto";
+    input.style.height = Math.min(input.scrollHeight, 200) + "px";
+  }
 }
 
 function openGenericCoach(initialQuestion) {

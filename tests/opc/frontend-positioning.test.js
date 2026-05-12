@@ -56,9 +56,40 @@ function testRandomCasePromptDoesNotOpenOldCardLibrary() {
   assert(!appJs.includes("openCard(pick.id)"), "random footer action should not open old card library");
 }
 
+function testSlashCommandEntryExists() {
+  [
+    'id="quick-slash-menu"',
+    'id="chat-slash-menu"',
+    "slash-command-menu",
+  ].forEach((marker) => {
+    assert(indexHtml.includes(marker), `expected slash command container ${marker}`);
+  });
+
+  [
+    "OPC_SLASH_COMMANDS",
+    "产品判断",
+    "相似案例",
+    "路线规划",
+    "国内坑位",
+    "定价获客",
+    "停损复盘",
+    "renderSlashMenu",
+    "applySlashCommand",
+  ].forEach((marker) => {
+    assert(appJs.includes(marker), `expected slash command implementation marker ${marker}`);
+  });
+
+  assert(appJs.includes("input.value.trim() === \"/\""), "slash menu should open only for slash trigger");
+  assert(appJs.includes("message === \"/\""), "quick submit should not send the slash trigger");
+  assert(appJs.includes("value === \"/\""), "chat submit should not send the slash trigger");
+  assert(!appJs.includes("openGenericCoach(command.prompt)"), "selecting a slash command should not auto-send");
+  assert(!appJs.includes("pushUserMessage(command.prompt)"), "selecting a slash command should not consume API");
+}
+
 testHomepagePositionsOnePersonCompanyProduct();
 testHomepageNoLongerSellsElonBookAsPrimaryExperience();
 testClientPromptIncludesOpcProtocolForLegacyCaches();
 testRandomCasePromptDoesNotOpenOldCardLibrary();
+testSlashCommandEntryExists();
 
 console.log("frontend OPC positioning tests passed");

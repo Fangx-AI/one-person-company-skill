@@ -14,7 +14,7 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;800&display=swap"
     rel="stylesheet"
   >
-  <link rel="stylesheet" href="./styles.css?v=20260418-modal4">
+  <link rel="stylesheet" href="./styles.css?v=20260512-slash">
 </head>
 <body>
   <div class="page-shell">
@@ -49,6 +49,7 @@
             <button id="quick-ask-submit" class="hero-min__submit" type="button" aria-label="开始对话">
               <span aria-hidden="true">↗</span>
             </button>
+            <div class="slash-command-menu hidden" id="quick-slash-menu" role="listbox" aria-label="一人公司作战库命令"></div>
           </div>
 
           <div class="hero-min__chips" id="quick-chip-row" data-preserve-children="true">
@@ -120,6 +121,7 @@
         <button class="conversation__submit" id="chat-submit-btn" type="submit" aria-label="发送">
           <span aria-hidden="true">↗</span>
         </button>
+        <div class="slash-command-menu slash-command-menu--chat hidden" id="chat-slash-menu" role="listbox" aria-label="一人公司作战库命令"></div>
       </div>
     </form>
   </section>
@@ -208,6 +210,6 @@
   <script defer src="./model-client.js?v=20260427-c2"></script>
   <script defer src="./reply-engine.js?v=20260427-c2"></script>
   <script defer src="./auth-ui.js?v=20260427-c2"></script>
-  <script defer src="./app.js?v=20260427-c2"></script>
+  <script defer src="./app.js?v=20260512-slash"></script>
 </body>
 </html>
