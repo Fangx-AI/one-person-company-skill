@@ -1,0 +1,53 @@
+{
+  "items": [
+    {
+      "id": "business_judgment",
+      "label": "Business Judgment",
+      "points": 2,
+      "pass": "The answer names the main business bottleneck instead of giving generic encouragement or a list of tactics."
+    },
+    {
+      "id": "case_or_pattern",
+      "label": "Case Or Pattern",
+      "points": 1.5,
+      "pass": "The answer uses at least one similar case, route, or commercial pattern to support the judgment."
+    },
+    {
+      "id": "china_reality",
+      "label": "China Reality",
+      "points": 1.5,
+      "pass": "The answer mentions relevant China-specific constraints such as platform rules, ICP, payment, private domain, company entity, or content risk when applicable."
+    },
+    {
+      "id": "route_planning",
+      "label": "Route Planning",
+      "points": 1.25,
+      "pass": "The answer gives a route appropriate to the user's stage rather than a mature-company plan."
+    },
+    {
+      "id": "next_action",
+      "label": "Low-Friction Next Action",
+      "points": 1.25,
+      "pass": "The next action is small enough to do today or this week and produces a payment, conversation, or rejection signal."
+    },
+    {
+      "id": "stop_loss",
+      "label": "Stop-Loss Condition",
+      "points": 1,
+      "pass": "The answer states what signal means pause, downgrade, or change direction."
+    },
+    {
+      "id": "anti_fluff",
+      "label": "Anti-Fluff",
+      "points": 1,
+      "pass": "The answer avoids using phrases such as '持续输出', '打造个人品牌', '做 MVP', '找到痛点', or '坚持下去' as conclusions."
+    },
+    {
+      "id": "expression_quality",
+      "label": "Expression Quality",
+      "points": 0.5,
+      "pass": "The answer is concise, direct, and does not overwhelm the user with long generic lists."
+    }
+  ],
+  "minimum_pass_score": 8
+}
