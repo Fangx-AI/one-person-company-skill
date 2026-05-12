@@ -48,29 +48,38 @@ quickInput.value = "/";
 window.__slashTest.updateSlashMenuForInput(quickInput, quickMenu);
 
 assert(!quickMenu.classList.contains("hidden"), "slash menu should show when quick input is /");
-assert.strictEqual(quickMenu.querySelectorAll("[data-slash-command-id]").length, 6);
+assert.strictEqual(quickMenu.querySelectorAll("[data-slash-command-id]").length, 3);
 assert(quickMenu.textContent.includes("/产品判断"));
 assert(quickMenu.textContent.includes("/相似案例"));
+assert(quickMenu.textContent.includes("/定价获客"));
+assert(!quickMenu.textContent.includes("/路线规划"));
+assert(!quickMenu.textContent.includes("/国内坑位"));
+assert(!quickMenu.textContent.includes("/停损复盘"));
 
 window.__slashTest.applySlashCommand("cases", "quick");
 
 assert(quickMenu.classList.contains("hidden"), "slash menu should hide after selecting command");
 assert(quickInput.value.includes("/相似案例"));
-assert(quickInput.value.includes("类似案例"));
+assert(quickInput.value.includes("target_user"));
+assert(quickInput.value.includes("付费机制"));
+assert(quickInput.value.includes("获客路径"));
+assert(quickInput.value.includes("不可复制风险"));
+
+window.__slashTest.applySlashCommand("judge", "quick");
+assert(quickInput.value.includes("竞品或替代方案"));
+assert(quickInput.value.includes("付费机制"));
+assert(quickInput.value.includes("具体工作流"));
+assert(quickInput.value.includes("target_user"));
 
 const chatInput = window.document.getElementById("chat-input");
 const chatMenu = window.document.getElementById("chat-slash-menu");
 
 chatInput.value = "/";
 window.__slashTest.updateSlashMenuForInput(chatInput, chatMenu);
-window.__slashTest.applySlashCommand("china", "chat");
+window.__slashTest.applySlashCommand("pricing", "chat");
 
-assert(chatInput.value.includes("/国内坑位"));
-assert(chatInput.value.includes("备案"));
-
-window.__slashTest.applySlashCommand("judge", "quick");
-assert(quickInput.value.includes("竞品或替代方案"));
-assert(quickInput.value.includes("付费机制"));
-assert(quickInput.value.includes("具体工作流"));
+assert(chatInput.value.includes("/定价获客"));
+assert(chatInput.value.includes("paid_trigger"));
+assert(chatInput.value.includes("acquisition_channel"));
 
 console.log("slash command DOM tests passed");

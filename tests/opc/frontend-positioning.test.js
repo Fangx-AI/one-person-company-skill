@@ -69,15 +69,20 @@ function testSlashCommandEntryExists() {
     "OPC_SLASH_COMMANDS",
     "产品判断",
     "相似案例",
-    "路线规划",
-    "国内坑位",
     "定价获客",
-    "停损复盘",
     "renderSlashMenu",
     "applySlashCommand",
   ].forEach((marker) => {
     assert(appJs.includes(marker), `expected slash command implementation marker ${marker}`);
   });
+
+  ["路线规划", "国内坑位", "停损复盘"].forEach((removedCommand) => {
+    assert(!appJs.includes(`label: "${removedCommand}"`), `slash command should not include ${removedCommand}`);
+  });
+
+  assert(appJs.includes("target_user"), "slash commands should request target user context");
+  assert(appJs.includes("paid_trigger"), "slash commands should request payment trigger context");
+  assert(appJs.includes("acquisition_channel"), "slash commands should request acquisition channel context");
 
   assert(appJs.includes("input.value.trim() === \"/\""), "slash menu should open only for slash trigger");
   assert(appJs.includes("message === \"/\""), "quick submit should not send the slash trigger");
