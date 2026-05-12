@@ -37,6 +37,7 @@ skills/
 
 knowledge/
   cases/                             # 一人公司案例情报库
+  github-sources/                    # GitHub 实操信号和开源知识源
   evals/answer-quality/              # 回答质量评估集
   market-patterns/                   # 细分市场模式
 
@@ -90,10 +91,12 @@ acquisition_channel: GitHub、公众号、即刻、微信群
 
 - 100 条标准化一人公司/小团队产品案例
 - 30 条高价值 gold cases
+- 10 个 GitHub 高价值开源知识源
+- 16 条 GitHub 实操信号
 - 13 个回答质量评估场景
 - 5 条金标回答样本
 
-案例不是用来装饰回答的。每个案例都要拆成：
+案例和 GitHub 来源不是用来装饰回答的。每条资料都要拆成：
 
 - 目标用户
 - 付费机制
@@ -101,6 +104,7 @@ acquisition_channel: GitHub、公众号、即刻、微信群
 - 交付方式
 - 可复制部分
 - 不可复制风险
+- 国内适配条件
 
 ## 本地工具
 
