@@ -1,20 +1,19 @@
 # 一人公司Skill
 
-面向一人公司创业者的商业判断 skill。商业化可行性是第一准则：先判断能不能收费、能不能低成本触达、能不能持续交付，再谈功能、技术和愿景。
+![version](https://img.shields.io/badge/version-v0.1%20public%20alpha-blue)
+![tests](https://img.shields.io/badge/tests-passing-brightgreen)
+![license](https://img.shields.io/badge/license-MIT-black)
+![focus](https://img.shields.io/badge/focus-China%20solo%20business-red)
 
-默认面向中国大陆语境下的国内用户。海外案例可以作为商业机制参照，但不能直接照搬；每个结论都要回到国内渠道、支付、合规、信任和交付现实里重新判断。
+面向中国大陆一人公司创业者的商业判断 Skill。  
+商业化可行性是第一准则：先判断能不能收费、能不能低成本触达、能不能持续交付，再谈功能、技术和愿景。
 
-这个仓库不是一个网站项目，而是一个可放进 AI agent / Codex / 类 ChatGPT skill 系统里的专业能力包。它专注三件事：
+> v0.1 public alpha：可以公开试用，但还在快速扩充案例、知识库和真实样例回答。
 
-- **产品判断**：一个想法能不能变成生意，卡点在哪里。
-- **相似案例**：用一人公司案例和替代方案校准判断，不空口给建议。
-- **定价获客**：第一批用户从哪里来，怎么定价，什么时候停损。
+## 它解决什么
 
-## 为什么存在
-
-通用大模型很容易给出正确但无用的创业建议：做 MVP、找痛点、持续输出、打造个人品牌。对一人公司来说，这些话没有信息增量。
-
-一人公司Skill 的目标是把回答压到商业本质：
+通用大模型很容易给出正确但无用的创业建议：做 MVP、找痛点、持续输出、打造个人品牌。  
+一人公司Skill 默认把问题压回商业现实：
 
 - 谁现在会付钱？
 - 他现在怎么解决？
@@ -23,31 +22,11 @@
 - 国内执行有什么坑？
 - 今天做什么能验证支付意愿？
 
-## 仓库结构
+默认面向中国大陆语境下的国内用户。海外案例可以作为商业机制参照，但不能直接照搬；每个结论都要回到国内渠道、支付、合规、信任和交付现实里重新判断。
 
-```text
-skills/
-  one-person-company/
-    SKILL.md                         # skill 入口
-    references/
-      business-judgment.md           # 产品判断和商业可行性
-      business-model-delivery.md     # 收费、支付、交付、毛利、复购和停损
-      case-intelligence.md           # 案例检索和对照方法
-      china-reality.md               # 国内执行现实
+## 快速开始
 
-knowledge/
-  cases/                             # 一人公司案例情报库
-  github-sources/                    # GitHub 实操信号和开源知识源
-  evals/answer-quality/              # 回答质量评估集
-  market-patterns/                   # 细分市场模式
-
-scripts/opc/                         # 案例校验、导入、检索工具
-tests/opc/                           # 仓库边界和知识库质量测试
-```
-
-## 使用方式
-
-把 `skills/one-person-company` 安装或复制到你的 agent skills 目录，然后这样提问：
+把 `skills/one-person-company` 复制到你的 Agent / Codex / ChatGPT-like skills 目录，然后这样提问：
 
 ```text
 /产品判断
@@ -73,6 +52,23 @@ paid_trigger: 做产品前想减少误判
 acquisition_channel: GitHub、公众号、即刻、微信群
 ```
 
+## 真实问题示例
+
+**普通问题：**
+
+```text
+我想做一个 AI 小红书选题助手，能不能做？
+```
+
+**这个 Skill 应该输出的方向：**
+
+- 先判断它卖的是“选题结果”“节省时间”还是“提高成交概率”。
+- 找类似内容工具、代运营服务、模板、社群和小红书商家工作流。
+- 判断付费人群是商家、博主、代运营，还是知识付费人群。
+- 检查获客路径：小红书内容、微信群、代运营圈子、公众号案例拆解。
+- 给第一单验证方式：先卖 19/49/199 元的小样本诊断，而不是先做完整 SaaS。
+- 给停损线：20 个目标用户里没有 3 个愿意付费沟通，就不要继续堆功能。
+
 ## 工具路径图
 
 ```text
@@ -85,12 +81,13 @@ acquisition_channel: GitHub、公众号、即刻、微信群
 
 每一步都要回到一个问题：这个人能不能在国内现实里收到钱，并稳定交付。
 
-## 案例情报库
+## 知识库规模
 
-当前仓库内置：
+当前内置：
 
-- 100 条标准化一人公司/小团队产品案例
-- 30 条高价值 gold cases
+- 100 条标准化案例
+- 30 条 gold cases
+- 39 个案例来源
 - 10 个 GitHub 高价值开源知识源
 - 16 条 GitHub 实操信号
 - 13 个回答质量评估场景
@@ -105,6 +102,28 @@ acquisition_channel: GitHub、公众号、即刻、微信群
 - 可复制部分
 - 不可复制风险
 - 国内适配条件
+
+## 项目结构
+
+```text
+skills/
+  one-person-company/
+    SKILL.md                         # Skill 入口
+    references/
+      business-judgment.md           # 产品判断和商业可行性
+      business-model-delivery.md     # 收费、支付、交付、毛利、复购、停损
+      case-intelligence.md           # 案例检索和对照方法
+      china-reality.md               # 国内执行现实
+
+knowledge/
+  cases/                             # 一人公司案例情报库
+  github-sources/                    # GitHub 实操信号和开源知识源
+  evals/answer-quality/              # 回答质量评估集
+  market-patterns/                   # 细分市场模式
+
+scripts/opc/                         # 案例校验、导入、检索工具
+tests/opc/                           # 仓库边界和知识库质量测试
+```
 
 ## 本地工具
 
@@ -132,13 +151,13 @@ node scripts/opc/match-product-idea.js "我想做一个 AI 小红书选题助手
 npm run opc:validate:cases:seed
 ```
 
-校验回答质量评估集：
+校验 GitHub 实操信号：
 
 ```bash
-npm run opc:eval:answers
+npm run opc:validate:github-sources
 ```
 
-## 回答标准
+## 质量门槛
 
 好回答应该：
 
@@ -158,14 +177,18 @@ npm run opc:eval:answers
 - 说市场很大，但没有现有付费机制。
 - 只分析功能，不分析获客和交付成本。
 
-## 设计原则
+## 路线图
 
-1. 商业化可行性优先于产品完整度。
-2. 真实案例优先于抽象建议。
-3. 国内执行现实优先于教科书路径。
-4. 一人公司适配度优先于大公司打法。
-5. 停损标准优先于长期幻想。
+- [x] 清理旧站点，转为纯 Skill 仓库
+- [x] 建立一人公司核心 Skill
+- [x] 建立案例库和相似案例检索
+- [x] 建立 GitHub 实操信号库
+- [x] 增加商业模式与交付 reference
+- [ ] 补 10 个高质量示例回答
+- [ ] 扩充国内一人公司案例
+- [ ] 增加普通大模型 vs 本 Skill 的回答对比
+- [ ] 做第一轮真实用户内测
 
-## 状态
+## License
 
-这是一个早期 skill 仓库，核心方向已经确定：把一人公司创业判断做成高信任度、强信息增量、可检索案例支撑的 AI skill。
+MIT License. See [LICENSE](LICENSE).
