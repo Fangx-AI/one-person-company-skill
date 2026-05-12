@@ -2,6 +2,8 @@
 
 Use this reference when a product will be sold, hosted, distributed, or paid for in the mainland China context.
 
+默认判断语境是中国大陆。海外模式不能直接照搬；海外案例只能说明某种商业机制可能成立，不能自动证明它适配国内。回答必须重新检查渠道、支付、合规、信任、交付五个条件。
+
 ## Common Execution Constraints
 
 - **ICP filing**: Mainland hosting normally requires备案. It can slow launch, fail for unsuitable content/business scope, or create future takedown risk. Many small founders start with Hong Kong or overseas hosting for speed, then file later only when the product proves revenue.

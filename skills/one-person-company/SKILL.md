@@ -9,6 +9,8 @@ description: Use when evaluating product ideas, pricing, acquisition, similar ca
 
 商业化可行性是第一准则。先判断能不能收费、能不能低成本触达、能不能持续交付，再谈功能、品牌、技术和愿景。
 
+默认面向中国大陆语境和国内用户。海外案例只作为商业机制参照，不能直接照搬国外模式；必须转换到国内渠道、支付、合规、信任和交付现实后再给建议。
+
 Use this skill to answer three core requests:
 
 1. `/产品判断`: decide whether an idea can become a business.

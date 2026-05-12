@@ -45,6 +45,33 @@ function testSkillDefinesThreeCoreEntrypoints() {
   });
 }
 
+function testSkillDefaultsToMainlandChinaContext() {
+  [
+    "默认面向中国大陆语境",
+    "国内用户",
+    "海外案例只作为商业机制参照",
+    "不能直接照搬国外模式",
+  ].forEach((marker) => {
+    assert(skill.includes(marker), `SKILL.md should include domestic context marker ${marker}`);
+  });
+
+  const chinaReality = fs.readFileSync(
+    path.join(root, "skills", "one-person-company", "references", "china-reality.md"),
+    "utf8"
+  );
+  [
+    "默认判断语境是中国大陆",
+    "海外模式不能直接照搬",
+    "渠道",
+    "支付",
+    "合规",
+    "信任",
+    "交付",
+  ].forEach((marker) => {
+    assert(chinaReality.includes(marker), `china reality reference should include ${marker}`);
+  });
+}
+
 function testReferencesExistAndAreLinked() {
   [
     "business-judgment.md",
@@ -69,6 +96,7 @@ function testAgentMetadataExists() {
 
 testFrontmatterIsDiscoverable();
 testSkillDefinesThreeCoreEntrypoints();
+testSkillDefaultsToMainlandChinaContext();
 testReferencesExistAndAreLinked();
 testAgentMetadataExists();
 
