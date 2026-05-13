@@ -64,7 +64,7 @@ function testSkillRepositorySurfaceExists() {
     "README.md",
     "skills/one-person-company/SKILL.md",
     "skills/one-person-company/references/business-judgment.md",
-    "skills/one-person-company/references/china-reality.md",
+    "skills/one-person-company/references/local-execution.md",
     "skills/one-person-company/references/case-intelligence.md",
     "knowledge/cases/normalized/normalized-cases.jsonl",
     "knowledge/cases/gold/gold-cases.jsonl",
@@ -93,6 +93,8 @@ function testReadmePresentsSkillInsteadOfOldSite() {
     "相似案例",
     "定价获客",
     "案例情报库",
+    "30 秒看懂输出差异",
+    "中文商业语境",
     "Codex",
   ].forEach((marker) => {
     assert(readme.includes(marker), `README should include ${marker}`);

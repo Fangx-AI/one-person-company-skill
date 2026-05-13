@@ -26,7 +26,9 @@ function testFrontmatterIsDiscoverable() {
   assert(fields.description.startsWith("Use when"), "description should start with Use when");
   assert(fields.description.includes("product ideas"));
   assert(fields.description.includes("commercial viability"));
+  assert(fields.description.includes("local execution constraints"));
   assert(fields.description.length < 500);
+  assert(!fields.description.includes("China-specific"), "description should avoid awkward public regional framing");
 }
 
 function testSkillDefinesThreeCoreEntrypoints() {
@@ -45,22 +47,24 @@ function testSkillDefinesThreeCoreEntrypoints() {
   });
 }
 
-function testSkillDefaultsToMainlandChinaContext() {
+function testSkillDefaultsToChineseBusinessContext() {
   [
-    "默认面向中国大陆语境",
-    "国内用户",
+    "中文商业语境",
+    "本土执行现实",
     "海外案例只作为商业机制参照",
-    "不能直接照搬国外模式",
+    "不能直接照搬",
+    "渠道、支付、合规、信任和交付",
   ].forEach((marker) => {
-    assert(skill.includes(marker), `SKILL.md should include domestic context marker ${marker}`);
+    assert(skill.includes(marker), `SKILL.md should include local business context marker ${marker}`);
   });
 
-  const chinaReality = fs.readFileSync(
-    path.join(root, "skills", "one-person-company", "references", "china-reality.md"),
+  const localExecution = fs.readFileSync(
+    path.join(root, "skills", "one-person-company", "references", "local-execution.md"),
     "utf8"
   );
   [
-    "默认判断语境是中国大陆",
+    "中文商业语境",
+    "本土执行现实",
     "海外模式不能直接照搬",
     "渠道",
     "支付",
@@ -68,7 +72,16 @@ function testSkillDefaultsToMainlandChinaContext() {
     "信任",
     "交付",
   ].forEach((marker) => {
-    assert(chinaReality.includes(marker), `china reality reference should include ${marker}`);
+    assert(localExecution.includes(marker), `local execution reference should include ${marker}`);
+  });
+
+  [
+    "中国大陆",
+    "mainland",
+    "China-specific",
+  ].forEach((marker) => {
+    assert(!skill.includes(marker), `SKILL.md should avoid public framing marker ${marker}`);
+    assert(!localExecution.includes(marker), `local execution reference should avoid public framing marker ${marker}`);
   });
 }
 
@@ -76,7 +89,7 @@ function testReferencesExistAndAreLinked() {
   [
     "business-judgment.md",
     "business-model-delivery.md",
-    "china-reality.md",
+    "local-execution.md",
     "case-intelligence.md",
   ].forEach((file) => {
     assert(skill.includes(`references/${file}`), `SKILL.md should link ${file}`);
@@ -128,7 +141,7 @@ function testAgentMetadataExists() {
 
 testFrontmatterIsDiscoverable();
 testSkillDefinesThreeCoreEntrypoints();
-testSkillDefaultsToMainlandChinaContext();
+testSkillDefaultsToChineseBusinessContext();
 testReferencesExistAndAreLinked();
 testBusinessModelDeliveryReferenceIsHardNosed();
 testAgentMetadataExists();

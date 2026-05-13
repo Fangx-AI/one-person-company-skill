@@ -9,7 +9,7 @@ Do not choose a business model because it sounds elegant. Choose the model that 
 The order is:
 
 1. **收费**: what exactly is being sold and why the buyer pays now.
-2. **支付**: how the first transaction happens in the mainland China context.
+2. **支付**: how the first transaction happens in the local Chinese-language business context.
 3. **交付**: how the promised outcome is delivered without hidden labor.
 4. **毛利**: what time, API cost, refund risk, and support burden remain after each sale.
 5. **复购**: whether the customer has a recurring reason to come back.
@@ -45,7 +45,7 @@ For `/定价获客`, give:
 - Core price: where the product should actually make money.
 - High price: service/consulting/data version for buyers with urgent need.
 
-## Payment In China
+## Local Payment Path
 
 For validation, do not overbuild payment infrastructure.
 

@@ -37,13 +37,13 @@ When the question involves practical execution, also check GitHub practice signa
 - Payment and first transaction paths.
 - Acquisition channels and launch surfaces.
 - Delivery boundaries and low-overhead operations.
-- Domestic adaptation of overseas indie patterns.
+- Local adaptation of overseas indie patterns.
 - Personal intelligence systems and solo-founder infrastructure.
 
 ## Case Use Rules
 
 - Do not name-drop cases as decoration. Explain the commercial mechanism.
-- Do not overfit from global indie-hacker examples to China without adjusting for channel, payment, compliance, and trust.
+- Do not overfit from global indie-hacker examples without adjusting for channel, payment, compliance, and trust.
 - Prefer adjacent substitutes when exact competitors are missing. A paid agency, template, course, community, spreadsheet, API, or workflow hack can prove demand.
 - Treat old cases as directional evidence. Flag when the channel or market may have changed.
 - Treat GitHub stars as attention evidence, not payment evidence.
