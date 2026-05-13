@@ -95,6 +95,25 @@ function createFixture() {
       date_checked: "2026-05-11",
     },
     {
+      id: "case_ai_virtual_try_on",
+      raw_ids: ["raw_ai_virtual_try_on"],
+      name: "AI Virtual Try-On Commerce Visuals",
+      founder_type: "solo_founder",
+      geography: ["global", "cn"],
+      target_user: ["fashion_sellers", "xiaohongshu_sellers", "ecommerce_operators"],
+      product_form: ["ai_image_tool", "virtual_try_on", "commerce_visual_tool"],
+      route: ["ai_commerce_visuals", "virtual_try_on_api", "commerce_material_service"],
+      acquisition: ["xiaohongshu", "taobao_seller_groups", "douyin_shop_operators"],
+      delivery: ["web_app", "api", "service"],
+      pricing: ["credits", "subscription", "service_fee"],
+      evidence_urls: ["https://example.com/try-on"],
+      summary: "A virtual try-on and commerce material workflow for fashion sellers.",
+      commercial_path: "Sell usable product-on-model images against model shooting, design outsourcing, and API alternatives.",
+      risks: ["output_quality_variance", "portrait_rights", "commodity_api_cost"],
+      confidence: "medium",
+      date_checked: "2026-05-13",
+    },
+    {
       id: "case_case_library",
       raw_ids: ["raw_case_library"],
       name: "Founder Case Library",
@@ -153,6 +172,15 @@ function createFixture() {
       applicable_to: ["habit_app"],
       warning_flags: ["Consumer churn is high."],
     },
+    {
+      id: "gold_ai_virtual_try_on",
+      case_id: "case_ai_virtual_try_on",
+      score: 92,
+      why_gold: "Strong fit for virtual try-on and AI commerce material ideas.",
+      reusable_lessons: ["Sell commerce-ready product images, not consumer entertainment."],
+      applicable_to: ["virtual_try_on", "ai_commerce_visuals", "fashion_sellers"],
+      warning_flags: ["C端玩法 can burn API cost without proving merchant willingness to pay."],
+    },
   ]);
 
   return root;
@@ -202,6 +230,37 @@ function testMatchesAiHeadshotOutcomeProduct() {
   assert(result.similarCases.find((row) => row.id === "case_ai_headshot").score >= result.similarCases[0].score - 5);
 }
 
+function testMatchesVirtualTryOnCommerceVisuals() {
+  const result = matchProductIdea({
+    root: createFixture(),
+    idea: "我想做一个换装小程序，用户上传人物图和商品图，就可以生成虚拟试衣和小红书商品图",
+    limit: 3,
+  });
+
+  assert(result.extractedSignals.keywords.includes("virtual_try_on"));
+  assert(result.extractedSignals.keywords.includes("ecommerce_visuals"));
+  assert(result.extractedSignals.keywords.includes("xiaohongshu"));
+  assert(result.similarCases.some((row) => row.id === "case_ai_virtual_try_on"));
+  assert(result.similarRoutes.some((route) => route.route === "ai_commerce_visuals"));
+  assert(result.businessBottlenecks.some((risk) => risk.includes("商家") || risk.includes("API")));
+}
+
+function testRepositoryMatchesVirtualTryOnDirectCases() {
+  const root = path.resolve(__dirname, "..", "..");
+  const result = matchProductIdea({
+    root,
+    idea: "我想做一个换装小程序 用户输入一张人物图和一张商品图 就可以换衣服",
+    limit: 5,
+  });
+
+  assert(result.extractedSignals.keywords.includes("virtual_try_on"));
+  assert(result.extractedSignals.keywords.includes("ecommerce_visuals"));
+  assert.strictEqual(result.similarCases[0].id, "case_fashn_ai_tryon_api");
+  assert(result.similarCases.some((row) => row.id === "case_botika_ai_fashion_models"));
+  assert(result.similarCases.some((row) => row.id === "case_vtry_virtual_tryon"));
+  assert(result.similarRoutes[0].route === "ai_commerce_visuals");
+}
+
 function testMatchesCaseIntelligenceIdea() {
   const result = matchProductIdea({
     root: createFixture(),
@@ -230,6 +289,8 @@ function testMatchesNotionSiteBuilder() {
 testMatchesDomesticAiContentIdea();
 testDoesNotTreatPaidAsAiSignal();
 testMatchesAiHeadshotOutcomeProduct();
+testMatchesVirtualTryOnCommerceVisuals();
+testRepositoryMatchesVirtualTryOnDirectCases();
 testMatchesCaseIntelligenceIdea();
 testMatchesNotionSiteBuilder();
 console.log("product-idea-matcher tests passed");

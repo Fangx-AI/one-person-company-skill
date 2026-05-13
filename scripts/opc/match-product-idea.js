@@ -13,6 +13,16 @@ const signalDictionary = [
     keyword: "visual_ai",
   },
   {
+    pattern:
+      /virtual\s*try[-\s]*on|try[-\s]*on|\u6362\u88c5|\u8bd5\u8863|\u865a\u62df\u8bd5\u8863|\u4e0a\u8eab\u56fe|\u6a21\u7279\u56fe|\u670d\u88c5|\u8863\u670d|\u5546\u54c1\u56fe|\u8be6\u60c5\u9875|\u7535\u5546\u7d20\u6750|\u79cd\u8349\u56fe|\u5973\u88c5|\u6dd8\u5b9d|\u6296\u97f3\u5c0f\u5e97/i,
+    keyword: "virtual_try_on",
+  },
+  {
+    pattern:
+      /\u5546\u54c1\u56fe|\u4e3b\u56fe|\u8be6\u60c5\u9875|\u7535\u5546|\u79cd\u8349\u56fe|\u5e7f\u544a\u56fe|\u4e0a\u65b0|\u6dd8\u5b9d|\u6296\u97f3\u5c0f\u5e97|\u5c0f\u7ea2\u4e66\u5546\u5bb6|\u670d\u88c5\u5546\u5bb6|\u5973\u88c5\u5546\u5bb6/i,
+    keyword: "ecommerce_visuals",
+  },
+  {
     pattern: /headshot|\u804c\u4e1a\u7167|\u8bc1\u4ef6\u7167|\u5546\u52a1\u7167|\u5de5\u4f5c\u7167/i,
     keyword: "headshot",
   },
@@ -75,6 +85,27 @@ const keywordAliases = {
     "image",
     "avatar",
     "headshot",
+  ],
+  virtual_try_on: [
+    "virtual_try_on",
+    "virtual_try_on_api",
+    "commerce_visual_tool",
+    "ai_commerce_visuals",
+    "product_on_model",
+    "fashion_sellers",
+    "ai_image_tool",
+    "commerce_material_service",
+  ],
+  ecommerce_visuals: [
+    "commerce_visual_tool",
+    "ai_commerce_visuals",
+    "commerce_material_service",
+    "ecommerce_operators",
+    "fashion_sellers",
+    "xiaohongshu_sellers",
+    "taobao_seller_groups",
+    "douyin_shop_operators",
+    "product_on_model",
   ],
   headshot: [
     "headshot",
@@ -182,6 +213,8 @@ const keywordWeights = {
   china: 10,
   xiaohongshu: 18,
   visual_ai: 14,
+  virtual_try_on: 22,
+  ecommerce_visuals: 20,
   headshot: 18,
   case_intelligence: 18,
   notion: 18,
@@ -268,12 +301,16 @@ function topRoutes(cases) {
 
 function inferBottlenecks(signals, cases) {
   const risks = new Set();
-  for (const row of cases) {
-    for (const risk of row.risks || []) risks.add(risk);
-  }
 
   if (signals.keywords.includes("ai")) {
     risks.add("\u0041\u0049 \u8f93\u51fa\u540c\u8d28\u5316\uff0c\u7528\u6237\u53ef\u80fd\u89c9\u5f97\u81ea\u5df1\u76f4\u63a5\u7528\u901a\u7528\u6a21\u578b\u4e5f\u80fd\u505a\u3002");
+  }
+  if (signals.keywords.includes("virtual_try_on") || signals.keywords.includes("ecommerce_visuals")) {
+    risks.add("\u0043\u7aef\u6362\u88c5\u5a31\u4e50\u5bb9\u6613\u70e7\u0041\u0050\u0049\u6210\u672c\uff0c\u66f4\u5e94\u8be5\u9a8c\u8bc1\u670d\u88c5\u5546\u5bb6\u662f\u5426\u613f\u610f\u4e3a\u53ef\u53d1\u5e03\u7684\u5546\u54c1\u4e0a\u8eab\u56fe\u4ed8\u94b1\u3002");
+    risks.add("\u5546\u5bb6\u4ed8\u8d39\u4e0d\u770b\u751f\u6210\u662f\u5426\u70ab\uff0c\u800c\u770b\u8863\u670d\u7eb9\u7406\u3001\u7248\u578b\u3001\u906e\u6321\u3001\u80cc\u666f\u548c\u5e73\u53f0\u53d1\u5e03\u662f\u5426\u53ef\u7528\u3002");
+  }
+  for (const row of cases) {
+    for (const risk of row.risks || []) risks.add(risk);
   }
   if (signals.keywords.includes("xiaohongshu")) {
     risks.add("\u5e73\u53f0\u4e92\u52a8\u4e0d\u7b49\u4e8e\u4ed8\u8d39\u610f\u613f\uff0c\u5fc5\u987b\u5355\u72ec\u9a8c\u8bc1\u4ed8\u6b3e\u52a8\u4f5c\u3002");
