@@ -20,9 +20,25 @@ const REQUIRED_GOLD_FIELDS = ["scenario_id", "answer", "why_it_works"];
 const REQUIRED_MUST_INCLUDE = [
   "business_judgment",
   "case_or_pattern",
+  "competitor_layering",
+  "payment_mechanism",
+  "evidence_boundary",
   "china_reality_or_constraint",
   "next_action",
   "stop_loss",
+];
+
+const REQUIRED_SCORING_FOCUS = [
+  "competitor_layering",
+  "payment_mechanism",
+  "evidence_boundary",
+];
+
+const GOLD_REQUIRED_PATTERNS = [
+  { id: "competitor_layering", pattern: /(直接竞品|相邻替代|免费替代|高价替代|对标)/ },
+  { id: "payment_mechanism", pattern: /(收费|付费|订阅|买断|额度|API|服务费|价格|元|credits?|SLA)/i },
+  { id: "evidence_boundary", pattern: /(证明|不能证明|不证明|只能说明|不能直接|边界|风险)/ },
+  { id: "numeric_action", pattern: /(\d+\s*(个|位|条|篇|天|周|元|人)|[一二三四五六七八九十]\s*(个|位|条|篇|天|周|元|人))/ },
 ];
 
 function evalPaths(root) {
@@ -117,8 +133,19 @@ function validateAnswerQualityEvals(options = {}) {
       errors.push(`scenario:${row.id} must_include missing ${missingMustInclude.join(", ")}`);
     }
 
+    const missingScoringFocus = REQUIRED_SCORING_FOCUS.filter((item) => !(row.scoring_focus || []).includes(item));
+    if (missingScoringFocus.length > 0) {
+      errors.push(`scenario:${row.id} scoring_focus missing ${missingScoringFocus.join(", ")}`);
+    }
+
     if (!isNonEmptyText(row.pass_bar) || row.pass_bar.length < 60) {
       errors.push(`scenario:${row.id} pass_bar must be specific and at least 60 chars`);
+    }
+
+    for (const phrase of ["直接竞品", "收费机制", "证据边界"]) {
+      if (!row.pass_bar.includes(phrase)) {
+        errors.push(`scenario:${row.id} pass_bar must mention ${phrase}`);
+      }
     }
   }
 
@@ -129,6 +156,11 @@ function validateAnswerQualityEvals(options = {}) {
     }
     if (!isNonEmptyTextArray(row.why_it_works)) {
       errors.push(`gold:${row.scenario_id} why_it_works must be a non-empty string array`);
+    }
+    for (const requirement of GOLD_REQUIRED_PATTERNS) {
+      if (!requirement.pattern.test(row.answer || "")) {
+        errors.push(`gold:${row.scenario_id} answer missing ${requirement.id}`);
+      }
     }
   }
 

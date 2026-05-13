@@ -27,7 +27,7 @@
     "opc:market:test": "node tests/opc/market-patterns.test.js",
     "opc:case-importer:test": "node tests/opc/case-importer.test.js",
     "opc:case-collector:test": "node tests/opc/case-candidate-url-collector.test.js",
-    "opc:eval:answers": "node scripts/opc/validate-answer-quality-evals.js --min-scenarios=13 --min-gold-answers=5",
+    "opc:eval:answers": "node scripts/opc/validate-answer-quality-evals.js --min-scenarios=13 --min-gold-answers=13",
     "opc:eval:test": "node tests/opc/answer-quality-evals.test.js",
     "opc:case-validator:test": "node tests/opc/case-intelligence-validator.test.js"
   }

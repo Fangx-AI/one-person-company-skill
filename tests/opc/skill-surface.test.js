@@ -87,6 +87,7 @@ function testSkillDefaultsToChineseBusinessContext() {
 
 function testReferencesExistAndAreLinked() {
   [
+    "answer-quality.md",
     "business-judgment.md",
     "business-model-delivery.md",
     "local-execution.md",
@@ -95,6 +96,37 @@ function testReferencesExistAndAreLinked() {
     assert(skill.includes(`references/${file}`), `SKILL.md should link ${file}`);
     const text = fs.readFileSync(path.join(root, "skills", "one-person-company", "references", file), "utf8");
     assert(text.length > 500, `${file} should contain substantive guidance`);
+  });
+}
+
+function testSkillRequiresEvidenceDenseAnswers() {
+  [
+    "直接竞品",
+    "相邻替代",
+    "免费替代",
+    "收费机制",
+    "证据边界",
+    "不能把不确定事实写成确定事实",
+    "不要随口列竞品",
+    "数字化下一步",
+  ].forEach((marker) => {
+    assert(skill.includes(marker), `SKILL.md should require evidence-dense answer marker ${marker}`);
+  });
+
+  const answerQuality = fs.readFileSync(
+    path.join(root, "skills", "one-person-company", "references", "answer-quality.md"),
+    "utf8"
+  );
+  [
+    "直接竞品",
+    "相邻替代",
+    "免费替代",
+    "收费机制",
+    "证据边界",
+    "错误示例",
+    "合格示例",
+  ].forEach((marker) => {
+    assert(answerQuality.includes(marker), `answer quality reference should include ${marker}`);
   });
 }
 
@@ -143,6 +175,7 @@ testFrontmatterIsDiscoverable();
 testSkillDefinesThreeCoreEntrypoints();
 testSkillDefaultsToChineseBusinessContext();
 testReferencesExistAndAreLinked();
+testSkillRequiresEvidenceDenseAnswers();
 testBusinessModelDeliveryReferenceIsHardNosed();
 testAgentMetadataExists();
 

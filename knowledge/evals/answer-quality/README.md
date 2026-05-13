@@ -15,9 +15,12 @@ This is not engineering coverage. It is product-value coverage. A useful answer 
 Most answers should contain:
 
 - one hard business judgment,
+- direct competitors, adjacent substitutes, free substitutes, or high-price alternatives when relevant,
+- the payment mechanism behind each comparable route,
+- the evidence boundary: what the case proves and what it does not prove,
 - at least one case, route, or commercial pattern,
-- one China-specific constraint when relevant,
-- one low-friction next action,
+- one local execution constraint when relevant,
+- one numeric low-friction next action,
 - one stop-loss condition.
 
 ## Failure Patterns
@@ -34,6 +37,14 @@ The answer is not acceptable if it ends with generic advice such as:
 
 These phrases can appear only if they are translated into a concrete action, cost, and validation signal.
 
+It is also not acceptable if it:
+
+- casually lists competitors without classifying direct competitor vs adjacent substitute,
+- mentions a case without explaining its payment mechanism,
+- treats uncertain facts as certain,
+- uses overseas or famous-product examples without stating evidence boundaries,
+- gives a next action without numbers, price, time window, or rejection signal.
+
 ## Validation
 
 Run:
@@ -43,3 +54,4 @@ npm run opc:eval:answers
 ```
 
 The validator checks that each scenario forces business judgment, case support, China reality, next action, and stop-loss logic.
+It also checks competitor layering, payment mechanism, evidence boundary, and numeric action requirements.

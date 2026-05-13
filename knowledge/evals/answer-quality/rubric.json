@@ -3,50 +3,56 @@
     {
       "id": "business_judgment",
       "label": "Business Judgment",
-      "points": 2,
-      "pass": "The answer names the main business bottleneck instead of giving generic encouragement or a list of tactics."
+      "points": 1.5,
+      "pass": "The answer gives a direct commercial judgment before tactics, naming the main bottleneck instead of offering generic encouragement."
+    },
+    {
+      "id": "competitor_layering",
+      "label": "Competitor Layering",
+      "points": 1.5,
+      "pass": "The answer separates direct competitors, adjacent substitutes, free substitutes, and high-price alternatives when relevant."
+    },
+    {
+      "id": "payment_mechanism",
+      "label": "Payment Mechanism",
+      "points": 1.5,
+      "pass": "The answer explains how comparable products, services, or routes actually charge: subscription, one-time license, API credits, service fee, quota, template, consulting, SLA, private deployment, or similar."
+    },
+    {
+      "id": "evidence_boundary",
+      "label": "Evidence Boundary",
+      "points": 1.25,
+      "pass": "The answer says what each case, competitor, or signal proves and what it does not prove; it does not turn uncertain facts into certain claims."
     },
     {
       "id": "case_or_pattern",
       "label": "Case Or Pattern",
-      "points": 1.5,
-      "pass": "The answer uses at least one similar case, route, or commercial pattern to support the judgment."
+      "points": 1,
+      "pass": "The answer uses at least one similar case, route, or commercial pattern and explains the commercial mechanism instead of name-dropping."
     },
     {
-      "id": "china_reality",
-      "label": "China Reality",
-      "points": 1.5,
-      "pass": "The answer mentions relevant China-specific constraints such as platform rules, ICP, payment, private domain, company entity, or content risk when applicable."
-    },
-    {
-      "id": "route_planning",
-      "label": "Route Planning",
-      "points": 1.25,
-      "pass": "The answer gives a route appropriate to the user's stage rather than a mature-company plan."
+      "id": "local_execution_reality",
+      "label": "Local Execution Reality",
+      "points": 1,
+      "pass": "The answer mentions relevant local execution constraints such as platform rules, ICP filing, payment, private traffic, invoices, entity setup, hosting, content risk, or delivery trust when applicable."
     },
     {
       "id": "next_action",
-      "label": "Low-Friction Next Action",
-      "points": 1.25,
-      "pass": "The next action is small enough to do today or this week and produces a payment, conversation, or rejection signal."
+      "label": "Numeric Next Action",
+      "points": 1,
+      "pass": "The next action includes a concrete number, price, time window, buyer count, artifact, or rejection signal and can be done today or this week."
     },
     {
       "id": "stop_loss",
       "label": "Stop-Loss Condition",
-      "points": 1,
-      "pass": "The answer states what signal means pause, downgrade, or change direction."
+      "points": 0.75,
+      "pass": "The answer states what signal means pause, narrow, downgrade, or kill the idea."
     },
     {
       "id": "anti_fluff",
       "label": "Anti-Fluff",
-      "points": 1,
-      "pass": "The answer avoids using phrases such as '持续输出', '打造个人品牌', '做 MVP', '找到痛点', or '坚持下去' as conclusions."
-    },
-    {
-      "id": "expression_quality",
-      "label": "Expression Quality",
       "points": 0.5,
-      "pass": "The answer is concise, direct, and does not overwhelm the user with long generic lists."
+      "pass": "The answer avoids using phrases such as '持续输出', '打造个人品牌', '做 MVP', '找到痛点', '差异化', or '坚持下去' as conclusions."
     }
   ],
   "minimum_pass_score": 8

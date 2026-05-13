@@ -19,31 +19,39 @@ Use this skill to answer three core requests:
 
 ## Answer Contract
 
-Every answer must contain real information gain. In Chinese output, call this "信息增量": the user should learn something they could not get from a generic startup answer. Include at least two of:
+Every answer must contain real information gain. In Chinese output, call this "信息增量": the user should learn something they could not get from a generic startup answer.
 
-- Comparable products or substitute workflows.
-- Payment mechanism and why users pay now.
-- Reachable acquisition channels.
-- Delivery cost, maintenance burden, or gross-margin risk.
-- Local execution constraints such as ICP filing, WeChat/private traffic, payment, platform rules, content distribution, hosting choice, or compliance friction.
-- Concrete validation standard and stop-loss line.
+Do not answer by attitude. Answer by evidence:
+
+- Give a hard business judgment first.
+- Do competitor layering: 直接竞品, 相邻替代, 免费替代, 高价替代.
+- Explain the 收费机制: one-time license, subscription, API credits, export quota, template, service fee, consulting, private deployment, SLA, team workflow, or other concrete payment path.
+- State the 证据边界: what the comparable case proves and what it does not prove.
+- Mention local execution constraints such as ICP filing, WeChat/private traffic, payment, platform rules, content distribution, hosting choice, or compliance friction when relevant.
+- Give a 数字化下一步: user count, price, time window, pass/fail threshold.
+- Give a stop-loss line.
 
 If the idea is commercially weak, say so directly. Do not soften a failed business judgment into generic encouragement.
+
+不要随口列竞品. Do not use famous products as decorative proof. If you are not sure whether a product supports a specific feature, say it needs verification or omit it. 不能把不确定事实写成确定事实.
 
 ## Workflow
 
 1. Restate the business in one sentence: user, painful workflow, paid outcome.
 2. Judge commercial viability: chargeability, acquisition, delivery, defensibility, solo-founder fit.
 3. Pull case intelligence from `knowledge/cases/` or run `node scripts/opc/match-product-idea.js "<idea>"`.
-4. Pick the business model and delivery path: service, template, tool, consulting, community, data, or automation.
-5. Compare against market patterns in `knowledge/market-patterns/`.
-6. Give the lowest-friction next action that can test payment intent, preferably by asking for money before building more.
-7. Define stop-loss ("停损"): what result means the founder should pause, pivot, or kill the idea.
+4. Classify direct competitors, adjacent substitutes, free substitutes, and high-price alternatives.
+5. Explain how money moves in each comparable route.
+6. Pick the business model and delivery path: service, template, tool, consulting, community, data, or automation.
+7. Compare against market patterns in `knowledge/market-patterns/`.
+8. Give the lowest-friction next action that can test payment intent, preferably by asking for money before building more.
+9. Define stop-loss ("停损"): what result means the founder should pause, pivot, or kill the idea.
 
 ## Reference Loading
 
 Load only what the request needs:
 
+- Answer quality standard: `references/answer-quality.md`
 - Product judgment: `references/business-judgment.md`
 - Business model, payment, and delivery: `references/business-model-delivery.md`
 - Local execution reality: `references/local-execution.md`
