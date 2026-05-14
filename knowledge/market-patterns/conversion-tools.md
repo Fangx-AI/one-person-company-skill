@@ -1,31 +1,50 @@
-# Conversion Tool Market Patterns
+# Conversion Tools
 
-Purpose: prevent product judgment from dismissing "small conversion tools" as non-businesses without checking buyer workflow and payment mechanics.
+date_checked: 2026-05-14
 
-## Markdown / Document Conversion References
+Purpose: Judge small conversion utilities by workflow, buyer urgency, and payment mechanics instead of dismissing them as mere functions.
 
-- Typora: paid Markdown editor with a one-time license model. Payment is tied to editor experience, local writing workflow, and long-term daily use.
-- Markdown Monster: paid Markdown editor for Windows. Commercial value includes live preview, HTML/PDF output, copy HTML, document/project workflow, and publishing support.
-- Marked 2: paid Mac Markdown preview/export tool. Value sits in preview quality, custom processors, export formats, and writer workflow.
-- CloudConvert / ConvertAPI style services: paid conversion API and credit/plan model. Payment is tied to API usage, file size, concurrency, automation, reliability, and integration.
+## direct competitors
 
-## Judgment Rule
+- Typora: paid Markdown editor with local writing workflow and export value.
+- Markdown Monster: Windows Markdown editor with HTML/PDF output, live preview, and publishing workflow.
+- Marked 2: Mac Markdown preview/export tool with copy HTML, save HTML, custom processors, and writer workflow.
+- CloudConvert / ConvertAPI: conversion API and credit/plan model for automation, reliability, file size, and integration.
 
-Do not judge conversion tools by "can it convert X to Y?" Judge by:
+## adjacent substitutes
 
-- buyer: writer, developer, product team, agency, CMS operator, enterprise workflow owner
-- urgency: how often conversion happens and what breaks when it is wrong
-- payment mechanism: license, subscription, API credits, batch processing, private deployment, SLA, template pack, team workflow
-- defensibility: style fidelity, workflow integration, privacy/local processing, speed, batch scale, platform-specific output
-- one-person fit: can a solo founder reach a narrow buyer group and hand-serve the first 10 conversions
+- Editor built-in export.
+- Static site generators and documentation sites.
+- CMS import/export workflow.
+- Email editors and help-center tools.
 
-## Markdown To HTML Paid Angles
+## free substitutes
 
-- Technical publishing: code highlighting, table of contents, SEO metadata, stable CSS, static-site-ready output.
-- Team documentation: batch conversion, style templates, knowledge base import/export, permission-safe processing.
-- Domestic content distribution: Markdown to WeChat/Zhihu/website-ready HTML with style adaptation and image handling.
-- API / automation: webhook, CLI, CI integration, file size limits, concurrency, usage credits.
+- Pandoc, markdown-it, remark, VS Code plugins, and free paste-convert websites.
+- Manual copy-paste plus CSS templates.
 
-## Weak Version
+## high-price alternatives
 
-A generic paste-and-convert web page with no buyer, no workflow, no batch/API, and no platform-specific output is usually not a business. It is a feature or free utility.
+- Enterprise content migration, CMS implementation, private conversion pipelines, and API integrations with SLA.
+
+## payment mechanism
+
+- One-time desktop license.
+- Subscription for workflow tools.
+- API credits, file size, concurrency, batch processing, private deployment, and SLA.
+- Template pack or paid service for platform-specific publishing.
+
+## evidence boundary
+
+- The category proves small conversion workflows can charge when embedded in repeated professional work.
+- It does not prove a generic paste-and-convert web page can sustain subscription revenue.
+
+## one-person company wedge
+
+- Pick one buyer: technical writer, product team, agency, CMS operator, or developer.
+- Sell a narrow output such as stable CSS, code highlighting, batch HTML, WeChat/Zhihu-ready output, or API automation.
+
+## stop-loss
+
+- 10 target users cannot name their current conversion workflow.
+- 15 users provide no real files or no willingness to pay 19-99 RMB/month or 299-999 RMB/service.

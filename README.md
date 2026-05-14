@@ -43,7 +43,7 @@
 
 ```text
 先别把“格式转换”当成生意。市面上已经有免费转换器、编辑器内置导出、文档站生成器、
-Notion/飞书/语雀发布流、邮件编辑器和开发者工具链。
+Pandoc/markdown-it/remark 这类开源工具、CloudConvert/ConvertAPI 这类转换 API、邮件编辑器和开发者工具链。
 
 真正可能付费的不是“转 HTML”，而是：
 1. 技术文档/产品说明能稳定发布到官网、邮件或帮助中心；
@@ -108,8 +108,11 @@ acquisition_channel: GitHub、公众号、即刻、微信群
 - 39 个案例来源
 - 10 个 GitHub 高价值开源知识源
 - 16 条 GitHub 实操信号
+- 10 个高频市场模式
 - 13 个回答质量评估场景
-- 5 条金标回答样本
+- 13 条金标回答样本
+
+当前已覆盖的高频市场模式包括：转换工具/API、AI 电商素材/虚拟试衣、AI 小红书内容、开发者工具/API、知识产品、案例情报库、AI 自动化服务、Notion 建站、本地获客、模板与 boilerplate。
 
 案例不是用来装饰回答的。每条资料都要拆成：
 
@@ -152,7 +155,7 @@ knowledge/
   cases/                             # 一人公司案例情报库
   github-sources/                    # GitHub 实操信号和开源知识源
   evals/answer-quality/              # 回答质量评估集
-  market-patterns/                   # 细分市场模式
+  market-patterns/                   # 高频市场模式
 
 scripts/opc/                         # 案例校验、导入、检索工具
 tests/opc/                           # 仓库边界和知识库质量测试
@@ -218,7 +221,9 @@ npm run opc:validate:github-sources
 - [x] 建立 GitHub 实操信号库
 - [x] 增加商业模式与交付 reference
 - [x] 重写 GitHub 项目主页
-- [ ] 补 10 个高质量示例回答
+- [x] 补 10 个高频市场模式
+- [x] 补 13 条金标回答样本
+- [ ] 持续扩充高质量示例回答
 - [ ] 扩充更多一人公司案例
 - [ ] 增加普通大模型 vs 本 Skill 的回答对比
 - [ ] 做第一轮真实用户内测

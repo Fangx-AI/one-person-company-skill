@@ -6,48 +6,73 @@ const fs = require("fs");
 const path = require("path");
 
 const root = path.resolve(__dirname, "..", "..");
-const conversionTools = fs.readFileSync(
-  path.join(root, "knowledge", "market-patterns", "conversion-tools.md"),
-  "utf8",
-);
-const aiCommerceVisuals = fs.readFileSync(
-  path.join(root, "knowledge", "market-patterns", "ai-commerce-visuals.md"),
-  "utf8",
-);
+const base = path.join(root, "knowledge", "market-patterns");
 
-[
-  "Typora",
-  "Markdown Monster",
-  "Marked 2",
-  "CloudConvert",
-  "ConvertAPI",
-  "payment mechanism",
-  "API credits",
-  "batch processing",
-  "Domestic content distribution",
-  "A generic paste-and-convert web page",
-].forEach((marker) => {
-  assert(conversionTools.includes(marker), `expected conversion tool market pattern marker ${marker}`);
-});
+const requiredPatterns = [
+  {
+    file: "conversion-tools.md",
+    markers: ["Typora", "Markdown Monster", "Marked 2", "CloudConvert", "ConvertAPI"],
+  },
+  {
+    file: "ai-commerce-visuals.md",
+    markers: ["AI Commerce Visuals", "FASHN AI", "VModel", "Botika", "VTry"],
+  },
+  {
+    file: "ai-xiaohongshu-content.md",
+    markers: ["AI Xiaohongshu Content", "direct competitors", "KOL运营", "千瓜", "灰豚"],
+  },
+  {
+    file: "developer-tools-api.md",
+    markers: ["Developer Tools And APIs", "direct competitors", "Postman", "Stripe", "Sentry"],
+  },
+  {
+    file: "knowledge-products.md",
+    markers: ["Knowledge Products", "direct competitors", "小报童", "知识星球", "Gumroad"],
+  },
+  {
+    file: "case-intelligence.md",
+    markers: ["Case Intelligence", "direct competitors", "Trends.vc", "Exploding Topics", "FounderPal"],
+  },
+  {
+    file: "ai-automation-services.md",
+    markers: ["AI Automation Services", "direct competitors", "Zapier", "Make", "n8n"],
+  },
+  {
+    file: "notion-site-builders.md",
+    markers: ["Notion Site Builders", "direct competitors", "Super", "Potion", "Feather"],
+  },
+  {
+    file: "local-lead-gen.md",
+    markers: ["Local Lead Generation", "direct competitors", "美团", "大众点评", "企业微信"],
+  },
+  {
+    file: "templates-boilerplates.md",
+    markers: ["Templates And Boilerplates", "direct competitors", "Tailwind UI", "ShipFast", "Notion templates"],
+  },
+];
 
-[
-  "AI Commerce Visuals",
-  "virtual try-on",
+const commonMarkers = [
   "direct competitors",
-  "FASHN AI",
-  "VModel",
-  "Botika",
-  "VTry",
   "adjacent substitutes",
   "free substitutes",
   "high-price alternatives",
   "payment mechanism",
-  "API credits",
-  "commerce-material service",
-  "Xiaohongshu fashion sellers",
+  "evidence boundary",
+  "one-person company wedge",
   "stop-loss",
-].forEach((marker) => {
-  assert(aiCommerceVisuals.includes(marker), `expected AI commerce visual market pattern marker ${marker}`);
-});
+  "date_checked",
+];
+
+assert.strictEqual(requiredPatterns.length, 10, "should cover 10 high-frequency market patterns");
+
+for (const pattern of requiredPatterns) {
+  const filePath = path.join(base, pattern.file);
+  assert(fs.existsSync(filePath), `market pattern file should exist: ${pattern.file}`);
+  const text = fs.readFileSync(filePath, "utf8");
+
+  for (const marker of [...commonMarkers, ...pattern.markers]) {
+    assert(text.includes(marker), `${pattern.file} should include marker ${marker}`);
+  }
+}
 
 console.log("market pattern tests passed");

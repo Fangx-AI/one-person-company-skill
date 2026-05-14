@@ -43,6 +43,8 @@ function testReadmeUsesTrustSignals() {
     "30 条 gold cases",
     "10 个 GitHub 高价值开源知识源",
     "16 条 GitHub 实操信号",
+    "10 个高频市场模式",
+    "13 条金标回答样本",
     "中文商业语境",
     "本土执行现实",
     "备案",
