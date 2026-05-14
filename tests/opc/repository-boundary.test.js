@@ -88,12 +88,13 @@ function testReadmePresentsSkillInsteadOfOldSite() {
   const readme = read("README.md");
   [
     "# 一人公司Skill",
+    "大多数创业建议死在一句话里：先做 MVP",
+    "它不负责鼓励你创业",
     "商业化可行性是第一准则",
     "产品判断",
     "相似案例",
     "定价获客",
-    "案例情报库",
-    "30 秒看懂输出差异",
+    "证据资产",
     "中文商业语境",
     "Codex",
   ].forEach((marker) => {
@@ -107,6 +108,7 @@ function testReadmePresentsSkillInsteadOfOldSite() {
     legacyReverseProxy,
     legacyPhoneLogin,
     legacySqlite,
+    "30 秒看懂输出差异",
   ].forEach((marker) => {
     assert(!readme.includes(marker), `README should not present old site marker: ${marker}`);
   });
