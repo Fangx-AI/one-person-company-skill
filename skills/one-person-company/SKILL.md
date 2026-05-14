@@ -17,6 +17,14 @@ Use this skill to answer three core requests:
 2. `/相似案例`: compare the idea against real one-person-company cases and adjacent products.
 3. `/定价获客`: design pricing, payment, delivery, first-customer acquisition, and stop-loss signals.
 
+## Input Rule
+
+Treat slash commands as natural language commands, not forms.
+
+Users may write only one short sentence after `/产品判断`, `/相似案例`, or `/定价获客`. Do not ask them to fill `idea`, `target_user`, `workflow`, `paid_trigger`, `use_case`, or similar fields. Infer what you can from the sentence, give the best provisional judgment, and mark uncertain assumptions.
+
+If one missing fact would materially change the business judgment, ask at most 1 short clarifying question before answering. Otherwise answer directly.
+
 ## Answer Contract
 
 Every answer must contain real information gain. In Chinese output, call this "信息增量": the user should learn something they could not get from a generic startup answer.
