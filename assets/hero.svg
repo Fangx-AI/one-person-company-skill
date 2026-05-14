@@ -1,0 +1,12 @@
+<svg width="1200" height="420" viewBox="0 0 1200 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="420" rx="28" fill="#0B0F1A"/>
+  <rect x="44" y="44" width="1112" height="332" rx="22" fill="#101826" stroke="#243244"/>
+  <text x="84" y="118" fill="#E6EDF6" font-family="Arial, Helvetica, sans-serif" font-size="54" font-weight="700">一人公司.skill</text>
+  <text x="86" y="174" fill="#9FB0C7" font-family="Arial, Helvetica, sans-serif" font-size="26">别再问“能不能做”，先问：谁现在付钱？</text>
+  <rect x="84" y="218" width="1032" height="1" fill="#26364A"/>
+  <text x="86" y="274" fill="#F6C76B" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700">产品判断 · 相似案例 · 定价获客</text>
+  <text x="86" y="326" fill="#D6DEE9" font-family="Arial, Helvetica, sans-serif" font-size="24">竞品 / 替代方案 / 收费机制 / 交付边界 / 停损线</text>
+  <circle cx="1020" cy="132" r="52" fill="#F25F5C"/>
+  <circle cx="1084" cy="198" r="34" fill="#2EC4B6"/>
+  <circle cx="1002" cy="274" r="24" fill="#F6C76B"/>
+</svg>

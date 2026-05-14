@@ -87,14 +87,16 @@ function testPackageIdentityIsOnePersonCompanySkill() {
 function testReadmePresentsSkillInsteadOfOldSite() {
   const readme = read("README.md");
   [
-    "# 一人公司Skill",
+    "# 一人公司.skill",
+    "![一人公司.skill](assets/hero.svg)",
     "大多数创业建议死在一句话里：先做 MVP",
-    "它不负责鼓励你创业",
+    "不是帮你想点子，是判断这个点子能不能收钱",
     "商业化可行性是第一准则",
     "产品判断",
     "相似案例",
     "定价获客",
     "证据资产",
+    "工作原理",
     "中文商业语境",
     "Codex",
   ].forEach((marker) => {
