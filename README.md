@@ -140,10 +140,13 @@
 - 10 个高频市场模式
 - 13 个回答质量评估场景
 - 13 条金标回答样本
+- 10 个可直接阅读的金标问答示例
 
 当前已覆盖的高频市场模式包括：转换工具/API、AI 电商素材/虚拟试衣、AI 小红书内容、开发者工具/API、知识产品、案例情报库、AI 自动化服务、Notion 建站、本地获客、模板与 boilerplate。
 
 案例不是用来装饰回答的。每条资料都要拆成：目标用户、付费机制、获客路径、交付方式、可复制部分、不可复制风险、本土执行现实。
+
+完整示例见 [examples/](examples/)。它们展示同一个问题下，普通 AI 容易怎么泛泛回答，以及一人公司.skill 如何输出商业判断卡。
 
 ## 工作原理
 
@@ -197,6 +200,8 @@ knowledge/
   evals/answer-quality/              # 回答质量评估集
   market-patterns/                   # 高频市场模式
 
+examples/                            # 金标问答示例
+
 scripts/opc/                         # 案例校验、导入、检索工具
 tests/opc/                           # 仓库边界和知识库质量测试
 ```
@@ -231,6 +236,12 @@ npm run opc:validate:cases:seed
 
 ```bash
 npm run opc:validate:github-sources
+```
+
+校验示例库：
+
+```bash
+npm run opc:validate:examples
 ```
 
 ## 质量门槛
@@ -268,6 +279,7 @@ npm run opc:validate:github-sources
 - [x] 重写 GitHub 项目主页
 - [x] 补 10 个高频市场模式
 - [x] 补 13 条金标回答样本
+- [x] 增加 10 个可阅读金标问答示例
 - [ ] 持续扩充高质量示例回答
 - [ ] 扩充更多一人公司案例
 - [ ] 增加普通大模型 vs 本 Skill 的回答对比

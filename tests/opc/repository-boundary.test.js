@@ -69,7 +69,10 @@ function testSkillRepositorySurfaceExists() {
     "knowledge/cases/normalized/normalized-cases.jsonl",
     "knowledge/cases/gold/gold-cases.jsonl",
     "knowledge/evals/answer-quality/rubric.json",
+    "examples/README.md",
+    "examples/ai-virtual-try-on.md",
     "scripts/opc/match-product-idea.js",
+    "scripts/opc/validate-examples.js",
     "scripts/opc/validate-case-intelligence.js",
     "scripts/opc/validate-answer-quality-evals.js",
   ].forEach((relativePath) => {

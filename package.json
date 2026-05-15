@@ -9,7 +9,7 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "npm run opc:repo:test && npm run opc:readme:test && npm run opc:skill:test && npm run opc:validate:cases:seed && npm run opc:validate:github-sources && npm run opc:eval:answers && npm run opc:idea:test && npm run opc:market:test && npm run opc:case-importer:test && npm run opc:case-collector:test",
+    "test": "npm run opc:repo:test && npm run opc:readme:test && npm run opc:skill:test && npm run opc:validate:cases:seed && npm run opc:validate:github-sources && npm run opc:eval:answers && npm run opc:examples:test && npm run opc:idea:test && npm run opc:market:test && npm run opc:case-importer:test && npm run opc:case-collector:test",
     "opc:repo:test": "node tests/opc/repository-boundary.test.js",
     "opc:readme:test": "node tests/opc/readme-publication.test.js",
     "opc:skill:test": "node tests/opc/skill-surface.test.js",
@@ -29,6 +29,8 @@
     "opc:case-collector:test": "node tests/opc/case-candidate-url-collector.test.js",
     "opc:eval:answers": "node scripts/opc/validate-answer-quality-evals.js --min-scenarios=13 --min-gold-answers=13",
     "opc:eval:test": "node tests/opc/answer-quality-evals.test.js",
+    "opc:validate:examples": "node scripts/opc/validate-examples.js --min-examples=10",
+    "opc:examples:test": "node tests/opc/examples.test.js",
     "opc:case-validator:test": "node tests/opc/case-intelligence-validator.test.js"
   }
 }
