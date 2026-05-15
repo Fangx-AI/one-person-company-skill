@@ -25,7 +25,7 @@ If two or more gates fail, call the idea weak. Give one salvage path only if the
 
 ## Output Shape
 
-Use this structure for `/产品判断`:
+Use this structure for `/product` or `/产品判断`:
 
 ```text
 判断：能做 / 谨慎做 / 不建议做

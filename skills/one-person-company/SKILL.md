@@ -11,23 +11,39 @@ description: Use when evaluating product ideas, pricing, acquisition, similar ca
 
 默认工作在中文商业语境和本土执行现实里。海外案例只作为商业机制参照，不能直接照搬；必须转换到渠道、支付、合规、信任和交付现实后再给建议。
 
-Use this skill to answer three core requests:
+Use `/opc` as the default entrypoint. It should infer whether the user needs product judgment, similar cases, or pricing/acquisition.
 
-1. `/产品判断`: decide whether an idea can become a business.
-2. `/相似案例`: compare the idea against real one-person-company cases and adjacent products.
-3. `/定价获客`: design pricing, payment, delivery, first-customer acquisition, and stop-loss signals.
+Use these focused entrypoints when the user wants a specific mode:
+
+1. `/product`: decide whether an idea can become a business. Alias: `/产品判断`.
+2. `/cases`: compare the idea against real one-person-company cases and adjacent products. Alias: `/相似案例`.
+3. `/pricing`: design pricing, payment, delivery, first-customer acquisition, and stop-loss signals. Alias: `/定价获客`.
 
 ## Input Rule
 
 Treat slash commands as natural language commands, not forms.
 
-Users may write only one short sentence after `/产品判断`, `/相似案例`, or `/定价获客`. Do not ask them to fill `idea`, `target_user`, `workflow`, `paid_trigger`, `use_case`, or similar fields. Infer what you can from the sentence, give the best provisional judgment, and mark uncertain assumptions.
+Users may write only one short sentence after `/opc`, `/product`, `/cases`, `/pricing`, `/产品判断`, `/相似案例`, or `/定价获客`. Do not ask them to fill `idea`, `target_user`, `workflow`, `paid_trigger`, `use_case`, or similar fields. Infer what you can from the sentence, give the best provisional judgment, and mark uncertain assumptions.
 
 If one missing fact would materially change the business judgment, ask at most 1 short clarifying question before answering. Otherwise answer directly.
 
 ## Answer Contract
 
 Every answer must contain real information gain. In Chinese output, call this "信息增量": the user should learn something they could not get from a generic startup answer.
+
+Default output should be a 商业判断卡 unless the user asks for a deep analysis:
+
+```text
+结论：
+付费可能性：
+最可能付费的人：
+直接竞品：
+替代方案：
+可收费切口：
+第一单动作：
+7 天验证：
+停损线：
+```
 
 Do not answer by attitude. Answer by evidence:
 

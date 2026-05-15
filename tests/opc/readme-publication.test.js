@@ -31,7 +31,7 @@ function testReadmeHasHeroFirstProjectPage() {
       "谁现在付钱？为什么现在付？竞品怎么收？替代方案是什么？",
       "先看效果",
       "怎么用",
-      "三个入口",
+      "四个入口",
       "它判断什么",
       "为什么不是提示词合集",
       "证据资产",
@@ -49,9 +49,9 @@ function testReadmeShowsEffectBeforeMechanism() {
   assert(readme.indexOf("## 先看效果") < readme.indexOf("## 工作原理"));
   assertIncludes(
     [
-      "/产品判断` 我想做一个 AI 换装小程序",
-      "/产品判断` 我想做 Markdown 转 HTML",
-      "/定价获客` 我想做一个一人公司案例库",
+      "/product` 我想做一个 AI 换装小程序",
+      "/product` 我想做 Markdown 转 HTML",
+      "/pricing` 我想做一个一人公司案例库",
       "普通 AI 往往会说",
       "一人公司.skill 会先判断",
       "一人公司.skill 不会把“能转格式”当成生意",
@@ -66,9 +66,11 @@ function testReadmeSupportsLowFrictionCommands() {
     [
       "入口是自然语言命令，不是表单",
       "最多先追问 1 个最关键的问题",
-      "/产品判断 我想做一个 AI 小红书选题工具",
-      "/相似案例 我想做一个一人公司案例检索库",
-      "/定价获客 我想做一个给本地商家的 AI 获客工具",
+      "/opc 我想做一个 AI 小红书选题工具",
+      "/product 我想做一个 AI 换装小程序",
+      "/cases 我想做一个一人公司案例检索库",
+      "/pricing 我想做一个给本地商家的 AI 获客工具",
+      "中文入口 `/产品判断`、`/相似案例`、`/定价获客` 仍然可用",
     ],
     "low-friction commands",
   );
@@ -95,6 +97,10 @@ function testReadmeUsesTrustSignals() {
       "交付边界",
       "证据边界",
       "停损线",
+      "商业判断卡",
+      "付费可能性",
+      "第一单动作",
+      "7 天验证",
       "npm test",
       "node scripts/opc/match-product-idea.js",
     ],

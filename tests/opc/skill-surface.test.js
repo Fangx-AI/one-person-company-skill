@@ -34,6 +34,10 @@ function testFrontmatterIsDiscoverable() {
 function testSkillDefinesThreeCoreEntrypoints() {
   [
     "商业化可行性是第一准则",
+    "/opc",
+    "/product",
+    "/cases",
+    "/pricing",
     "/产品判断",
     "/相似案例",
     "/定价获客",
@@ -133,12 +137,29 @@ function testSkillRequiresEvidenceDenseAnswers() {
 function testSkillAcceptsLowFrictionSlashInputs() {
   [
     "Treat slash commands as natural language commands, not forms.",
-    "Users may write only one short sentence after `/产品判断`, `/相似案例`, or `/定价获客`.",
+    "Users may write only one short sentence after `/opc`, `/product`, `/cases`, `/pricing`, `/产品判断`, `/相似案例`, or `/定价获客`.",
     "Do not ask them to fill `idea`, `target_user`, `workflow`, `paid_trigger`, `use_case`, or similar fields.",
     "ask at most 1 short clarifying question",
     "Otherwise answer directly.",
   ].forEach((marker) => {
     assert(skill.includes(marker), `SKILL.md should include low-friction input marker ${marker}`);
+  });
+}
+
+function testSkillDefinesBusinessJudgmentCard() {
+  [
+    "Default output should be a 商业判断卡",
+    "结论：",
+    "付费可能性：",
+    "最可能付费的人：",
+    "直接竞品：",
+    "替代方案：",
+    "可收费切口：",
+    "第一单动作：",
+    "7 天验证：",
+    "停损线：",
+  ].forEach((marker) => {
+    assert(skill.includes(marker), `SKILL.md should include business judgment card marker ${marker}`);
   });
 }
 
@@ -189,6 +210,7 @@ testSkillDefaultsToChineseBusinessContext();
 testReferencesExistAndAreLinked();
 testSkillRequiresEvidenceDenseAnswers();
 testSkillAcceptsLowFrictionSlashInputs();
+testSkillDefinesBusinessJudgmentCard();
 testBusinessModelDeliveryReferenceIsHardNosed();
 testAgentMetadataExists();
 

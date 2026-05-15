@@ -39,7 +39,7 @@ Price from the buyer's alternative cost, not from your effort.
 - If the alternative is free content, sell packaging, confidence, implementation, or current data.
 - If the alternative is doing nothing, the payment intent is weak unless there is deadline, revenue, risk, status, or compliance pressure.
 
-For `/定价获客`, give:
+For `/pricing` or `/定价获客`, give:
 
 - Entry price: low-friction first purchase.
 - Core price: where the product should actually make money.
