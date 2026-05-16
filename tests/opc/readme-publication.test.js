@@ -27,19 +27,13 @@ function testReadmeHasHeroFirstProjectPage() {
       "![一人公司.skill](assets/hero.svg)",
       "不是帮你想点子，是判断这个点子能不能收钱",
       "大多数创业建议死在一句话里：先做 MVP",
-      "这个 Skill 从不这样回答",
       "谁现在付钱？为什么现在付？竞品怎么收？替代方案是什么？",
       "先看效果",
       "你可能正在问",
       "怎么用",
       "四个入口",
-      "它判断什么",
-      "为什么不是提示词合集",
       "证据资产",
       "让它变强",
-      "工作原理",
-      "背后的判断",
-      "路线图",
       "License",
     ],
     "hero-first project page",
@@ -48,16 +42,12 @@ function testReadmeHasHeroFirstProjectPage() {
 
 function testReadmeShowsEffectBeforeMechanism() {
   assert(readme.indexOf("## 先看效果") < readme.indexOf("## 怎么用"));
-  assert(readme.indexOf("## 先看效果") < readme.indexOf("## 工作原理"));
+  assert(readme.indexOf("## 推荐安装方式") < readme.indexOf("## 证据资产"));
   assertIncludes(
     [
       "/product` 我想做一个 AI 换装小程序",
-      "/product` 我想做一个给本地门店用的 AI 获客工具",
-      "/pricing` 我想做一个一人公司案例库",
       "普通 AI 往往会说",
       "一人公司.skill 会先判断",
-      "一人公司.skill 会先拆现金流",
-      "一人公司.skill 会先反驳",
     ],
     "effect examples",
   );
@@ -78,7 +68,7 @@ function testReadmeSupportsLowFrictionCommands() {
       "推荐安装方式",
       "Codex GitHub 安装脚本",
       "Fangx-AI/one-person-company-skill",
-      "skills/one-person-company",
+      "skills/opc",
       "未写入",
       "npx skills add",
       "/opc 我想做一个 AI 小红书选题工具",
@@ -127,6 +117,7 @@ function testReadmeUsesTrustSignals() {
     ],
     "trust signal",
   );
+  assert(!readme.includes("skills/one-person-company"), "README should use short skill path");
 }
 
 function testHeroAssetExists() {

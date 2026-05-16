@@ -62,10 +62,10 @@ function testOldApplicationAssetsAreRemoved() {
 function testSkillRepositorySurfaceExists() {
   [
     "README.md",
-    "skills/one-person-company/SKILL.md",
-    "skills/one-person-company/references/business-judgment.md",
-    "skills/one-person-company/references/local-execution.md",
-    "skills/one-person-company/references/case-intelligence.md",
+    "skills/opc/SKILL.md",
+    "skills/opc/references/business-judgment.md",
+    "skills/opc/references/local-execution.md",
+    "skills/opc/references/case-intelligence.md",
     "knowledge/cases/normalized/normalized-cases.jsonl",
     "knowledge/cases/gold/gold-cases.jsonl",
     "knowledge/evals/answer-quality/rubric.json",
@@ -94,7 +94,6 @@ function testReadmePresentsSkillInsteadOfOldSite() {
     "![一人公司.skill](assets/hero.svg)",
     "大多数创业建议死在一句话里：先做 MVP",
     "不是帮你想点子，是判断这个点子能不能收钱",
-    "商业化可行性是第一准则",
     "产品判断",
     "相似案例",
     "定价获客",
@@ -102,8 +101,8 @@ function testReadmePresentsSkillInsteadOfOldSite() {
     "/product",
     "/cases",
     "/pricing",
+    "skills/opc",
     "证据资产",
-    "工作原理",
     "中文商业语境",
     "Codex",
   ].forEach((marker) => {
@@ -111,6 +110,7 @@ function testReadmePresentsSkillInsteadOfOldSite() {
   });
 
   [
+    "skills/one-person-company",
     legacyTitle,
     legacyDomain,
     legacyPm2,

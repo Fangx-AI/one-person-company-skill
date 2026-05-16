@@ -1,5 +1,5 @@
 ---
-name: one-person-company
+name: opc
 description: Use when evaluating product ideas, pricing, acquisition, similar cases, local execution constraints, or commercial viability for solo founders and one-person companies.
 ---
 

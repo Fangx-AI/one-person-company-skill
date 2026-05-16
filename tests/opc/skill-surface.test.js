@@ -6,7 +6,7 @@ const fs = require("fs");
 const path = require("path");
 
 const root = path.resolve(__dirname, "..", "..");
-const skillPath = path.join(root, "skills", "one-person-company", "SKILL.md");
+const skillPath = path.join(root, "skills", "opc", "SKILL.md");
 const skill = fs.readFileSync(skillPath, "utf8");
 
 function frontmatter() {
@@ -22,7 +22,7 @@ function frontmatter() {
 
 function testFrontmatterIsDiscoverable() {
   const fields = frontmatter();
-  assert.strictEqual(fields.name, "one-person-company");
+  assert.strictEqual(fields.name, "opc");
   assert(fields.description.startsWith("Use when"), "description should start with Use when");
   assert(fields.description.includes("product ideas"));
   assert(fields.description.includes("commercial viability"));
@@ -63,7 +63,7 @@ function testSkillDefaultsToChineseBusinessContext() {
   });
 
   const localExecution = fs.readFileSync(
-    path.join(root, "skills", "one-person-company", "references", "local-execution.md"),
+    path.join(root, "skills", "opc", "references", "local-execution.md"),
     "utf8"
   );
   [
@@ -98,7 +98,7 @@ function testReferencesExistAndAreLinked() {
     "case-intelligence.md",
   ].forEach((file) => {
     assert(skill.includes(`references/${file}`), `SKILL.md should link ${file}`);
-    const text = fs.readFileSync(path.join(root, "skills", "one-person-company", "references", file), "utf8");
+    const text = fs.readFileSync(path.join(root, "skills", "opc", "references", file), "utf8");
     assert(text.length > 500, `${file} should contain substantive guidance`);
   });
 }
@@ -118,7 +118,7 @@ function testSkillRequiresEvidenceDenseAnswers() {
   });
 
   const answerQuality = fs.readFileSync(
-    path.join(root, "skills", "one-person-company", "references", "answer-quality.md"),
+    path.join(root, "skills", "opc", "references", "answer-quality.md"),
     "utf8"
   );
   [
@@ -170,7 +170,7 @@ function testBusinessModelDeliveryReferenceIsHardNosed() {
   );
 
   const delivery = fs.readFileSync(
-    path.join(root, "skills", "one-person-company", "references", "business-model-delivery.md"),
+    path.join(root, "skills", "opc", "references", "business-model-delivery.md"),
     "utf8"
   );
   [
@@ -196,7 +196,7 @@ function testBusinessModelDeliveryReferenceIsHardNosed() {
 
 function testAgentMetadataExists() {
   const metadata = fs.readFileSync(
-    path.join(root, "skills", "one-person-company", "agents", "openai.yaml"),
+    path.join(root, "skills", "opc", "agents", "openai.yaml"),
     "utf8"
   );
   assert(metadata.includes("display_name: 一人公司Skill"));
