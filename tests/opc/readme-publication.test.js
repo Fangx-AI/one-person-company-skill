@@ -50,15 +50,16 @@ function testReadmeShowsEffectBeforeMechanism() {
   assertIncludes(
     [
       "/product` 我想做一个 AI 换装小程序",
-      "/product` 我想做 Markdown 转 HTML",
+      "/product` 我想做一个给本地门店用的 AI 获客工具",
       "/pricing` 我想做一个一人公司案例库",
       "普通 AI 往往会说",
       "一人公司.skill 会先判断",
-      "一人公司.skill 不会把“能转格式”当成生意",
+      "一人公司.skill 会先拆现金流",
       "一人公司.skill 会先反驳",
     ],
     "effect examples",
   );
+  assert(!readme.slice(readme.indexOf("## 先看效果"), readme.indexOf("## 怎么用")).includes("Markdown 转 HTML"));
 }
 
 function testReadmeSupportsLowFrictionCommands() {
@@ -66,6 +67,12 @@ function testReadmeSupportsLowFrictionCommands() {
     [
       "入口是自然语言命令，不是表单",
       "最多先追问 1 个最关键的问题",
+      "推荐安装方式",
+      "Codex GitHub 安装脚本",
+      "Fangx-AI/one-person-company-skill",
+      "skills/one-person-company",
+      "未写入",
+      "npx skills add",
       "/opc 我想做一个 AI 小红书选题工具",
       "/product 我想做一个 AI 换装小程序",
       "/cases 我想做一个一人公司案例检索库",

@@ -35,20 +35,19 @@
 10 个卖家里没有 3 个付款，就不要继续烧 API。
 ```
 
-### `/product` 我想做 Markdown 转 HTML
+### `/product` 我想做一个给本地门店用的 AI 获客工具
 
-一人公司.skill 不会把“能转格式”当成生意。它会先拆：
+一人公司.skill 会先拆现金流：
 
 ```text
-直接竞品：Marked 2、Markdown Monster、CloudConvert、ConvertAPI
-免费替代：Pandoc、markdown-it、remark、VS Code 插件
-相邻替代：文档站、CMS、邮件编辑器、帮助中心工具
+不要先卖“AI 获客工具”。门店老板不买工具，买到店、咨询、成交。
 
-用户不为“转 HTML”付费，而为稳定发布、批量处理、样式一致、API 自动化、
-隐私或本地处理、团队协作付费。
+先选一个窄行业：口腔、教培、摄影、美甲、家政、装修，本质完全不同。
+直接竞品不是 AI，而是美团/抖音团购、代运营、地推、私域运营、老客转介绍。
 
-可验证切口：把 10 篇 Markdown 文档变成品牌化帮助中心页面，收 199/499 元服务费。
-20 个目标用户里没有 3 个给真实文件并付款，就不要先做 SaaS。
+第一单不要收订阅费。卖“7 天获客试跑”：你交付 20 条可发布内容、3 个落地页标题、
+1 套私信话术、1 个成交记录表，收 499/999 元。
+如果 10 个门店老板里没有 2 个愿意先付试跑费，就不是产品问题，是支付点不成立。
 ```
 
 ### `/pricing` 我想做一个一人公司案例库
@@ -86,6 +85,27 @@
 ```
 
 把 `skills/one-person-company` 复制到你的 Agent / Codex / ChatGPT-like skills 目录即可使用。
+
+## 推荐安装方式
+
+这个仓库的 Skill 目录是：
+
+```text
+skills/one-person-company
+```
+
+| 场景 | 操作 | 验证状态 | 注意事项 |
+|---|---|---|---|
+| Codex GitHub 安装脚本 | 使用 Codex 内置 skill installer，从 `Fangx-AI/one-person-company-skill` 安装 `skills/one-person-company` | 仓库和路径已确认 | 需要本机 Python 可用；安装后重启 Codex |
+| 手动安装 | 下载仓库，把 `skills/one-person-company` 复制到你的 skills 目录 | 当前最稳 | 只复制这个目录，不需要复制整个仓库 |
+| Cursor / Trae / 其他 Agent | 把 `SKILL.md` 和 `references/` 作为项目规则或知识库导入 | 兼容思路可用 | 不同工具的 skills 目录规范不同，按各自工具配置 |
+| 未验证命令 | `npx skills add ...` | 未写入 | 这个仓库目前不把未验证命令写成安装路径 |
+
+安装后直接输入：
+
+```text
+/product 我想做一个 AI 换装小程序，用户输入人物图和商品图就能换衣服。
+```
 
 ## 四个入口
 
