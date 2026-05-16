@@ -1,0 +1,33 @@
+name: 纠错 / 补充证据
+description: 指出案例、竞品、定价、渠道、执行现实中的错误或过时信息
+title: "[Correction] "
+labels: ["correction"]
+body:
+  - type: textarea
+    id: content
+    attributes:
+      label: 需要纠正的内容
+      description: 贴出 README、examples、knowledge 或 Skill 回答里需要修正的片段。
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 证据链接
+      description: 提供公开链接、产品页、定价页、文档、截图说明或其他可核查来源。
+    validations:
+      required: true
+  - type: textarea
+    id: commercial-impact
+    attributes:
+      label: 为什么会影响商业判断
+      description: 例如会影响竞品判断、付费可能性、定价、获客渠道、合规风险或交付边界。
+    validations:
+      required: true
+  - type: textarea
+    id: suggested-change
+    attributes:
+      label: 建议改法
+      description: 你认为应该怎么改，或至少应该补充什么边界。
+    validations:
+      required: false

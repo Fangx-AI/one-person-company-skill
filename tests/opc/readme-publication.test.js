@@ -30,11 +30,13 @@ function testReadmeHasHeroFirstProjectPage() {
       "这个 Skill 从不这样回答",
       "谁现在付钱？为什么现在付？竞品怎么收？替代方案是什么？",
       "先看效果",
+      "你可能正在问",
       "怎么用",
       "四个入口",
       "它判断什么",
       "为什么不是提示词合集",
       "证据资产",
+      "让它变强",
       "工作原理",
       "背后的判断",
       "路线图",
@@ -63,8 +65,14 @@ function testReadmeShowsEffectBeforeMechanism() {
 }
 
 function testReadmeSupportsLowFrictionCommands() {
+  assert(readme.indexOf("## 你可能正在问") < readme.indexOf("## 怎么用"));
   assertIncludes(
     [
+      "AI 电商素材",
+      "本地门店获客",
+      "知识产品定价",
+      "开发者工具",
+      "案例情报库",
       "入口是自然语言命令，不是表单",
       "最多先追问 1 个最关键的问题",
       "推荐安装方式",
@@ -113,6 +121,9 @@ function testReadmeUsesTrustSignals() {
       "npm test",
       "npm run opc:validate:examples",
       "node scripts/opc/match-product-idea.js",
+      "提交产品想法",
+      "提交案例",
+      "纠错",
     ],
     "trust signal",
   );

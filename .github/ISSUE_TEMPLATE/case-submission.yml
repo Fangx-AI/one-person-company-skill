@@ -1,0 +1,58 @@
+name: 提交案例
+description: 提交一个可用于补充案例情报库的产品、服务或一人公司案例
+title: "[Case] "
+labels: ["case-submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        好案例不是“看起来厉害”，而是能解释谁付钱、为什么付钱、怎么获客、哪里不能照抄。
+  - type: input
+    id: case-name
+    attributes:
+      label: 案例名称
+      placeholder: 产品名 / 创作者名 / 服务名
+    validations:
+      required: true
+  - type: input
+    id: link
+    attributes:
+      label: 链接
+      placeholder: 官网、GitHub、文章、播客、小红书、知乎、即刻等公开链接
+    validations:
+      required: true
+  - type: textarea
+    id: target-user
+    attributes:
+      label: 目标用户
+      description: 它服务谁，谁可能付钱。
+    validations:
+      required: true
+  - type: textarea
+    id: pricing
+    attributes:
+      label: 收费方式
+      description: 免费、一次性付费、订阅、服务费、佣金、线索费、咨询费等。
+    validations:
+      required: false
+  - type: textarea
+    id: acquisition
+    attributes:
+      label: 获客路径
+      description: 它可能从哪里获得第一批用户。
+    validations:
+      required: false
+  - type: textarea
+    id: replicable
+    attributes:
+      label: 可复制部分
+      description: 一人公司创业者可以学习什么。
+    validations:
+      required: true
+  - type: textarea
+    id: non-replicable-risk
+    attributes:
+      label: 不可复制风险
+      description: 哪些地方不能照搬，例如资源、时机、渠道、人设、平台规则、合规或交付成本。
+    validations:
+      required: true

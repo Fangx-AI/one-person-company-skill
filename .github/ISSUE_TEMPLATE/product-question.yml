@@ -1,0 +1,45 @@
+name: 产品想法判断
+description: 提交一个产品想法，让它进入后续案例和回答质量优化
+title: "[Product] "
+labels: ["product-question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请尽量写真实场景。这里不是收集点子，而是收集可判断的商业问题。
+  - type: textarea
+    id: idea
+    attributes:
+      label: 产品想法
+      description: 一句话说明你想做什么。
+      placeholder: 例如：我想做一个给本地门店用的 AI 获客工具。
+    validations:
+      required: true
+  - type: textarea
+    id: target-user
+    attributes:
+      label: 目标用户
+      description: 谁会用，谁会付钱，最好具体到行业/岗位/场景。
+    validations:
+      required: true
+  - type: textarea
+    id: current-solution
+    attributes:
+      label: 现在怎么解决
+      description: 目标用户现在用什么替代方案、人工流程、工具或服务解决。
+    validations:
+      required: true
+  - type: textarea
+    id: paid-result
+    attributes:
+      label: 愿意为什么结果付费
+      description: 用户不是为功能付费，而是为什么具体结果付费。
+    validations:
+      required: true
+  - type: textarea
+    id: first-order
+    attributes:
+      label: 第一单
+      description: 你准备先卖什么、收多少钱、怎么交付。
+    validations:
+      required: false
