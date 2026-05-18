@@ -10,7 +10,7 @@ const skillPath = path.join(root, "skills", "opc", "SKILL.md");
 const skill = fs.readFileSync(skillPath, "utf8");
 
 function frontmatter() {
-  const match = skill.match(/^---\n([\s\S]*?)\n---/);
+  const match = skill.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   assert(match, "SKILL.md must have YAML-style frontmatter");
   const fields = {};
   for (const line of match[1].split(/\r?\n/)) {
