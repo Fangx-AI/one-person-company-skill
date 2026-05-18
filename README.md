@@ -85,6 +85,8 @@ skills/opc
 | Cursor / Trae / 其他 Agent | 把 `SKILL.md` 和 `references/` 作为项目规则或知识库导入 | 兼容思路可用 |
 | 未验证命令 | `npx skills add ...` | 未写入 |
 
+详细安装验证见 [docs/INSTALL.md](docs/INSTALL.md)。
+
 ## 四个入口
 
 | 入口 | 适合问什么 | 输出重点 |
@@ -107,6 +109,7 @@ skills/opc
 - 13 个回答质量评估场景
 - 13 条金标回答样本
 - 10 个可直接阅读的金标问答示例：[examples/](examples/)
+- 回答质量 Benchmark：[knowledge/evals/manual-benchmark.md](knowledge/evals/manual-benchmark.md)
 
 默认判断会考虑中文商业语境和本土执行现实：备案、微信生态、竞品、替代方案、收费机制、交付边界、证据边界、停损线。
 

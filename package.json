@@ -9,10 +9,11 @@
     "node": ">=20"
   },
   "scripts": {
-    "test": "npm run opc:repo:test && npm run opc:readme:test && npm run opc:github-surface:test && npm run opc:skill:test && npm run opc:validate:cases:seed && npm run opc:validate:github-sources && npm run opc:eval:answers && npm run opc:examples:test && npm run opc:idea:test && npm run opc:market:test && npm run opc:case-importer:test && npm run opc:case-collector:test",
+    "test": "npm run opc:repo:test && npm run opc:readme:test && npm run opc:github-surface:test && npm run opc:install-benchmark:test && npm run opc:skill:test && npm run opc:validate:cases:seed && npm run opc:validate:github-sources && npm run opc:eval:answers && npm run opc:examples:test && npm run opc:idea:test && npm run opc:market:test && npm run opc:case-importer:test && npm run opc:case-collector:test",
     "opc:repo:test": "node tests/opc/repository-boundary.test.js",
     "opc:readme:test": "node tests/opc/readme-publication.test.js",
     "opc:github-surface:test": "node tests/opc/github-surface.test.js",
+    "opc:install-benchmark:test": "node tests/opc/install-and-benchmark.test.js",
     "opc:skill:test": "node tests/opc/skill-surface.test.js",
     "opc:validate:cases": "node scripts/opc/validate-case-intelligence.js",
     "opc:validate:cases:seed": "node scripts/opc/validate-case-intelligence.js --min-sources=30 --min-raw=100 --min-normalized=100 --min-gold=30",
